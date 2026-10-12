@@ -39,9 +39,9 @@ export async function GET(
       return NextResponse.json({ error: 'ایجنسی نہیں ملی' }, { status: 404 });
     }
 
-    const host = req.headers.get('host') || 'localhost:3000';
+    const host = req.headers.get('host') || 'localhost:3003';
     const proto = req.headers.get('x-forwarded-proto') || 'http';
-    const appUrl = `${proto}://${host}`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${proto}://${host}`;
     const verifyUrl = `${appUrl}/verify/${receiptNo}`;
 
     const totalPayable = customer?.total_payable || 0;

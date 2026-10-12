@@ -97,7 +97,7 @@ export default function LedgerPage() {
   };
 
   const handleSendWhatsAppReceipt = (cust: any, tx: any) => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+    const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3003');
     const verifyUrl = `${origin}/verify/${tx.receipt_no}`;
     const agencyName = agency?.name || 'Travel Agency';
     const phone = cust.phone ? cust.phone.replace(/[^0-9]/g, '') : '';

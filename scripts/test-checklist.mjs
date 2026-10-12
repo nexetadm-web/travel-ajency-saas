@@ -112,7 +112,7 @@ async function runChecklist() {
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   page.drawText(agency.name, { x: 50, y: 800, size: 20, font: fontBold });
   page.drawText('License: ' + (agency.license_no || 'DTS Reg'), { x: 50, y: 775, size: 10 });
-  const qrDataUrl = await QRCode.toDataURL('http://localhost:3000/verify/' + receiptNo);
+  const qrDataUrl = await QRCode.toDataURL('http://localhost:3003/verify/' + receiptNo);
   const qrBytes = Buffer.from(qrDataUrl.split(',')[1], 'base64');
   const qrImg = await pdfDoc.embedPng(qrBytes);
   page.drawImage(qrImg, { x: 50, y: 650, width: 80, height: 80 });
