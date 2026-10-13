@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { pilgrims, groups, customers_ledger } from '@/lib/db/schema';
+import { pilgrims, groups, customers_ledger, subAgents } from '@/lib/db/schema';
 import { getSession } from '@/lib/auth';
 import { eq, and, desc, like, or } from 'drizzle-orm';
 
@@ -77,6 +77,7 @@ export async function POST(req: Request) {
       group_id,
       payment_total,
       payment_paid,
+      sub_agent_id,
     } = body;
 
     if (!full_name || !passport_no) {
@@ -123,6 +124,7 @@ export async function POST(req: Request) {
         hotel_status: 'pending',
         payment_total: totalVal,
         payment_paid: paidVal,
+        sub_agent_id: sub_agent_id || null,
       })
       .returning();
 
@@ -136,6 +138,37 @@ export async function POST(req: Request) {
       total_paid: paidVal,
       type: 'individual',
     });
+
+    // If sub-agent is attached, update commission and count
+    if (sub_agent_id) {
+      const [agent] = await db
+        .select()
+        .from(subAgents)
+        .where(and(eq(subAgents.id, sub_agent_id), eq(subAgents.agencyId, session.agency_id)))
+        .limit(1);
+
+      if (agent) {
+        let earnedCommission = 0;
+        if (agent.commissionType === 'percent') {
+          earnedCommission = (totalVal * (agent.commissionValue || 0)) / 100;
+        } else {
+          earnedCommission = agent.commissionValue || 0;
+        }
+
+        const newTotalPilgrims = (agent.totalPilgrims || 0) + 1;
+        const newTotalEarned = (agent.totalEarned || 0) + earnedCommission;
+        const newRemaining = newTotalEarned - (agent.totalPaid || 0);
+
+        await db
+          .update(subAgents)
+          .set({
+            totalPilgrims: newTotalPilgrims,
+            totalEarned: newTotalEarned,
+            remaining: newRemaining,
+          })
+          .where(eq(subAgents.id, sub_agent_id));
+      }
+    }
 
     return NextResponse.json({ success: true, pilgrim: newPilgrim });
   } catch (error: any) {

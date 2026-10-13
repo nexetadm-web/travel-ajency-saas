@@ -26,6 +26,9 @@ import {
   Camera,
   Loader2,
   CheckCircle2,
+  Package,
+  Boxes,
+  AlertCircle,
 } from 'lucide-react';
 import { formatDate, formatCurrency } from '@/lib/utils';
 
@@ -39,11 +42,26 @@ export default function GroupDetailsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data, mutate, isLoading } = useSWR(`/api/groups/${groupId}`, fetcher);
-  const [activeTab, setActiveTab] = useState<'pilgrims' | 'documents' | 'accounts'>('pilgrims');
+  const [activeTab, setActiveTab] = useState<'pilgrims' | 'documents' | 'accounts' | 'kits'>('pilgrims');
   const [search, setSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Inventory & Kit distribution state
+  const { data: invData, mutate: mutateInventory } = useSWR('/api/inventory', fetcher);
+  const { data: groupIssuesData, mutate: mutateGroupIssues } = useSWR(
+    groupId ? `/api/inventory/issue?groupId=${groupId}` : null,
+    fetcher
+  );
+  const inventoryItemsList = invData?.items || [];
+  const groupIssuesList = groupIssuesData?.issues || [];
+
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+  const [selectedPilgrimIds, setSelectedPilgrimIds] = useState<string[]>([]);
+  const [issuingKits, setIssuingKits] = useState(false);
+  const [kitSuccessMsg, setKitSuccessMsg] = useState('');
+  const [kitErrorMsg, setKitErrorMsg] = useState('');
 
   // New Pilgrim Form
   const [formData, setFormData] = useState({
@@ -197,6 +215,42 @@ export default function GroupDetailsPage() {
     }
   };
 
+  const handleBatchIssueKits = async () => {
+    if (selectedPilgrimIds.length === 0) {
+      setKitErrorMsg('براہ کرم کم از کم ایک حاجی منتخب کریں');
+      return;
+    }
+    if (selectedItemIds.length === 0) {
+      setKitErrorMsg('براہ کرم کم از کم ایک سامان / آئٹم منتخب کریں');
+      return;
+    }
+    setIssuingKits(true);
+    setKitErrorMsg('');
+    setKitSuccessMsg('');
+    try {
+      const res = await fetch('/api/inventory/issue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          groupId,
+          pilgrimIds: selectedPilgrimIds,
+          itemIds: selectedItemIds,
+        }),
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || 'کٹ جاری کرنے میں خرابی');
+      setKitSuccessMsg(`${selectedPilgrimIds.length} حجاج کو ${selectedItemIds.length} اقسام کا سامان کامیابی سے جاری کر دیا گیا!`);
+      setSelectedPilgrimIds([]);
+      setSelectedItemIds([]);
+      mutateInventory();
+      mutateGroupIssues();
+    } catch (err: any) {
+      setKitErrorMsg(err.message);
+    } finally {
+      setIssuingKits(false);
+    }
+  };
+
   const handleExportEmbassyPdf = async () => {
     try {
       const res = await fetch(`/api/groups/${groupId}/pdf`);
@@ -313,6 +367,18 @@ export default function GroupDetailsPage() {
         >
           <DollarSign className="w-4 h-4" />
           اکاؤنٹس سمری (Accounts)
+        </button>
+
+        <button
+          onClick={() => setActiveTab('kits')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+            activeTab === 'kits'
+              ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          }`}
+        >
+          <Package className="w-4 h-4" />
+          🧳 کٹ تقسیم ({groupIssuesList.length})
         </button>
       </div>
 
@@ -441,6 +507,218 @@ export default function GroupDetailsPage() {
             >
               مکمل منافع کیلکولیٹر کھولیں →
             </Link>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: KIT DISTRIBUTION (BATCH ISSUE) */}
+      {activeTab === 'kits' && (
+        <div className="space-y-6">
+          {/* Messages */}
+          {kitSuccessMsg && (
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+              <span>{kitSuccessMsg}</span>
+            </div>
+          )}
+          {kitErrorMsg && (
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+              <span>{kitErrorMsg}</span>
+            </div>
+          )}
+
+          {/* BATCH ISSUE CONTROL CARD */}
+          <div className="bg-white rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+              <div>
+                <h3 className="text-lg font-black text-gray-900">
+                  🧳 اس گروپ کے حجاج کو عمرہ و حج کٹ تقسیم کریں
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  ایک ساتھ متعدد حجاج اور سامان منتخب کر کے فوری سٹاک جاری کریں
+                </p>
+              </div>
+
+              <button
+                onClick={handleBatchIssueKits}
+                disabled={issuingKits || selectedItemIds.length === 0 || selectedPilgrimIds.length === 0}
+                className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center gap-2 disabled:opacity-50"
+              >
+                {issuingKits ? <Loader2 className="w-4 h-4 animate-spin" /> : <Package className="w-4 h-4" />}
+                <span>
+                  منتخب {selectedPilgrimIds.length} حجاج کو {selectedItemIds.length} آئٹمز جاری کریں
+                </span>
+              </button>
+            </div>
+
+            {/* STEP 1: SELECT ITEMS */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-black flex items-center justify-center">1</span>
+                  سامان / کٹ آئٹمز منتخب کریں (Select Items)
+                </span>
+                <span className="text-[11px] text-gray-400">
+                  {selectedItemIds.length} آئٹمز منتخب ہیں
+                </span>
+              </div>
+
+              {inventoryItemsList.length === 0 ? (
+                <div className="p-4 rounded-xl bg-gray-50 text-center text-xs text-gray-500">
+                  کوئی سامان رجسٹر نہیں ہے۔ پہلے انوینٹری پیج پر سامان شامل کریں۔
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {inventoryItemsList.map((it: any) => {
+                    const isSelected = selectedItemIds.includes(it.id);
+                    return (
+                      <label
+                        key={it.id}
+                        className={`p-3 rounded-2xl border cursor-pointer transition flex items-start gap-3 select-none ${
+                          isSelected
+                            ? 'bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-200'
+                            : 'bg-gray-50/60 border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedItemIds([...selectedItemIds, it.id]);
+                            } else {
+                              setSelectedItemIds(selectedItemIds.filter((id) => id !== it.id));
+                            }
+                          }}
+                          className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span className="font-bold text-xs text-gray-900 block truncate">
+                            {it.itemName}
+                          </span>
+                          <span className="text-[10px] text-gray-500 block mt-0.5">
+                            سٹاک: <strong className={it.stockQty <= 5 ? 'text-rose-600' : 'text-emerald-700'}>{it.stockQty}</strong> پیس
+                          </span>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* STEP 2: SELECT PILGRIMS */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black flex items-center justify-center">2</span>
+                  حجاج منتخب کریں (Select Pilgrims)
+                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedPilgrimIds.length === pilgrims.length) {
+                        setSelectedPilgrimIds([]);
+                      } else {
+                        setSelectedPilgrimIds(pilgrims.map((p: any) => p.id));
+                      }
+                    }}
+                    className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 underline"
+                  >
+                    {selectedPilgrimIds.length === pilgrims.length ? 'سب کو غیر منتخب کریں' : 'تمام حجاج منتخب کریں'}
+                  </button>
+                  <span className="text-[11px] text-gray-400">
+                    {selectedPilgrimIds.length} / {pilgrims.length} منتخب
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-60 overflow-y-auto p-1 border border-gray-100 rounded-2xl bg-gray-50/40">
+                {pilgrims.map((p: any) => {
+                  const isSelected = selectedPilgrimIds.includes(p.id);
+                  return (
+                    <label
+                      key={p.id}
+                      className={`p-2.5 rounded-xl border cursor-pointer transition flex items-center gap-2.5 select-none ${
+                        isSelected
+                          ? 'bg-emerald-50 border-emerald-300'
+                          : 'bg-white border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedPilgrimIds([...selectedPilgrimIds, p.id]);
+                          } else {
+                            setSelectedPilgrimIds(selectedPilgrimIds.filter((id) => id !== p.id));
+                          }
+                        }}
+                        className="rounded text-emerald-600 focus:ring-emerald-500"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <span className="font-bold text-xs text-gray-900 block truncate">{p.full_name}</span>
+                        <span className="text-[10px] text-gray-400 font-mono block">{p.passport_no}</span>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* RECENT ISSUES IN THIS GROUP */}
+          <div className="bg-white rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+              <h4 className="font-bold text-gray-900 text-sm">
+                اس گروپ میں جاری شدہ سامان کی فہرست
+              </h4>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">
+                کل: {groupIssuesList.length}
+              </span>
+            </div>
+
+            {groupIssuesList.length === 0 ? (
+              <div className="p-10 text-center text-gray-400 text-xs">
+                اس گروپ میں ابھی تک کوئی سامان تقسیم نہیں کیا گیا۔
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-gray-700">
+                  <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
+                    <tr>
+                      <th className="p-3.5">حاجی کا نام</th>
+                      <th className="p-3.5">پاسپورٹ نمبر</th>
+                      <th className="p-3.5">سامان</th>
+                      <th className="p-3.5">تاریخ اجرا</th>
+                      <th className="p-3.5 text-center">سٹیٹس</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {groupIssuesList.map((iss: any) => (
+                      <tr key={iss.id} className="hover:bg-gray-50/60 transition">
+                        <td className="p-3.5 font-bold text-gray-900">{iss.pilgrimName || '-'}</td>
+                        <td className="p-3.5 font-mono text-emerald-700 font-bold">{iss.passportNo || '-'}</td>
+                        <td className="p-3.5 font-semibold text-gray-800">
+                          <span className="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-200">
+                            {iss.itemName || 'عمرہ کٹ'}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-gray-500 font-mono text-[11px]">{iss.issuedDate || '-'}</td>
+                        <td className="p-3.5 text-center">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            جاری شدہ ✅
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}

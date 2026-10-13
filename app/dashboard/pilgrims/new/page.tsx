@@ -26,6 +26,9 @@ export default function NewPilgrimPage() {
   const { data: groupsData } = useSWR('/api/groups', fetcher);
   const groups = groupsData?.groups || [];
 
+  const { data: subAgentsData } = useSWR('/api/sub-agents', fetcher);
+  const subAgents = subAgentsData?.subAgents || [];
+
   const [scanning, setScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -33,6 +36,7 @@ export default function NewPilgrimPage() {
 
   const [form, setForm] = useState({
     group_id: '',
+    sub_agent_id: '',
     full_name: '',
     father_name: '',
     passport_no: '',
@@ -212,6 +216,26 @@ export default function NewPilgrimPage() {
               {groups.map((g: any) => (
                 <option key={g.id} value={g.id}>
                   {g.group_name} ({g.available_seats} سیٹیں باقی)
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Sub Agent / Referral */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1.5">
+              سب ایجنٹ / ریفرل پارٹنر (اختیاری)
+            </label>
+            <select
+              value={form.sub_agent_id}
+              onChange={(e) => setForm({ ...form, sub_agent_id: e.target.value })}
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="">-- کوئی سب ایجنٹ نہیں (براہ راست واک اِن) --</option>
+              {subAgents.map((a: any) => (
+                <option key={a.id} value={a.id}>
+                  {a.name} ({a.city || a.phone} - کمیشن:{' '}
+                  {a.commissionType === 'percent' ? `${a.commissionValue}%` : `Rs. ${a.commissionValue}`})
                 </option>
               ))}
             </select>

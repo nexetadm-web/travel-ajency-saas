@@ -53,6 +53,7 @@ export const pilgrims = sqliteTable('pilgrims', {
   hotel_status: text('hotel_status').default('pending'),
   payment_total: real('payment_total').default(0),
   payment_paid: real('payment_paid').default(0),
+  sub_agent_id: text('sub_agent_id'),
   created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 }, (table) => ({
   agencyIdx: index('pilgrims_agency_idx').on(table.agency_id),
@@ -374,3 +375,90 @@ export const tour_bookings = sqliteTable('tour_bookings', {
   agencyIdx: index('tour_bookings_agency_idx').on(table.agency_id),
   packageIdx: index('tour_bookings_package_idx').on(table.package_id),
 }));
+
+// 23. INSTALLMENT PLANS (QIST SYSTEM)
+export const installmentPlans = sqliteTable('installment_plans', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agencyId: text('agency_id').notNull(),
+  pilgrimId: text('pilgrim_id').notNull().references(() => pilgrims.id),
+  groupId: text('group_id'),
+  totalAmount: real('total_amount').notNull(),
+  advancePaid: real('advance_paid').default(0),
+  installmentsCount: integer('installments_count').notNull(),
+  perInstallment: real('per_installment').notNull(),
+  status: text('status').default('active'), // active, completed, overdue
+  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  agencyIdx: index('installment_plans_agency_idx').on(table.agencyId),
+  pilgrimIdx: index('installment_plans_pilgrim_idx').on(table.pilgrimId),
+}));
+export const installment_plans = installmentPlans;
+
+// 24. INSTALLMENT PAYMENTS
+export const installmentPayments = sqliteTable('installment_payments', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  planId: text('plan_id').notNull().references(() => installmentPlans.id),
+  agencyId: text('agency_id').notNull(),
+  dueDate: text('due_date').notNull(), // DD-MM-YYYY
+  paidDate: text('paid_date'),
+  amount: real('amount').notNull(),
+  status: text('status').default('pending'), // pending, paid, overdue
+  method: text('method'), // cash, easypaisa, jazzcash, bank
+  receiptNo: text('receipt_no'),
+  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  planIdx: index('installment_payments_plan_idx').on(table.planId),
+  agencyIdx: index('installment_payments_agency_idx').on(table.agencyId),
+}));
+export const installment_payments = installmentPayments;
+
+// 25. SUB AGENT / REFERRAL
+export const subAgents = sqliteTable('sub_agents', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agencyId: text('agency_id').notNull(),
+  name: text('name').notNull(),
+  phone: text('phone').notNull(),
+  cnic: text('cnic'),
+  city: text('city'),
+  commissionType: text('commission_type').default('per_person'), // per_person, percent
+  commissionValue: real('commission_value').default(5000), // 5000 Rs or 5%
+  totalPilgrims: integer('total_pilgrims').default(0),
+  totalEarned: real('total_earned').default(0),
+  totalPaid: real('total_paid').default(0),
+  remaining: real('remaining'),
+  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  agencyIdx: index('sub_agents_agency_idx').on(table.agencyId),
+}));
+export const sub_agents = subAgents;
+
+// 26. KIT INVENTORY ITEMS
+export const inventoryItems = sqliteTable('inventory_items', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agencyId: text('agency_id').notNull(),
+  itemName: text('item_name').notNull(), // Umrah Bag, Ihram, Dua Book, ID Card
+  purchasePrice: real('purchase_price'),
+  stockQty: integer('stock_qty').default(0),
+  issuedQty: integer('issued_qty').default(0),
+  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  agencyIdx: index('inventory_items_agency_idx').on(table.agencyId),
+}));
+export const inventory_items = inventoryItems;
+
+// 27. INVENTORY ISSUES
+export const inventoryIssues = sqliteTable('inventory_issues', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agencyId: text('agency_id').notNull(),
+  groupId: text('group_id').references(() => groups.id),
+  pilgrimId: text('pilgrim_id').notNull().references(() => pilgrims.id),
+  itemId: text('item_id').notNull().references(() => inventoryItems.id),
+  issuedDate: text('issued_date').default(sql`CURRENT_TIMESTAMP`),
+  returned: integer('returned').default(0),
+}, (table) => ({
+  agencyIdx: index('inventory_issues_agency_idx').on(table.agencyId),
+  pilgrimIdx: index('inventory_issues_pilgrim_idx').on(table.pilgrimId),
+  itemIdx: index('inventory_issues_item_idx').on(table.itemId),
+}));
+export const inventory_issues = inventoryIssues;
+

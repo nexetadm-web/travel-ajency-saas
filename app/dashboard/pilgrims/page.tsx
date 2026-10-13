@@ -16,6 +16,10 @@ import {
   DollarSign,
   Camera,
   Download,
+  CreditCard,
+  Share2,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { formatDate, formatCurrency } from '@/lib/utils';
 
@@ -24,6 +28,16 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function PilgrimsDirectoryPage() {
   const [search, setSearch] = useState('');
   const [visaFilter, setVisaFilter] = useState('all');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyTrackLink = (passportNo: string) => {
+    if (typeof window !== 'undefined') {
+      const url = `${window.location.origin}/track/${passportNo}`;
+      navigator.clipboard.writeText(url);
+      setCopiedId(passportNo);
+      setTimeout(() => setCopiedId(null), 2000);
+    }
+  };
 
   const { data, mutate, isLoading } = useSWR(
     `/api/pilgrims?q=${encodeURIComponent(search)}&visaStatus=${visaFilter}`,
@@ -112,7 +126,7 @@ export default function PilgrimsDirectoryPage() {
                 <th className="p-4">ویزہ سٹیٹس</th>
                 <th className="p-4">ٹکٹ سٹیٹس</th>
                 <th className="p-4">ادائیگی</th>
-                <th className="p-4 text-center">دعا کارڈ PDF</th>
+                <th className="p-4 text-center">ایکشنز اور لنکس</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -147,15 +161,57 @@ export default function PilgrimsDirectoryPage() {
                     {formatCurrency(p.payment_paid)}
                   </td>
                   <td className="p-4 text-center">
-                    <a
-                      href={`/api/pdf/dua-card/${p.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-[11px] border border-emerald-200 transition"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      دعا کارڈ PDF
-                    </a>
+                    <div className="inline-flex flex-wrap items-center justify-center gap-1.5">
+                      <Link
+                        href={`/dashboard/pilgrims/${p.id}/installments`}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-[11px] border border-indigo-200 transition"
+                        title="قسط پلان"
+                      >
+                        <CreditCard className="w-3 h-3" />
+                        <span>اقساط</span>
+                      </Link>
+
+                      <button
+                        onClick={() => handleCopyTrackLink(p.passport_no)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 font-bold text-[11px] transition"
+                        title="ٹریکنگ لنک کاپی کریں"
+                      >
+                        {copiedId === p.passport_no ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            <span className="text-emerald-600">کاپی ہو گیا</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>ٹریکنگ</span>
+                          </>
+                        )}
+                      </button>
+
+                      {p.phone && (
+                        <a
+                          href={`https://wa.me/${p.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`السلام علیکم جناب ${p.full_name}! آپ کے عمرہ/حج کیس کا لائیو سٹیٹس اور ویزہ معلومات درج ذیل لنک پر دستیاب ہیں:\n${typeof window !== 'undefined' ? window.location.origin : ''}/track/${p.passport_no}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-[11px] border border-emerald-200 transition"
+                          title="حاجی کو WhatsApp لنک بھیجیں"
+                        >
+                          <Share2 className="w-3 h-3" />
+                          <span>WhatsApp</span>
+                        </a>
+                      )}
+
+                      <a
+                        href={`/api/pdf/dua-card/${p.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 font-bold text-[11px] border border-gray-200 transition"
+                        title="دعا کارڈ ڈاؤن لوڈ"
+                      >
+                        <Download className="w-3 h-3" />
+                      </a>
+                    </div>
                   </td>
                 </tr>
               ))}
