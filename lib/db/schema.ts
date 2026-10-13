@@ -251,3 +251,126 @@ export const notifications = sqliteTable('notifications', {
 }, (table) => ({
   agencyIdx: index('notifications_agency_idx').on(table.agency_id),
 }));
+
+// 16. PASSPORT SCANS TABLE (AI AUTO-FILL LOGS)
+export const passport_scans = sqliteTable('passport_scans', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agency_id: text('agency_id').notNull(),
+  full_name: text('full_name'),
+  father_name: text('father_name'),
+  passport_no: text('passport_no'),
+  cnic: text('cnic'),
+  dob: text('dob'),
+  expiry: text('expiry'),
+  place_of_birth: text('place_of_birth'),
+  photo_url: text('photo_url'),
+  raw_response: text('raw_response'),
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  agencyIdx: index('passport_scans_agency_idx').on(table.agency_id),
+}));
+
+// 17. CASH BOOK TABLE (DAILY CASH IN/OUT & HAND CASH)
+export const cash_book = sqliteTable('cash_book', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agency_id: text('agency_id').notNull(),
+  date: text('date').notNull(),
+  opening_balance: real('opening_balance').default(0),
+  type: text('type').notNull(), // 'in' | 'out'
+  category: text('category'),
+  amount: real('amount').notNull().default(0),
+  method: text('method').default('cash'), // 'cash' | 'bank' | 'easypaisa' | 'jazzcash'
+  description: text('description'),
+  created_by: text('created_by'),
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  agencyIdx: index('cash_book_agency_idx').on(table.agency_id),
+  dateIdx: index('cash_book_date_idx').on(table.date),
+}));
+
+// 18. VISA CASES TABLE (STUDY / VISIT / WORK / TOURIST VISA CONSULTANCY)
+export const visa_cases = sqliteTable('visa_cases', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agency_id: text('agency_id').notNull(),
+  client_name: text('client_name').notNull(),
+  father_name: text('father_name'),
+  passport_no: text('passport_no'),
+  phone: text('phone'),
+  visa_type: text('visa_type').notNull().default('study'), // 'study' | 'visit' | 'work' | 'tourist' | 'business' | 'family'
+  country: text('country').notNull(), // 'UK' | 'Canada' | 'Dubai' | 'Schengen' | etc.
+  status: text('status').notNull().default('inquiry'), // 'inquiry' | 'documents_pending' | 'applied' | 'in_embassy' | 'approved' | 'rejected' | 'passport_returned'
+  total_fee: real('total_fee').default(0),
+  paid: real('paid').default(0),
+  remaining: real('remaining').generatedAlwaysAs((): SQL => sql`total_fee - paid`),
+  university_name: text('university_name'),
+  employer_name: text('employer_name'),
+  travel_date: text('travel_date'),
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  agencyIdx: index('visa_cases_agency_idx').on(table.agency_id),
+  passportIdx: index('visa_cases_passport_idx').on(table.passport_no),
+  statusIdx: index('visa_cases_status_idx').on(table.status),
+}));
+
+// 19. VISA CASE DOCUMENTS TABLE
+export const visa_case_documents = sqliteTable('visa_case_documents', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  case_id: text('case_id').notNull(),
+  doc_name: text('doc_name').notNull(), // e.g. 'Bank Statement', 'IELTS', 'Offer Letter'
+  file_url: text('file_url'),
+  status: text('status').default('pending'), // 'pending' | 'received' | 'verified'
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  caseIdx: index('visa_case_docs_case_idx').on(table.case_id),
+}));
+
+// 20. VISA CASE TIMELINE TABLE
+export const visa_case_timeline = sqliteTable('visa_case_timeline', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  case_id: text('case_id').notNull(),
+  status_from: text('status_from'),
+  status_to: text('status_to'),
+  note: text('note'),
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  caseIdx: index('visa_case_timeline_case_idx').on(table.case_id),
+}));
+
+// 21. TOUR PACKAGES TABLE (DOMESTIC & INTERNATIONAL)
+export const tour_packages = sqliteTable('tour_packages', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agency_id: text('agency_id').notNull(),
+  package_name: text('package_name').notNull(), // e.g. 'Hunza 5 Days', 'Dubai 4 Nights'
+  type: text('type').notNull().default('domestic'), // 'domestic' | 'international'
+  destination: text('destination').notNull(),
+  duration_days: integer('duration_days').default(1),
+  price_per_person: real('price_per_person').default(0),
+  includes: text('includes'), // e.g. 'Hotel,Jeep,Breakfast'
+  max_seats: integer('max_seats').default(20),
+  departure_dates: text('departure_dates'), // JSON array string
+  status: text('status').default('active'), // 'active' | 'full'
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  agencyIdx: index('tour_packages_agency_idx').on(table.agency_id),
+}));
+
+// 22. TOUR BOOKINGS TABLE
+export const tour_bookings = sqliteTable('tour_bookings', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agency_id: text('agency_id').notNull(),
+  package_id: text('package_id').notNull(),
+  client_name: text('client_name').notNull(),
+  phone: text('phone'),
+  cnic: text('cnic'),
+  persons: integer('persons').default(1),
+  total_amount: real('total_amount').default(0),
+  advance: real('advance').default(0),
+  remaining: real('remaining').generatedAlwaysAs((): SQL => sql`total_amount - advance`),
+  booking_date: text('booking_date'),
+  travel_date: text('travel_date'),
+  status: text('status').default('confirmed'),
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  agencyIdx: index('tour_bookings_agency_idx').on(table.agency_id),
+  packageIdx: index('tour_bookings_package_idx').on(table.package_id),
+}));

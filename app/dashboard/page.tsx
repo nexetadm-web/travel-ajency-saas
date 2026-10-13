@@ -20,7 +20,10 @@ import {
   ArrowDownRight,
   Sparkles,
   Calendar,
-  ChevronRight,
+  Globe2,
+  Compass,
+  Wallet,
+  CheckCircle2,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
@@ -29,7 +32,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function DashboardOverviewPage() {
   const { agency } = useAgency();
 
-  // Fetch data in parallel with SWR (<200ms response)
+  // Parallel SWR data fetching
   const { data: groupsData } = useSWR('/api/groups', fetcher, { revalidateOnFocus: false });
   const { data: pilgrimsData } = useSWR('/api/pilgrims', fetcher, { revalidateOnFocus: false });
   const { data: ticketsData } = useSWR('/api/tickets', fetcher, { revalidateOnFocus: false });
@@ -38,6 +41,7 @@ export default function DashboardOverviewPage() {
   const { data: ledgerSuppData } = useSWR('/api/ledger/suppliers', fetcher, { revalidateOnFocus: false });
   const { data: expensesData } = useSWR('/api/expenses', fetcher, { revalidateOnFocus: false });
   const { data: notifData } = useSWR('/api/notifications', fetcher, { revalidateOnFocus: false });
+  const { data: cashbookData } = useSWR('/api/cashbook', fetcher, { revalidateOnFocus: false });
 
   const totalGroups = groupsData?.groups?.length || 0;
   const totalPilgrims = pilgrimsData?.pilgrims?.length || 0;
@@ -45,300 +49,345 @@ export default function DashboardOverviewPage() {
   const todayTickets = ticketsData?.stats?.todayCount || 0;
   const ticketsMonthProfit = ticketsData?.stats?.monthProfit || 0;
 
-  const visaPending = visasData?.visas?.filter((v: any) => v.status === 'document_pending' || v.status === 'in_embassy')?.length || 0;
+  const visaPending =
+    visasData?.visas?.filter(
+      (v: any) => v.status === 'document_pending' || v.status === 'in_embassy'
+    )?.length || 0;
   const receivable = ledgerCustData?.totalReceivable || 0;
   const payable = ledgerSuppData?.totalPayable || 0;
   const totalExpenses = expensesData?.totalExpense || 0;
 
-  // Approximate overall net cash flow
-  const netProfit = (receivable > 0 ? receivable : 0) + ticketsMonthProfit - payable - totalExpenses;
-  const todayProfit = ticketsData?.stats?.todayCount ? ticketsData.stats.todayCount * 5000 : 0;
+  // Real net profit calculation
+  const netProfit =
+    (receivable > 0 ? receivable : 0) + ticketsMonthProfit - payable - totalExpenses;
+  const todayProfit =
+    ticketsData?.stats?.todayCount ? ticketsData.stats.todayCount * 5000 : 0;
 
   const notifications = notifData?.notifications || [];
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Top Welcome & Agency Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-slate-800 p-6 rounded-3xl shadow-xl">
-        <div className="flex items-center gap-4">
+      {/* TOP AGENCY HEADER CARD (Shell/PSO Light Theme) */}
+      <div className="bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="flex items-center gap-5">
           {agency?.logo_url ? (
             <img
               src={agency.logo_url}
               alt={agency?.name}
-              className="w-14 h-14 rounded-2xl object-cover border border-emerald-500/40 shadow-lg"
+              className="w-14 h-14 rounded-2xl object-cover border border-emerald-200 shadow-md shadow-emerald-500/10"
             />
           ) : (
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-2xl font-black flex items-center justify-center shadow-lg shadow-emerald-500/20 uppercase">
               {agency?.name ? agency.name.charAt(0) : 'T'}
             </div>
           )}
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-white">{agency?.name || 'Travel Agency SaaS'}</h1>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
-                100% آن لائن
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                {agency?.name || 'Travel Agency SaaS'}
+              </h1>
+              <span className="px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                لائیو پورٹل
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
-              خوش آمدید، <strong>{agency?.owner_name || 'ایڈمن'}</strong> | حکومتی لائسنس: {agency?.license_no || 'DTS Reg'} | رابطہ: {agency?.phone || '0300-0000000'}
+            <p className="text-sm text-gray-500 mt-1">
+              حکومتی لائسنس: <strong className="text-gray-700">{agency?.license_no || 'DTS Reg.'}</strong> | رابطہ: <strong className="text-gray-700">{agency?.phone || '0300-0000000'}</strong> | مالک: <strong className="text-gray-700">{agency?.owner_name || 'ایڈمن'}</strong>
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Right CTA Buttons */}
+        <div className="flex items-center gap-3 flex-wrap">
           <Link
             href="/dashboard/groups"
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition flex items-center gap-1.5"
+            className="bg-emerald-500 text-white rounded-full px-6 py-3 shadow-lg shadow-emerald-200 hover:bg-emerald-600 text-xs font-bold transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             + نیا گروپ بنائیں
           </Link>
           <Link
             href="/dashboard/tickets"
-            className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition flex items-center gap-1.5"
+            className="bg-white border border-gray-200 rounded-full px-6 py-3 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition flex items-center gap-2"
           >
-            <Plane className="w-4 h-4 text-sky-400" />
+            <Plane className="w-4 h-4 text-sky-500" />
             + نئی ٹکٹ
           </Link>
         </div>
       </div>
 
-      {/* AI ALERTS BANNER (If any notifications present) */}
+      {/* AI ALERTS BANNER (If notifications present) */}
       {notifications.length > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3 text-amber-200 text-xs">
-          <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-900 text-xs shadow-sm">
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <span className="font-bold block text-amber-300">خودکار AI الرٹس (System Alerts):</span>
-            <p className="mt-0.5 text-slate-300">{notifications[0].message}</p>
+            <span className="font-bold block text-amber-800">خودکار AI الرٹس (System Alerts):</span>
+            <p className="mt-0.5 text-amber-700">{notifications[0].message}</p>
           </div>
-          <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">
+          <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
             {notifications.length} الرٹس
           </span>
         </div>
       )}
 
-      {/* TOP 8 BIG GRADIENT CARDS */}
+      {/* 8 METRICS CARDS - COLORFUL GRADIENTS LIKE SHELL CARDS */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+          <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-600" />
             کاروباری سمری اور کلیدی اشاریے (Executive Key Metrics)
           </h2>
-          <span className="text-[11px] text-slate-500">اپ ڈیٹ: ہر 5 سیکنڈ میں</span>
+          <span className="text-xs text-gray-400">ریئل ٹائم اپ ڈیٹ</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1: Total Groups */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* 1 Groups: bg-gradient-to-br from-blue-500 to-indigo-600 text-white */}
           <Link
             href="/dashboard/groups"
-            className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 border border-slate-800 hover:border-emerald-500/40 transition group shadow-xl flex flex-col justify-between"
+            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-400">کل گروپس (Groups)</span>
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-                <Users className="w-4 h-4" />
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-blue-100 uppercase tracking-wide">
+                عمرہ گروپس (Groups)
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
+                <Users className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-white tracking-tight">{totalGroups}</span>
-              <span className="block text-[11px] text-emerald-400 mt-1 font-medium">فعال عمرہ و حج ٹورز</span>
+              <span className="text-3xl font-black tracking-tight">{totalGroups}</span>
+              <span className="block text-xs text-blue-100 mt-1 font-medium">فعال عمرہ و حج گروپس</span>
             </div>
           </Link>
 
-          {/* Card 2: Pilgrims Count */}
+          {/* 2 Pilgrims: bg-gradient-to-br from-emerald-400 to-cyan-600 text-white */}
           <Link
             href="/dashboard/pilgrims"
-            className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950/40 border border-slate-800 hover:border-sky-500/40 transition group shadow-xl flex flex-col justify-between"
+            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-emerald-400 to-cyan-600 text-white flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-400">کل زائرین (Pilgrims)</span>
-              <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center">
-                <Users className="w-4 h-4" />
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
+                کل زائرین (Pilgrims)
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
+                <Users className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-white tracking-tight">{totalPilgrims}</span>
-              <span className="block text-[11px] text-sky-400 mt-1 font-medium">پاسپورٹ اور ویزہ رجسٹرڈ</span>
+              <span className="text-3xl font-black tracking-tight">{totalPilgrims}</span>
+              <span className="block text-xs text-emerald-100 mt-1 font-medium">
+                پاسپورٹ و ٹکٹ رجسٹرڈ
+              </span>
             </div>
           </Link>
 
-          {/* Card 3: Tickets Month */}
+          {/* 3 Tickets: bg-gradient-to-br from-orange-400 to-pink-500 text-white */}
           <Link
             href="/dashboard/tickets"
-            className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 hover:border-indigo-500/40 transition group shadow-xl flex flex-col justify-between"
+            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-orange-400 to-pink-500 text-white flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-400">ماہانہ ٹکٹس (Tickets)</span>
-              <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
-                <Plane className="w-4 h-4" />
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-orange-100 uppercase tracking-wide">
+                ماہانہ ٹکٹس (Tickets)
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
+                <Plane className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-white tracking-tight">{monthTickets}</span>
-              <span className="block text-[11px] text-indigo-400 mt-1 font-medium">آج کی ٹکٹس: {todayTickets}</span>
+              <span className="text-3xl font-black tracking-tight">{monthTickets}</span>
+              <span className="block text-xs text-orange-100 mt-1 font-medium">
+                آج کی ٹکٹس: {todayTickets} | منافع: {formatCurrency(ticketsMonthProfit)}
+              </span>
             </div>
           </Link>
 
-          {/* Card 4: Visa Pending */}
+          {/* 4 Visas: bg-gradient-to-br from-violet-500 to-purple-600 text-white */}
           <Link
             href="/dashboard/visas"
-            className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/40 border border-slate-800 hover:border-amber-500/40 transition group shadow-xl flex flex-col justify-between"
+            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-violet-500 to-purple-600 text-white flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-400">ویزہ زیر التواء (Visas)</span>
-              <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
-                <FileCheck2 className="w-4 h-4" />
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-purple-100 uppercase tracking-wide">
+                ویزہ کارروائی (Visas)
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
+                <FileCheck2 className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-amber-400 tracking-tight">{visaPending}</span>
-              <span className="block text-[11px] text-amber-300/80 mt-1 font-medium">سفارت خانے میں کارروائی جاری</span>
+              <span className="text-3xl font-black tracking-tight">{visaPending}</span>
+              <span className="block text-xs text-purple-100 mt-1 font-medium">
+                سفارت خانے میں زیر التواء
+              </span>
             </div>
           </Link>
 
-          {/* Card 5: Total Receivable */}
+          {/* 5 Receivable: bg-white border-2 border-green-100 amount text-3xl font-black text-green-600 */}
           <Link
             href="/dashboard/ledger"
-            className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/60 border border-emerald-500/20 hover:border-emerald-500/40 transition group shadow-xl flex flex-col justify-between"
+            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-white border-2 border-green-100 flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-emerald-300">کل واجب الوصول (Receivable)</span>
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                <ArrowDownRight className="w-4 h-4" />
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+                کل واجب الوصول (Receivable)
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center">
+                <ArrowDownRight className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-2xl font-extrabold text-emerald-400 tracking-tight">
+              <span className="text-3xl font-black text-green-600 tracking-tight block">
                 {formatCurrency(receivable)}
               </span>
-              <span className="block text-[11px] text-emerald-300/70 mt-1 font-medium">گاہکوں سے لینی ہے</span>
+              <span className="block text-xs text-green-700/80 mt-1 font-medium">
+                گاہکوں اور سب ایجنٹس سے وصولی
+              </span>
             </div>
           </Link>
 
-          {/* Card 6: Total Payable */}
+          {/* 6 Payable: bg-white border-2 border-red-100 amount text-red-600 */}
           <Link
             href="/dashboard/ledger"
-            className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-rose-950/60 border border-rose-500/20 hover:border-rose-500/40 transition group shadow-xl flex flex-col justify-between"
+            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-white border-2 border-red-100 flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-rose-300">کل واجب الادا (Payable)</span>
-              <div className="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
-                <ArrowUpRight className="w-4 h-4" />
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+                کل واجب الادا (Payable)
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                <ArrowUpRight className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-2xl font-extrabold text-rose-400 tracking-tight">
+              <span className="text-3xl font-black text-red-600 tracking-tight block">
                 {formatCurrency(payable)}
               </span>
-              <span className="block text-[11px] text-rose-300/70 mt-1 font-medium">سپلائرز کو دینی ہے</span>
+              <span className="block text-xs text-red-700/80 mt-1 font-medium">
+                ایئرلائن اور ہوٹل سپلائرز کو ادائیگی
+              </span>
             </div>
           </Link>
 
-          {/* Card 7: Net Profit */}
-          <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-teal-950/60 border border-teal-500/30 shadow-xl flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-teal-300">مجموعی خالص منافع (Net Profit)</span>
-              <div className="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4" />
+          {/* 7 Net Profit: bg-gradient-to-br from-green-500 to-emerald-700 text-white */}
+          <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-green-500 to-emerald-700 text-white flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
+                خالص منافع (Net Profit)
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
+                <TrendingUp className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-2xl font-extrabold text-teal-300 tracking-tight">
+              <span className="text-3xl font-black tracking-tight block">
                 {formatCurrency(netProfit)}
               </span>
-              <span className="block text-[11px] text-teal-400/80 mt-1 font-medium">خالص آپریٹنگ منافع</span>
+              <span className="block text-xs text-emerald-100 mt-1 font-medium">
+                خالص آپریٹنگ منافع
+              </span>
             </div>
           </div>
 
-          {/* Card 8: Today Profit */}
-          <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-purple-950/60 border border-purple-500/30 shadow-xl flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-purple-300">آج کا منافع (Today Profit)</span>
-              <div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
-                <DollarSign className="w-4 h-4" />
+          {/* 8 Today Profit: bg-white border-2 border-purple-100 amount text-purple-600 */}
+          <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-white border-2 border-purple-100 flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+                آج کا منافع (Today Profit)
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <DollarSign className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-2xl font-extrabold text-purple-300 tracking-tight">
+              <span className="text-3xl font-black text-purple-600 tracking-tight block">
                 {formatCurrency(todayProfit)}
               </span>
-              <span className="block text-[11px] text-purple-400/80 mt-1 font-medium">آج کی بکنگز اور ٹکٹس</span>
+              <span className="block text-xs text-purple-700/80 mt-1 font-medium">
+                آج کی بکنگز اور ٹکٹس
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* BOTTOM SMALL POWER TOOL CARDS FOR EACH MODULE */}
+      {/* QUICK ACTIONS 6 CARDS (Clean Light Theme with Colored Icon Circles) */}
       <div>
-        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 flex items-center gap-2">
           <span>⚡</span> فوری رسائی اور پاور ٹولز (Module Quick Actions)
         </h2>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {/* Action 1: Groups */}
           <Link
             href="/dashboard/groups"
-            className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-850 transition text-center flex flex-col items-center justify-center gap-2 group"
+            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-emerald-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition">
-              <Users className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition">
+              <Users className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold text-white">گروپس اوکیوپینسی</span>
-            <span className="text-[10px] text-slate-400">کاؤنٹ ڈاؤن اور سیٹیں</span>
+            <span className="text-xs font-bold text-gray-900">گروپس اوکیوپینسی</span>
+            <span className="text-[11px] text-gray-500">کاؤنٹ ڈاؤن اور سیٹیں</span>
           </Link>
 
+          {/* Action 2: Tickets */}
           <Link
             href="/dashboard/tickets"
-            className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-sky-500/50 hover:bg-slate-850 transition text-center flex flex-col items-center justify-center gap-2 group"
+            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-sky-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center group-hover:scale-110 transition">
-              <Plane className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center group-hover:scale-110 transition">
+              <Plane className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold text-white">PNR انسٹنٹ سرچ</span>
-            <span className="text-[10px] text-slate-400">ایئرلائن منافع چارٹ</span>
+            <span className="text-xs font-bold text-gray-900">PNR انسٹنٹ سرچ</span>
+            <span className="text-[11px] text-gray-500">ایئرلائن منافع چارٹ</span>
           </Link>
 
+          {/* Action 3: Visa Tracking */}
           <Link
             href="/dashboard/visas"
-            className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-purple-500/50 hover:bg-slate-850 transition text-center flex flex-col items-center justify-center gap-2 group"
+            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-purple-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:scale-110 transition">
-              <FileCheck2 className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition">
+              <FileCheck2 className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold text-white">ویزہ کنبان بورڈ</span>
-            <span className="text-[10px] text-slate-400">ڈریگ اور آٹو واٹس ایپ</span>
+            <span className="text-xs font-bold text-gray-900">ویزہ کنبان بورڈ</span>
+            <span className="text-[11px] text-gray-500">ڈریگ اور آٹو واٹس ایپ</span>
           </Link>
 
+          {/* Action 4: Visa Consultancy */}
           <Link
-            href="/dashboard/hotels"
-            className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-850 transition text-center flex flex-col items-center justify-center gap-2 group"
+            href="/dashboard/visa-consultancy"
+            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-indigo-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center group-hover:scale-110 transition">
-              <Building2 className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition">
+              <Globe2 className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold text-white">ہوٹل و ٹرانسپورٹ</span>
-            <span className="text-[10px] text-slate-400">مکہ و مدینہ الاٹمنٹ</span>
+            <span className="text-xs font-bold text-gray-900">ویزہ کنسلٹنسی</span>
+            <span className="text-[11px] text-gray-500">اسٹڈی / وزٹ / ورک ویزہ</span>
           </Link>
 
+          {/* Action 5: Tour Packages */}
           <Link
-            href="/dashboard/ledger"
-            className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-teal-500/50 hover:bg-slate-850 transition text-center flex flex-col items-center justify-center gap-2 group"
+            href="/dashboard/tours"
+            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-teal-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center group-hover:scale-110 transition">
-              <BookOpen className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center group-hover:scale-110 transition">
+              <Compass className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold text-white">کھاتہ اور QR رسیدیں</span>
-            <span className="text-[10px] text-slate-400">کسٹمر و سپلائر لیجر</span>
+            <span className="text-xs font-bold text-gray-900">ٹور پیکجز</span>
+            <span className="text-[11px] text-gray-500">اندرون و بیرون ملک واؤچرز</span>
           </Link>
 
+          {/* Action 6: Cash Book */}
           <Link
-            href="/dashboard/settings/whatsapp"
-            className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-pink-500/50 hover:bg-slate-850 transition text-center flex flex-col items-center justify-center gap-2 group"
+            href="/dashboard/cashbook"
+            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-amber-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-pink-500/10 text-pink-400 flex items-center justify-center group-hover:scale-110 transition">
-              <Receipt className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 transition">
+              <Wallet className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold text-white">WhatsApp برانڈنگ</span>
-            <span className="text-[10px] text-slate-400">9PM آٹو سمری کرون</span>
+            <span className="text-xs font-bold text-gray-900">روزمرہ کیش بک</span>
+            <span className="text-[11px] text-gray-500">کیش ان ہینڈ اور آمدن</span>
           </Link>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { agencies, tickets, pilgrims, groups, notifications } from '@/lib/db/schema';
+import { agencies, tickets, pilgrims, groups, notifications, cash_book } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { sendWhatsAppMessage } from '@/lib/whatsapp';
 import dayjs from 'dayjs';
@@ -77,8 +77,18 @@ export async function GET(req: Request) {
         }
       }
 
-      // 4. Send WhatsApp Daily Summary to Owner
-      const summaryMsg = `آج کی سمری - [${agency.name}] - ٹکٹس ${ticketsCount} - منافع PKR ${todayProfit.toLocaleString()}`;
+      // Calculate Cash in Hand from cash_book
+      const agencyCashEntries = await db
+        .select()
+        .from(cash_book)
+        .where(eq(cash_book.agency_id, agency.id));
+
+      const totalCashIn = agencyCashEntries.filter(e => e.type === 'in').reduce((s, e) => s + (e.amount || 0), 0);
+      const totalCashOut = agencyCashEntries.filter(e => e.type === 'out').reduce((s, e) => s + (e.amount || 0), 0);
+      const cashInHand = 50000 + totalCashIn - totalCashOut;
+
+      // 4. Send WhatsApp Daily Summary to Owner with Cash in Hand
+      const summaryMsg = `آج کی سمری - [${agency.name}] - کیش ان ہینڈ: PKR ${cashInHand.toLocaleString()} - ٹکٹس ${ticketsCount} - منافع PKR ${todayProfit.toLocaleString()}`;
       if (agency.phone) {
         await sendWhatsAppMessage({
           agencyId: agency.id,
