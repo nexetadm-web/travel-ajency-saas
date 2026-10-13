@@ -62,6 +62,7 @@ export default function GroupDetailsPage() {
   const [issuingKits, setIssuingKits] = useState(false);
   const [kitSuccessMsg, setKitSuccessMsg] = useState('');
   const [kitErrorMsg, setKitErrorMsg] = useState('');
+  const [loadingPdf, setLoadingPdf] = useState(false);
 
   // New Pilgrim Form
   const [formData, setFormData] = useState({
@@ -253,16 +254,24 @@ export default function GroupDetailsPage() {
 
   const handleExportEmbassyPdf = async () => {
     try {
-      const res = await fetch(`/api/groups/${groupId}/pdf`);
-      if (!res.ok) throw new Error('PDF Generation failed');
+      setLoadingPdf(true);
+      const res = await fetch(`/api/groups/${groupId}/pdf`, { cache: 'no-store' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'PDF Generation failed');
+      }
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `embassy-manifest-${group?.group_name || 'group'}.pdf`;
+      a.download = `embassy-${groupId}.pdf`;
       a.click();
-    } catch (err) {
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
       console.error('PDF export error:', err);
+      alert('PDF Error: ' + (err?.message || 'Download failed'));
+    } finally {
+      setLoadingPdf(false);
     }
   };
 
@@ -316,10 +325,11 @@ export default function GroupDetailsPage() {
 
           <button
             onClick={handleExportEmbassyPdf}
-            className="px-4 py-2.5 rounded-full bg-white hover:bg-gray-50 text-purple-700 border border-purple-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+            disabled={loadingPdf}
+            className="px-4 py-2.5 rounded-full bg-white hover:bg-gray-50 text-purple-700 border border-purple-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
           >
-            <FileDown className="w-4 h-4" />
-            سفارت خانہ لسٹ (PDF)
+            {loadingPdf ? <Loader2 className="w-4 h-4 animate-spin text-purple-600" /> : <FileDown className="w-4 h-4" />}
+            <span>{loadingPdf ? 'PDF ڈاؤن لوڈ ہو رہی ہے...' : 'سفارت خانہ لسٹ (PDF)'}</span>
           </button>
 
           <Link

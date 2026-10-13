@@ -71,26 +71,26 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-[#F8FAFF] text-slate-800 flex flex-col md:flex-row antialiased">
       {/* SIDEBAR (Desktop) */}
-      <aside className="hidden md:flex flex-col w-72 bg-white shadow-[4px_0_24px_rgba(0,0,0,0.04)] border-r border-gray-100 p-5 justify-between sticky top-0 h-screen select-none z-30 overflow-y-auto">
+      <aside className="hidden md:flex flex-col w-72 bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#0f172a] text-white shadow-2xl border-r border-slate-800/80 p-5 justify-between sticky top-0 h-screen select-none z-30 overflow-y-auto">
         <div>
           {/* Dynamic Agency Branding Header */}
-          <div className="flex items-center gap-3.5 pb-5 border-b border-gray-100">
+          <div className="flex items-center gap-3.5 pb-5 border-b border-white/10">
             {agency?.logo_url ? (
               <img
                 src={agency.logo_url}
                 alt={agency?.name || 'Agency Logo'}
-                className="w-12 h-12 rounded-2xl object-cover border border-emerald-100 shadow-md shadow-emerald-500/10"
+                className="w-12 h-12 rounded-2xl object-cover border border-emerald-400/30 shadow-lg shadow-emerald-500/20"
               />
             ) : (
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 uppercase">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 uppercase">
                 {agency?.name ? agency.name.charAt(0) : 'T'}
               </div>
             )}
             <div className="overflow-hidden">
-              <h2 className="font-extrabold text-sm text-gray-900 truncate tracking-tight">
+              <h2 className="font-extrabold text-sm text-white truncate tracking-tight">
                 {agency?.name || (isLoading ? 'لوڈ ہو رہا ہے...' : 'میری ٹریول ایجنسی')}
               </h2>
-              <span className="block text-[11px] text-gray-500 font-medium truncate">
+              <span className="block text-[11px] text-slate-300 font-medium truncate">
                 لائسنس: {agency?.license_no || 'DTS Reg.'}
               </span>
             </div>
@@ -101,7 +101,7 @@ export default function DashboardLayout({
             <div className="pt-4">
               <Link
                 href="/super-admin"
-                className="w-full px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-purple-600/30 transition flex items-center justify-between group"
+                className="w-full px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-purple-600/40 transition flex items-center justify-between group border border-purple-400/20"
               >
                 <div className="flex items-center gap-2">
                   <span className="text-base">🛡️</span>
@@ -122,15 +122,15 @@ export default function DashboardLayout({
                   key={item.href}
                   href={item.href}
                   prefetch={true}
-                  className={`flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition ${
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs transition ${
                     active
-                      ? 'bg-emerald-50 text-emerald-700 rounded-xl font-bold border-l-4 border-emerald-500 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium'
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold shadow-lg shadow-emerald-500/25 ring-1 ring-white/20'
+                      : 'text-white/80 hover:text-white hover:bg-white/10 font-medium'
                   }`}
                 >
                   <Icon
                     className={`w-4 h-4 flex-shrink-0 ${
-                      active ? 'text-emerald-600' : 'text-gray-400 group-hover:text-gray-600'
+                      active ? 'text-white' : 'text-white/70 group-hover:text-white'
                     }`}
                   />
                   <span className="truncate">{item.name}</span>
@@ -141,20 +141,20 @@ export default function DashboardLayout({
         </div>
 
         {/* Bottom User & Logout Card */}
-        <div className="pt-4 border-t border-gray-100 mt-4">
-          <div className="flex items-center justify-between p-2.5 rounded-2xl bg-gray-50 border border-gray-100 text-xs">
+        <div className="pt-4 border-t border-white/10 mt-4">
+          <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/10 text-xs">
             <div className="truncate pr-2">
-              <span className="block font-bold text-gray-800 truncate">
+              <span className="block font-bold text-white truncate">
                 {agency?.owner_name || 'مالک ایجنسی'}
               </span>
-              <span className="block text-[10px] text-gray-500 truncate">
+              <span className="block text-[10px] text-slate-300 truncate">
                 {agency?.phone || 'آن لائن'}
               </span>
             </div>
             <button
               onClick={handleLogout}
               title="لاگ آؤٹ"
-              className="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition"
+              className="p-1.5 rounded-lg text-slate-300 hover:text-rose-400 hover:bg-white/10 transition"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -182,12 +182,12 @@ export default function DashboardLayout({
 
       {/* MOBILE DROPDOWN */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-100 p-4 space-y-1.5 z-40 shadow-lg max-h-[80vh] overflow-y-auto">
+        <div className="md:hidden bg-[#0f172a] border-b border-slate-800 p-4 space-y-1.5 z-40 shadow-2xl max-h-[80vh] overflow-y-auto text-white">
           {isSuper && (
             <Link
               href="/super-admin"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full px-3 py-2 rounded-xl bg-purple-600 text-white text-xs font-bold flex items-center gap-2 mb-2 shadow"
+              className="w-full px-3 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold flex items-center gap-2 mb-2 shadow"
             >
               <span>🛡️</span> سپر ایڈمن پورٹل
             </Link>
@@ -201,18 +201,18 @@ export default function DashboardLayout({
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs ${
                   active
-                    ? 'bg-emerald-50 text-emerald-700 font-bold border-l-4 border-emerald-500'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold shadow'
+                    : 'text-white/80 hover:bg-white/10'
                 }`}
               >
-                <item.icon className="w-4 h-4 text-emerald-600" />
+                <item.icon className="w-4 h-4 text-emerald-400" />
                 <span>{item.name}</span>
               </Link>
             );
           })}
           <button
             onClick={handleLogout}
-            className="w-full mt-2 text-left px-3 py-2 rounded-xl text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 border-t border-gray-100 pt-3"
+            className="w-full mt-2 text-left px-3 py-2 rounded-xl text-xs text-rose-400 hover:bg-white/10 flex items-center gap-2 border-t border-slate-800 pt-3"
           >
             <LogOut className="w-4 h-4" />
             لاگ آؤٹ

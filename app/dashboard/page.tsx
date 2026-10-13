@@ -223,39 +223,39 @@ export default function DashboardOverviewPage() {
             </div>
           </Link>
 
-          {/* 5 Receivable: bg-white border-2 border-green-100 amount text-3xl font-black text-green-600 */}
+          {/* 5 Receivable: bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200 text-blue-900 value text-emerald-600 */}
           <Link
             href="/dashboard/ledger"
-            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-white border-2 border-green-100 flex flex-col justify-between"
+            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 flex flex-col justify-between"
           >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-bold text-blue-900 uppercase tracking-wide">
                 کل واجب الوصول (Receivable)
               </span>
-              <div className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-700 flex items-center justify-center">
                 <ArrowDownRight className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-3xl font-black text-green-600 tracking-tight block">
+              <span className="text-3xl font-black text-emerald-600 tracking-tight block">
                 {formatCurrency(receivable)}
               </span>
-              <span className="block text-xs text-green-700/80 mt-1 font-medium">
+              <span className="block text-xs text-blue-800/80 mt-1 font-medium">
                 گاہکوں اور سب ایجنٹس سے وصولی
               </span>
             </div>
           </Link>
 
-          {/* 6 Payable: bg-white border-2 border-red-100 amount text-red-600 */}
+          {/* 6 Payable: bg-gradient-to-br from-red-50 to-rose-100 border-red-200 value text-red-600 */}
           <Link
             href="/dashboard/ledger"
-            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-white border-2 border-red-100 flex flex-col justify-between"
+            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 flex flex-col justify-between"
           >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-bold text-rose-900 uppercase tracking-wide">
                 کل واجب الادا (Payable)
               </span>
-              <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-700 flex items-center justify-center">
                 <ArrowUpRight className="w-5 h-5" />
               </div>
             </div>
@@ -263,14 +263,14 @@ export default function DashboardOverviewPage() {
               <span className="text-3xl font-black text-red-600 tracking-tight block">
                 {formatCurrency(payable)}
               </span>
-              <span className="block text-xs text-red-700/80 mt-1 font-medium">
+              <span className="block text-xs text-rose-800/80 mt-1 font-medium">
                 ایئرلائن اور ہوٹل سپلائرز کو ادائیگی
               </span>
             </div>
           </Link>
 
-          {/* 7 Net Profit: bg-gradient-to-br from-green-500 to-emerald-700 text-white */}
-          <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-green-500 to-emerald-700 text-white flex flex-col justify-between">
+          {/* 7 Net Profit: Keep green but add glow shadow-[0_0_20px_rgba(34,197,94,0.3)] */}
+          <div className="rounded-[20px] p-6 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] hover:-translate-y-1 transition-all bg-gradient-to-br from-green-500 via-emerald-600 to-teal-700 text-white flex flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
                 خالص منافع (Net Profit)
@@ -280,7 +280,7 @@ export default function DashboardOverviewPage() {
               </div>
             </div>
             <div>
-              <span className="text-3xl font-black tracking-tight block">
+              <span className="text-3xl font-black tracking-tight block text-white drop-shadow-sm">
                 {formatCurrency(netProfit)}
               </span>
               <span className="block text-xs text-emerald-100 mt-1 font-medium">
@@ -289,21 +289,21 @@ export default function DashboardOverviewPage() {
             </div>
           </div>
 
-          {/* 8 Today Profit: bg-white border-2 border-purple-100 amount text-purple-600 */}
-          <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-white border-2 border-purple-100 flex flex-col justify-between">
+          {/* 8 Today Profit: bg-gradient-to-br from-purple-50 to-violet-100 border-purple-200 value text-purple-700 */}
+          <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-purple-50 to-violet-100 border border-purple-200 flex flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-bold text-purple-900 uppercase tracking-wide">
                 آج کا منافع (Today Profit)
               </span>
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-700 flex items-center justify-center">
                 <DollarSign className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <span className="text-3xl font-black text-purple-600 tracking-tight block">
+              <span className="text-3xl font-black text-purple-700 tracking-tight block">
                 {formatCurrency(todayProfit)}
               </span>
-              <span className="block text-xs text-purple-700/80 mt-1 font-medium">
+              <span className="block text-xs text-purple-800/80 mt-1 font-medium">
                 آج کی بکنگز اور ٹکٹس
               </span>
             </div>
@@ -311,7 +311,7 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      {/* QUICK ACTIONS 6 CARDS (Clean Light Theme with Colored Icon Circles) */}
+      {/* QUICK ACTIONS 6 CARDS (Colorful circles with hover scale effect) */}
       <div>
         <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 flex items-center gap-2">
           <span>⚡</span> فوری رسائی اور پاور ٹولز (Module Quick Actions)
@@ -321,9 +321,9 @@ export default function DashboardOverviewPage() {
           {/* Action 1: Groups */}
           <Link
             href="/dashboard/groups"
-            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-emerald-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-emerald-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
               <Users className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">گروپس اوکیوپینسی</span>
@@ -333,9 +333,9 @@ export default function DashboardOverviewPage() {
           {/* Action 2: Tickets */}
           <Link
             href="/dashboard/tickets"
-            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-sky-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-sky-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
               <Plane className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">PNR انسٹنٹ سرچ</span>
@@ -345,9 +345,9 @@ export default function DashboardOverviewPage() {
           {/* Action 3: Visa Tracking */}
           <Link
             href="/dashboard/visas"
-            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-purple-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-purple-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
               <FileCheck2 className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">ویزہ کنبان بورڈ</span>
@@ -357,9 +357,9 @@ export default function DashboardOverviewPage() {
           {/* Action 4: Visa Consultancy */}
           <Link
             href="/dashboard/visa-consultancy"
-            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-indigo-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-indigo-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
               <Globe2 className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">ویزہ کنسلٹنسی</span>
@@ -369,9 +369,9 @@ export default function DashboardOverviewPage() {
           {/* Action 5: Tour Packages */}
           <Link
             href="/dashboard/tours"
-            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-teal-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-teal-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
               <Compass className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">ٹور پیکجز</span>
@@ -381,9 +381,9 @@ export default function DashboardOverviewPage() {
           {/* Action 6: Cash Book */}
           <Link
             href="/dashboard/cashbook"
-            className="bg-white rounded-2xl border border-gray-100 p-5 text-center hover:border-amber-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-amber-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
               <Wallet className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">روزمرہ کیش بک</span>

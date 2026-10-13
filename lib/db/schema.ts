@@ -107,9 +107,13 @@ export const visas = sqliteTable('visas', {
 export const hotels = sqliteTable('hotels', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   agency_id: text('agency_id').notNull(),
+  name: text('name'),
+  hotel_name: text('hotel_name'),
   city: text('city').notNull(), // 'Makkah' | 'Madina'
-  hotel_name: text('hotel_name').notNull(),
+  type: text('type').default('hotel_directory'), // 'group_hotel_booking' | 'hotel_directory'
+  price_per_night: real('price_per_night').default(0),
   per_night_rate: real('per_night_rate').default(0),
+  contact_person: text('contact_person'),
   contact: text('contact'),
   created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 }, (table) => ({
@@ -147,6 +151,18 @@ export const transport_bookings = sqliteTable('transport_bookings', {
 }, (table) => ({
   agencyIdx: index('transport_bookings_agency_idx').on(table.agency_id),
   groupIdx: index('transport_bookings_group_idx').on(table.group_id),
+}));
+
+// 8B. TRANSPORTS DIRECTORY TABLE
+export const transports = sqliteTable('transports', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  agency_id: text('agency_id').notNull(),
+  type: text('type'), // bus, car, gmc, coaster, train
+  route: text('route'),
+  cost: real('cost').default(0),
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  agencyIdx: index('transports_agency_idx').on(table.agency_id),
 }));
 
 // 9. CUSTOMERS LEDGER TABLE
