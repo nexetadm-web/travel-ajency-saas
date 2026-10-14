@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import PremiumCard from '@/components/ui/premium-card';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -84,6 +85,11 @@ export default function GroupsPage() {
     return diff;
   };
 
+  const totalGroups = groups.length;
+  const activeGroups = groups.filter((g: any) => g.status === 'open' || !g.status).length;
+  const completedGroups = groups.filter((g: any) => g.status === 'closed' || g.status === 'completed').length;
+  const totalRevenue = groups.reduce((acc: number, g: any) => acc + ((g.booked_seats || 0) * (Number(g.price_per_person) || 0)), 0);
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Header */}
@@ -92,7 +98,7 @@ export default function GroupsPage() {
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-gray-900">عمرہ و حج گروپ مینجمنٹ</h1>
             <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-              کل گروپس: {groups.length}
+              کل گروپس: {totalGroups}
             </span>
           </div>
           <p className="text-xs text-gray-500 mt-1">
@@ -107,6 +113,42 @@ export default function GroupsPage() {
           <Plus className="w-4 h-4" />
           + نیا گروپ بنائیں (New Group)
         </button>
+      </div>
+
+      {/* Top 4 Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <PremiumCard
+          title="ٹوٹل گروپس"
+          value={totalGroups}
+          subtitle="فعال اور مکمل گروپس"
+          icon={Users}
+          gradient="violet"
+          trend="تمام ادوار"
+        />
+        <PremiumCard
+          title="فعال گروپس"
+          value={activeGroups}
+          subtitle="بکنگ جاری ہے"
+          icon={Sparkles}
+          gradient="amber"
+          trend="اوپن فار بکنگ"
+        />
+        <PremiumCard
+          title="مکمل گروپس"
+          value={completedGroups}
+          subtitle="سفر مکمل ہو چکا"
+          icon={CheckCircle2}
+          gradient="emerald"
+          trend="کلوزڈ"
+        />
+        <PremiumCard
+          title="گروپ ریونیو"
+          value={formatCurrency(totalRevenue)}
+          subtitle="مجموعی بک شدہ مالیت"
+          icon={DollarSign}
+          gradient="rose"
+          trend="آمدن"
+        />
       </div>
 
       {/* Groups List Grid */}
@@ -140,50 +182,54 @@ export default function GroupsPage() {
             return (
               <div
                 key={grp.id}
-                className="rounded-[24px] bg-white border border-gray-100 p-6 hover:shadow-[0_12px_40px_rgba(0,0,0,0.1)] transition shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col justify-between group"
+                className="rounded-[24px] bg-white border border-gray-100 overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.1)] transition shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col justify-between group"
               >
-                <div>
-                  {/* Card Header & Countdown */}
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
-                      {grp.status === 'open' ? 'بکنگ جاری ہے (Open)' : 'مکمل (Closed)'}
-                    </span>
+                {/* Top Gradient Strip */}
+                <div className="h-2.5 w-full bg-gradient-to-r from-emerald-500 to-teal-500" />
 
-                    {daysLeft !== null && (
-                      <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 ${
-                        daysLeft <= 7
-                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                          : 'bg-gray-100 text-gray-700'
-                      }`}>
-                        <Clock className="w-3 h-3" />
-                        {daysLeft > 0 ? `روانگی: ${daysLeft} دن باقی` : 'روانہ ہو چکا'}
+                <div className="p-6 flex flex-col justify-between flex-1">
+                  <div>
+                    {/* Card Header & Countdown */}
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
+                        {grp.status === 'open' ? 'بکنگ جاری ہے (Open)' : 'مکمل (Closed)'}
                       </span>
-                    )}
-                  </div>
 
-                  <h3 className="font-bold text-base text-gray-900 group-hover:text-emerald-600 transition leading-snug">
-                    {grp.group_name}
-                  </h3>
+                      {daysLeft !== null && (
+                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 ${
+                          daysLeft <= 7
+                            ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          <Clock className="w-3 h-3" />
+                          {daysLeft > 0 ? `روانگی: ${daysLeft} دن باقی` : 'روانہ ہو چکا'}
+                        </span>
+                      )}
+                    </div>
 
-                  {/* Occupancy Progress Bar */}
-                  <div className="mt-4 p-3.5 rounded-2xl bg-gray-50 border border-gray-100">
-                    <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
-                      <span className="text-gray-500">سیٹوں کی اوکیوپینسی:</span>
-                      <span className="text-emerald-700 font-bold">
-                        {booked} / {total} سیٹیں ({percentage}%)
-                      </span>
+                    <h3 className="font-bold text-base text-gray-900 group-hover:text-emerald-600 transition leading-snug">
+                      {grp.group_name}
+                    </h3>
+
+                    {/* Occupancy Progress Bar */}
+                    <div className="mt-4 p-3.5 rounded-2xl bg-gray-50 border border-gray-100">
+                      <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
+                        <span className="text-gray-500">سیٹوں کی اوکیوپینسی:</span>
+                        <span className="text-emerald-700 font-bold">
+                          {booked} / {total} سیٹیں ({percentage}%)
+                        </span>
+                      </div>
+                      <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
+                          style={{ width: `${percentage}%` }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between items-center mt-1.5 text-[10px] text-gray-400">
+                        <span>خالی سیٹیں: {Math.max(0, total - booked)}</span>
+                        <span>بک شدہ: {booked}</span>
+                      </div>
                     </div>
-                    <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                        style={{ width: `${percentage}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between items-center mt-1.5 text-[10px] text-gray-400">
-                      <span>خالی سیٹیں: {Math.max(0, total - booked)}</span>
-                      <span>بک شدہ: {booked}</span>
-                    </div>
-                  </div>
 
                   {/* Group Details */}
                   <div className="mt-4 space-y-2 text-xs text-gray-700 border-t border-gray-100 pt-3">
@@ -236,7 +282,8 @@ export default function GroupsPage() {
                   </Link>
                 </div>
               </div>
-            );
+            </div>
+          );
           })}
         </div>
       )}

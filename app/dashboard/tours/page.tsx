@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAgency } from '@/hooks/useAgency';
+import PremiumCard from '@/components/ui/premium-card';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -138,6 +139,11 @@ export default function TourPackagesPage() {
     }
   };
 
+  const totalTours = packages.length;
+  const totalBookings = packages.reduce((acc: number, p: any) => acc + (p.bookingsCount || 0), 0);
+  const tourRevenue = packages.reduce((acc: number, p: any) => acc + ((p.bookedPersons || 0) * (Number(p.price_per_person) || 0)), 0);
+  const netProfit = Math.round(tourRevenue * 0.22);
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Header */}
@@ -163,6 +169,42 @@ export default function TourPackagesPage() {
           <Plus className="w-4 h-4" />
           + نیا ٹور پیکیج بنائیں (Add Package)
         </button>
+      </div>
+
+      {/* Top 4 Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <PremiumCard
+          title="ٹوٹل ٹورز"
+          value={totalTours}
+          subtitle="فعال پیکجز"
+          icon={Compass}
+          gradient="violet"
+          trend="تمام ٹورز"
+        />
+        <PremiumCard
+          title="کل بکنگز"
+          value={totalBookings}
+          subtitle="بک شدہ زائرین و سیاح"
+          icon={Users}
+          gradient="cyan"
+          trend="کنفرمڈ"
+        />
+        <PremiumCard
+          title="ٹور ریونیو"
+          value={formatCurrency(tourRevenue)}
+          subtitle="مجموعی بکنگ آمدن"
+          icon={DollarSign}
+          gradient="emerald"
+          trend="آمدنی"
+        />
+        <PremiumCard
+          title="تخمینہ منافع"
+          value={formatCurrency(netProfit)}
+          subtitle="نیٹ پرافٹ مارجن"
+          icon={TrendingUp}
+          gradient="rose"
+          trend="منافع"
+        />
       </div>
 
       {/* FILTER BUTTONS: ALL / DOMESTIC / INTERNATIONAL */}

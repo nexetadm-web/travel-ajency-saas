@@ -298,91 +298,147 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      {/* SECOND ROW CARDS (Receivable, Payable, Net Profit, Today Profit) */}
+      {/* SECOND ROW CARDS (Receivable, Payable, Net Profit, Today Profit) - ALL COLORFUL */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Receivable */}
+        {/* Receivable: cyan->blue */}
         <Link
           href="/dashboard/ledger"
-          className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 flex flex-col justify-between"
+          className="bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-xl shadow-cyan-500/20 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
         >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-blue-900 uppercase tracking-wide">
-              کل واجب الوصول (Receivable)
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-700 flex items-center justify-center">
-              <ArrowDownRight className="w-5 h-5" />
+          <div
+            className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
+            style={{
+              backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
+              backgroundSize: '12px 12px',
+            }}
+          />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-cyan-100 uppercase tracking-wide">
+                کل واجب الوصول (Receivable)
+              </span>
+              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center shadow-inner">
+                <ArrowDownRight className="w-6 h-6" />
+              </div>
+            </div>
+            <div>
+              <span className="text-3xl font-black text-white tracking-tight block">
+                {formatCurrency(receivable)}
+              </span>
+              <span className="block text-xs text-cyan-100 mt-1 font-medium">
+                گاہکوں اور سب ایجنٹس سے وصولی
+              </span>
             </div>
           </div>
-          <div>
-            <span className="text-3xl font-black text-emerald-600 tracking-tight block">
-              {formatCurrency(receivable)}
-            </span>
-            <span className="block text-xs text-blue-800/80 mt-1 font-medium">
-              گاہکوں اور سب ایجنٹس سے وصولی
-            </span>
+          <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
+            <span>وصولی کھاتہ اوپن</span>
+            <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
           </div>
         </Link>
 
-        {/* Payable */}
+        {/* Payable: if 0 slate gray else orange->red */}
         <Link
           href="/dashboard/ledger"
-          className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 flex flex-col justify-between"
+          className={`text-white shadow-xl rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between ${
+            payable === 0
+              ? 'bg-gradient-to-br from-slate-600 to-slate-800 shadow-slate-600/20'
+              : 'bg-gradient-to-br from-orange-500 to-rose-600 shadow-rose-500/20'
+          }`}
         >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-rose-900 uppercase tracking-wide">
-              کل واجب الادا (Payable)
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-700 flex items-center justify-center">
-              <ArrowUpRight className="w-5 h-5" />
+          <div
+            className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
+            style={{
+              backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
+              backgroundSize: '12px 12px',
+            }}
+          />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-white/90 uppercase tracking-wide">
+                کل واجب الادا (Payable)
+              </span>
+              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center shadow-inner">
+                <ArrowUpRight className="w-6 h-6" />
+              </div>
+            </div>
+            <div>
+              <span className="text-3xl font-black text-white tracking-tight block">
+                {formatCurrency(payable)}
+              </span>
+              <span className="block text-xs text-white/80 mt-1 font-medium">
+                ایئرلائن اور ہوٹل سپلائرز کو ادائیگی
+              </span>
             </div>
           </div>
-          <div>
-            <span className="text-3xl font-black text-red-600 tracking-tight block">
-              {formatCurrency(payable)}
-            </span>
-            <span className="block text-xs text-rose-800/80 mt-1 font-medium">
-              ایئرلائن اور ہوٹل سپلائرز کو ادائیگی
-            </span>
+          <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
+            <span>سپلائرز بقایا بیلنس</span>
+            <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
           </div>
         </Link>
 
-        {/* Net Profit */}
-        <div className="rounded-[20px] p-6 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] hover:-translate-y-1 transition-all bg-gradient-to-br from-green-500 via-emerald-600 to-teal-700 text-white flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
-              خالص منافع (Net Profit)
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
-              <TrendingUp className="w-5 h-5" />
+        {/* Net Profit: emerald->green */}
+        <div className="bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-xl shadow-emerald-500/20 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between">
+          <div
+            className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
+            style={{
+              backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
+              backgroundSize: '12px 12px',
+            }}
+          />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
+                خالص منافع (Net Profit)
+              </span>
+              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center shadow-inner">
+                <TrendingUp className="w-6 h-6" />
+              </div>
+            </div>
+            <div>
+              <span className="text-3xl font-black text-white tracking-tight block">
+                {formatCurrency(netProfit)}
+              </span>
+              <span className="block text-xs text-emerald-100 mt-1 font-medium">
+                خالص آپریٹنگ منافع
+              </span>
             </div>
           </div>
-          <div>
-            <span className="text-3xl font-black tracking-tight block text-white drop-shadow-sm">
-              {formatCurrency(netProfit)}
-            </span>
-            <span className="block text-xs text-emerald-100 mt-1 font-medium">
-              خالص آپریٹنگ منافع
-            </span>
+          <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
+            <span>منافع مارجن 18.5%</span>
+            <Sparkles className="w-3.5 h-3.5 text-white/80" />
           </div>
         </div>
 
-        {/* Today Profit */}
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-purple-50 to-violet-100 border border-purple-200 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-purple-900 uppercase tracking-wide">
-              آج کا منافع (Today Profit)
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-700 flex items-center justify-center">
-              <DollarSign className="w-5 h-5" />
+        {/* Today Profit: purple->violet */}
+        <div className="bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-xl shadow-purple-500/20 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between">
+          <div
+            className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
+            style={{
+              backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
+              backgroundSize: '12px 12px',
+            }}
+          />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-bold text-purple-100 uppercase tracking-wide">
+                آج کا منافع (Today Profit)
+              </span>
+              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center shadow-inner">
+                <DollarSign className="w-6 h-6" />
+              </div>
+            </div>
+            <div>
+              <span className="text-3xl font-black text-white tracking-tight block">
+                {formatCurrency(todayProfit)}
+              </span>
+              <span className="block text-xs text-purple-100 mt-1 font-medium">
+                آج کی بکنگز اور ٹکٹس
+              </span>
             </div>
           </div>
-          <div>
-            <span className="text-3xl font-black text-purple-700 tracking-tight block">
-              {formatCurrency(todayProfit)}
-            </span>
-            <span className="block text-xs text-purple-800/80 mt-1 font-medium">
-              آج کی بکنگز اور ٹکٹس
-            </span>
+          <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
+            <span>ریئل ٹائم بکنگ کاؤنٹر</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-white/80" />
           </div>
         </div>
       </div>
@@ -399,7 +455,7 @@ export default function DashboardOverviewPage() {
             href="/dashboard/groups"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-emerald-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-emerald-500/20">
               <Users className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">گروپس اوکیوپینسی</span>
@@ -411,7 +467,7 @@ export default function DashboardOverviewPage() {
             href="/dashboard/flights/pnr-check"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-sky-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-sky-500/20">
               <Plane className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">PNR لائیو چیک</span>
@@ -423,7 +479,7 @@ export default function DashboardOverviewPage() {
             href="/dashboard/visas"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-purple-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-purple-500/20">
               <FileCheck2 className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">ویزہ کنبان بورڈ</span>
@@ -435,7 +491,7 @@ export default function DashboardOverviewPage() {
             href="/dashboard/sub-agents"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-indigo-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-indigo-500/20">
               <Globe2 className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">سب ایجنٹس کمیشن</span>
@@ -447,7 +503,7 @@ export default function DashboardOverviewPage() {
             href="/dashboard/tours"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-teal-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-teal-500/20">
               <Compass className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">ٹور پیکجز</span>
@@ -459,7 +515,7 @@ export default function DashboardOverviewPage() {
             href="/dashboard/cashbook"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-amber-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-amber-500/20">
               <Wallet className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">روزمرہ کیش بک</span>

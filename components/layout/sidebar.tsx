@@ -140,10 +140,10 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                 key={item.href}
                 href={item.href}
                 onClick={onCloseMobile}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs transition duration-150 ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl mx-2 text-xs transition duration-150 ${
                   active
                     ? 'bg-white/10 backdrop-blur-xl border-l-4 border-emerald-400 text-white shadow-lg font-bold'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.06] font-medium'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5 font-medium'
                 }`}
               >
                 <Icon

@@ -1,19 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: #F8FAFF;
+    --background: #f8fafc;
     --foreground: #0f172a;
   }
 }
 
 body {
   color: var(--foreground);
-  background-color: #F8FAFF;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8fafc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Urdu typography helper */
+.font-urdu {
+  font-family: 'Noto Nastaliq Urdu', -apple-system, sans-serif;
+  line-height: 2.2;
 }
 
 /* Custom scrollbars */

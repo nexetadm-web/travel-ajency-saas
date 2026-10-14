@@ -25,16 +25,17 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAgency } from '@/hooks/useAgency';
+import PremiumCard from '@/components/ui/premium-card';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const KANBAN_COLUMNS = [
-  { id: 'inquiry', title: 'انکوائری (Inquiry)', color: 'border-slate-300 bg-slate-50 text-slate-700' },
-  { id: 'documents_pending', title: 'دستاویزات جمع (Pending)', color: 'border-amber-300 bg-amber-50 text-amber-700' },
-  { id: 'applied', title: 'درخواست جمع (Applied)', color: 'border-blue-300 bg-blue-50 text-blue-700' },
-  { id: 'in_embassy', title: 'سفارت خانے میں (Embassy)', color: 'border-purple-300 bg-purple-50 text-purple-700' },
-  { id: 'approved', title: 'منظور شدہ (Approved 🎉)', color: 'border-emerald-300 bg-emerald-50 text-emerald-700' },
-  { id: 'rejected', title: 'مسترد (Rejected)', color: 'border-rose-300 bg-rose-50 text-rose-700' },
+  { id: 'inquiry', title: 'انکوائری (Inquiry)', border: 'border-l-4 border-l-indigo-400', badge: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
+  { id: 'documents_pending', title: 'دستاویزات جمع (Pending)', border: 'border-l-4 border-l-blue-400', badge: 'border-blue-200 bg-blue-50 text-blue-700' },
+  { id: 'applied', title: 'درخواست جمع (Applied)', border: 'border-l-4 border-l-amber-400', badge: 'border-amber-200 bg-amber-50 text-amber-700' },
+  { id: 'in_embassy', title: 'سفارت خانے میں (Embassy)', border: 'border-l-4 border-l-purple-400', badge: 'border-purple-200 bg-purple-50 text-purple-700' },
+  { id: 'approved', title: 'منظور شدہ (Approved 🎉)', border: 'border-l-4 border-l-emerald-400', badge: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+  { id: 'rejected', title: 'مسترد (Rejected)', border: 'border-l-4 border-l-rose-400', badge: 'border-rose-200 bg-rose-50 text-rose-700' },
 ];
 
 export default function VisaConsultancyPage() {
@@ -190,66 +191,39 @@ export default function VisaConsultancyPage() {
       </div>
 
       {/* TOP 4 METRICS CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wide text-gray-500 block mb-1">
-              کل ویزہ کیسز (Total Cases)
-            </span>
-            <span className="text-3xl font-black text-gray-900 tracking-tight block">
-              {stats.totalCases}
-            </span>
-            <span className="text-[11px] text-gray-400 mt-1 block">تمام ممالک کے سٹوڈنٹ و وزٹ</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-            <Globe2 className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wide text-gray-500 block mb-1">
-              منظور شدہ ویزے (Approved)
-            </span>
-            <span className="text-3xl font-black text-emerald-600 tracking-tight block">
-              {stats.approvedCases}
-            </span>
-            <span className="text-[11px] text-emerald-600/80 mt-1 block">100% کامیاب ریٹ</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <CheckCircle2 className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wide text-gray-500 block mb-1">
-              سفارت خانے میں زیر التواء
-            </span>
-            <span className="text-3xl font-black text-purple-600 tracking-tight block">
-              {stats.pendingCases}
-            </span>
-            <span className="text-[11px] text-purple-600/80 mt-1 block">پراسیسنگ مرحلے میں</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
-            <Clock className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wide text-gray-500 block mb-1">
-              کنسلٹنسی آمدنی (Revenue)
-            </span>
-            <span className="text-3xl font-black text-teal-600 tracking-tight block">
-              {formatCurrency(stats.totalRevenue)}
-            </span>
-            <span className="text-[11px] text-teal-600/80 mt-1 block">وصول شدہ فیس</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
-            <DollarSign className="w-6 h-6" />
-          </div>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <PremiumCard
+          title="کل ویزہ کیسز"
+          value={stats.totalCases}
+          subtitle="تمام ممالک کے سٹوڈنٹ و وزٹ"
+          icon={Globe2}
+          gradient="violet"
+          trend="کل کیسز"
+        />
+        <PremiumCard
+          title="منظور شدہ ویزے"
+          value={stats.approvedCases}
+          subtitle="100% کامیاب ریٹ"
+          icon={CheckCircle2}
+          gradient="emerald"
+          trend="کامیاب"
+        />
+        <PremiumCard
+          title="سفارت خانے میں زیرِ التواء"
+          value={stats.pendingCases}
+          subtitle="پراسیسنگ مرحلے میں"
+          icon={Clock}
+          gradient="amber"
+          trend="پینڈنگ"
+        />
+        <PremiumCard
+          title="کنسلٹنسی ریونیو"
+          value={formatCurrency(stats.totalRevenue)}
+          subtitle="وصول شدہ سروس چارجز"
+          icon={DollarSign}
+          gradient="cyan"
+          trend="آمدن"
+        />
       </div>
 
       {/* FILTERS & SEARCH */}
@@ -308,12 +282,14 @@ export default function VisaConsultancyPage() {
           return (
             <div
               key={col.id}
-              className="bg-white rounded-[20px] border border-gray-200/80 p-4 shadow-sm flex flex-col min-h-[480px]"
+              className={`bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex flex-col min-h-[480px] ${col.border}`}
             >
               {/* Column Header */}
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
-                <span className="font-bold text-xs text-gray-800 truncate">{col.title}</span>
-                <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-700 text-xs font-bold flex items-center justify-center">
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 gap-1">
+                <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold border ${col.badge} truncate`}>
+                  {col.title}
+                </span>
+                <span className="w-5 h-5 rounded-full bg-gray-50 border border-gray-200 text-gray-700 text-[11px] font-bold flex items-center justify-center flex-shrink-0">
                   {colCases.length}
                 </span>
               </div>

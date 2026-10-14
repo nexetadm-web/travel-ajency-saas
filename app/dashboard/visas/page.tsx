@@ -19,6 +19,8 @@ import {
 import { DndContext, useDroppable, useDraggable, DragEndEvent } from '@dnd-kit/core';
 import dayjs from 'dayjs';
 import { formatDate } from '@/lib/utils';
+import PremiumCard from '@/components/ui/premium-card';
+import ContentCard from '@/components/ui/content-card';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -100,16 +102,16 @@ function KanbanColumn({ col, visas }: { col: any; visas: any[] }) {
   return (
     <div
       ref={setNodeRef}
-      className={`rounded-[24px] border border-gray-200 bg-gray-50/60 p-4 min-h-[500px] flex flex-col justify-between transition ${
-        isOver ? 'ring-2 ring-emerald-500 bg-emerald-50/20' : ''
+      className={`rounded-2xl border border-gray-100 bg-white shadow-sm p-4 min-h-[500px] flex flex-col justify-between transition ${
+        isOver ? 'ring-2 ring-emerald-500 bg-emerald-50/10' : ''
       }`}
     >
       <div>
-        <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-200">
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
           <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${col.color}`}>
             {col.title}
           </span>
-          <span className="w-6 h-6 rounded-full bg-white border border-gray-200 text-xs font-bold flex items-center justify-center text-gray-700 shadow-sm">
+          <span className="w-6 h-6 rounded-full bg-gray-50 border border-gray-200 text-xs font-bold flex items-center justify-center text-gray-700 shadow-sm">
             {visas.length}
           </span>
         </div>
@@ -230,6 +232,11 @@ export default function VisasPage() {
     v.visa_number?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const docsReceived = visas.filter((v: any) => (v.status || 'document_pending') === 'document_pending').length;
+  const inEmbassy = visas.filter((v: any) => v.status === 'in_embassy').length;
+  const printed = visas.filter((v: any) => v.status === 'printed').length;
+  const returned = visas.filter((v: any) => v.status === 'returned').length;
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Header */}
@@ -279,6 +286,42 @@ export default function VisasPage() {
         </div>
       </div>
 
+      {/* Top 4 Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <PremiumCard
+          title="دستاویزات موصول"
+          value={docsReceived}
+          subtitle="کاغذات ویریفائی ہو رہے ہیں"
+          icon={FileText}
+          gradient="cyan"
+          trend="مرحلہ 1"
+        />
+        <PremiumCard
+          title="سفارت خانے میں (Embassy)"
+          value={inEmbassy}
+          subtitle="کیس جمع ہے"
+          icon={Building2}
+          gradient="amber"
+          trend="مرحلہ 2"
+        />
+        <PremiumCard
+          title="ویزہ پرنٹ ہو گیا"
+          value={printed}
+          subtitle="ویزہ تیار ہے"
+          icon={CheckCircle}
+          gradient="emerald"
+          trend="مرحلہ 3"
+        />
+        <PremiumCard
+          title="پاسپورٹ موصول / واپس"
+          value={returned}
+          subtitle="حاجی کے سپردگی کے لیے"
+          icon={FileCheck2}
+          gradient="rose"
+          trend="مرحلہ 4"
+        />
+      </div>
+
       {/* SEARCH BAR */}
       <div className="relative w-full sm:w-80">
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -287,7 +330,7 @@ export default function VisasPage() {
           placeholder="پاسپورٹ نمبر یا ویزہ نمبر سرچ کریں..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-500 shadow-sm"
+          className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-500 shadow-sm"
         />
       </div>
 
@@ -303,36 +346,38 @@ export default function VisasPage() {
         </DndContext>
       ) : (
         /* LIST VIEW */
-        <div className="rounded-[24px] border border-gray-100 bg-white overflow-x-auto shadow-sm">
-          <table className="w-full text-left text-xs text-gray-700">
-            <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[11px] border-b border-gray-100">
-              <tr>
-                <th className="p-4">پاسپورٹ نمبر</th>
-                <th className="p-4">ویزہ کیٹیگری</th>
-                <th className="p-4">سفارت خانہ</th>
-                <th className="p-4">ویزہ نمبر</th>
-                <th className="p-4">میعاد</th>
-                <th className="p-4">موجودہ مرحلہ</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredVisas.map((v: any) => (
-                <tr key={v.id} className="hover:bg-gray-50/60 transition">
-                  <td className="p-4 font-mono font-bold text-sky-700">{v.passport_no}</td>
-                  <td className="p-4 uppercase">{v.visa_type}</td>
-                  <td className="p-4">{v.embassy || '-'}</td>
-                  <td className="p-4 font-mono text-emerald-700">{v.visa_number || '-'}</td>
-                  <td className="p-4">{formatDate(v.expiry_date)}</td>
-                  <td className="p-4">
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-800">
-                      {v.status}
-                    </span>
-                  </td>
+        <ContentCard>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-gray-700">
+              <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[11px] border-b border-gray-100">
+                <tr>
+                  <th className="p-4">پاسپورٹ نمبر</th>
+                  <th className="p-4">ویزہ کیٹیگری</th>
+                  <th className="p-4">سفارت خانہ</th>
+                  <th className="p-4">ویزہ نمبر</th>
+                  <th className="p-4">میعاد</th>
+                  <th className="p-4">موجودہ مرحلہ</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredVisas.map((v: any) => (
+                  <tr key={v.id} className="hover:bg-gray-50/60 transition">
+                    <td className="p-4 font-mono font-bold text-sky-700">{v.passport_no}</td>
+                    <td className="p-4 uppercase">{v.visa_type}</td>
+                    <td className="p-4">{v.embassy || '-'}</td>
+                    <td className="p-4 font-mono text-emerald-700">{v.visa_number || '-'}</td>
+                    <td className="p-4">{formatDate(v.expiry_date)}</td>
+                    <td className="p-4">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-800">
+                        {v.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </ContentCard>
       )}
 
       {/* CREATE VISA MODAL */}

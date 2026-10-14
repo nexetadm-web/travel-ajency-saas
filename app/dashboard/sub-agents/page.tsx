@@ -20,6 +20,8 @@ import {
   Building,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import PremiumCard from '@/components/ui/premium-card';
+import ContentCard from '@/components/ui/content-card';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -113,47 +115,40 @@ export default function SubAgentsPage() {
         </button>
       </div>
 
-      {/* METRICS CARDS - COLORFUL PSO/SHELL STYLE */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold opacity-90">کل سب ایجنٹس</span>
-            <Users2 className="w-5 h-5 opacity-80" />
-          </div>
-          <div className="text-3xl font-black mt-3">{subAgents.length}</div>
-          <div className="text-[11px] opacity-80 mt-1">ایکٹو پارٹنرز</div>
-        </div>
-
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold opacity-90">کل ریفر کردہ حجاج</span>
-            <TrendingUp className="w-5 h-5 opacity-80" />
-          </div>
-          <div className="text-3xl font-black mt-3">{totalPilgrims}</div>
-          <div className="text-[11px] opacity-80 mt-1">کامیاب بکنگز</div>
-        </div>
-
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-white border-2 border-emerald-100">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-bold text-gray-500">کل کمیشن بن چکا</span>
-            <DollarSign className="w-5 h-5 text-emerald-500" />
-          </div>
-          <div className="text-3xl font-black text-emerald-600 mt-3">
-            {formatCurrency(totalEarned)}
-          </div>
-          <div className="text-[11px] text-gray-400 mt-1">مجموعی کمیشن</div>
-        </div>
-
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-white border-2 border-rose-100">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-bold text-gray-500">باقی واجب الادا کمیشن</span>
-            <CreditCard className="w-5 h-5 text-rose-500" />
-          </div>
-          <div className="text-3xl font-black text-rose-600 mt-3">
-            {formatCurrency(totalRemaining)}
-          </div>
-          <div className="text-[11px] text-gray-400 mt-1">ادائیگی کے منتظر</div>
-        </div>
+      {/* METRICS CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <PremiumCard
+          title="کل سب ایجنٹس"
+          value={subAgents.length}
+          subtitle="ایکٹو پارٹنرز و ریفرلز"
+          icon={Users2}
+          gradient="violet"
+          trend="پارٹنرز"
+        />
+        <PremiumCard
+          title="کل ریفر کردہ حجاج"
+          value={totalPilgrims}
+          subtitle="کامیاب بکنگز و ویزے"
+          icon={TrendingUp}
+          gradient="cyan"
+          trend="حجاج تعداد"
+        />
+        <PremiumCard
+          title="کل کمیشن بن چکا"
+          value={formatCurrency(totalEarned)}
+          subtitle="مجموعی ارننگ"
+          icon={DollarSign}
+          gradient="emerald"
+          trend="کمیشن"
+        />
+        <PremiumCard
+          title="باقی واجب الادا کمیشن"
+          value={formatCurrency(totalRemaining)}
+          subtitle="ادائیگی کے منتظر"
+          icon={CreditCard}
+          gradient="rose"
+          trend="بقایا جات"
+        />
       </div>
 
       {/* SUB AGENTS TABLE */}
@@ -171,7 +166,7 @@ export default function SubAgentsPage() {
           </p>
         </div>
       ) : (
-        <div className="rounded-[24px] border border-gray-100 bg-white overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+        <ContentCard>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-gray-700">
               <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
@@ -241,7 +236,7 @@ export default function SubAgentsPage() {
               </tbody>
             </table>
           </div>
-        </div>
+        </ContentCard>
       )}
 
       {/* ADD SUB AGENT MODAL */}

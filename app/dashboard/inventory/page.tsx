@@ -18,6 +18,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import PremiumCard from '@/components/ui/premium-card';
+import ContentCard from '@/components/ui/content-card';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -143,45 +145,40 @@ export default function InventoryPage() {
         </button>
       </div>
 
-      {/* METRICS CARDS - SHELL/PSO THEME */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold opacity-90">کل سامان کی اقسام</span>
-            <Boxes className="w-5 h-5 opacity-80" />
-          </div>
-          <div className="text-3xl font-black mt-3">{items.length}</div>
-          <div className="text-[11px] opacity-80 mt-1">انوینٹری آئٹمز</div>
-        </div>
-
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold opacity-90">دستیاب سٹاک (موجود)</span>
-            <Package className="w-5 h-5 opacity-80" />
-          </div>
-          <div className="text-3xl font-black mt-3">{totalStock}</div>
-          <div className="text-[11px] opacity-80 mt-1">سٹور میں موجود پیس</div>
-        </div>
-
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-white border-2 border-emerald-100">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-bold text-gray-500">تقسیم شدہ کٹس</span>
-            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-          </div>
-          <div className="text-3xl font-black text-emerald-600 mt-3">{totalIssued}</div>
-          <div className="text-[11px] text-gray-400 mt-1">حجاج کو دیے گئے پیس</div>
-        </div>
-
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-white border-2 border-purple-100">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-bold text-gray-500">سٹاک کی تخمینہ قیمت</span>
-            <DollarSign className="w-5 h-5 text-purple-600" />
-          </div>
-          <div className="text-3xl font-black text-purple-600 mt-3">
-            {formatCurrency(totalValue)}
-          </div>
-          <div className="text-[11px] text-gray-400 mt-1">موجودہ سٹاک مالیت</div>
-        </div>
+      {/* METRICS CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <PremiumCard
+          title="سامان کی اقسام"
+          value={items.length}
+          subtitle="رجسٹرڈ انوینٹری آئٹمز"
+          icon={Boxes}
+          gradient="violet"
+          trend="آئٹمز"
+        />
+        <PremiumCard
+          title="دستیاب سٹاک (موجود)"
+          value={totalStock}
+          subtitle="سٹور میں موجود پیس"
+          icon={Package}
+          gradient="emerald"
+          trend="سٹاک"
+        />
+        <PremiumCard
+          title="تقسیم شدہ کٹس"
+          value={totalIssued}
+          subtitle="حجاج کو دیے گئے کٹس"
+          icon={CheckCircle2}
+          gradient="cyan"
+          trend="ایشوڈ"
+        />
+        <PremiumCard
+          title="سٹاک کی تخمینہ قیمت"
+          value={formatCurrency(totalValue)}
+          subtitle="موجودہ انوینٹری مالیت"
+          icon={DollarSign}
+          gradient="rose"
+          trend="مالیت"
+        />
       </div>
 
       {/* TABS */}

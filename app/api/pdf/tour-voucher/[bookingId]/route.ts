@@ -5,6 +5,14 @@ import { eq } from 'drizzle-orm';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import QRCode from 'qrcode';
 
+export const dynamic = 'force-dynamic';
+
+function toAsciiSafe(str: string | null | undefined, fallback = 'N/A'): string {
+  if (!str) return fallback;
+  const cleaned = str.replace(/[^\x20-\x7E]/g, '').trim();
+  return cleaned.length > 0 ? cleaned : fallback;
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ bookingId: string }> | { bookingId: string } }
@@ -19,7 +27,7 @@ export async function GET(
       .limit(1);
 
     if (!booking) {
-      return NextResponse.json({ error: 'بکنگ نہیں ملی' }, { status: 404 });
+      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
     const [pkg] = await db
@@ -55,48 +63,54 @@ export async function GET(
       color: rgb(0.08, 0.45, 0.65), // Ocean Tour Blue
     });
 
-    const agencyName = (agency?.name || 'EXPLORE TRAVELS & TOURS').toUpperCase();
+    const agencyName = toAsciiSafe(agency?.name, 'EXPLORE TRAVELS AND TOURS').toUpperCase();
     page.drawText(agencyName, {
       x: 40,
       y: height - 50,
-      size: 20,
+      size: 18,
       font: fontBold,
       color: rgb(1, 1, 1),
     });
 
-    page.drawText(`OFFICIAL HOLIDAY TOUR VOUCHER & BOOKING CONFIRMATION`, {
+    page.drawText(`OFFICIAL HOLIDAY TOUR VOUCHER AND BOOKING CONFIRMATION`, {
       x: 40,
       y: height - 72,
-      size: 11,
+      size: 10,
       font: fontBold,
       color: rgb(0.85, 0.95, 1),
     });
 
-    page.drawText(`License: ${agency?.license_no || 'DTS-4421'} | 24/7 Helpline: ${agency?.phone || '+92 300 1234567'}`, {
+    const agencyPhone = toAsciiSafe(agency?.phone, '+92 300 1234567');
+    const agencyLic = toAsciiSafe(agency?.license_no, 'DTS-4421');
+    page.drawText(`License: ${agencyLic} | 24/7 Helpline: ${agencyPhone}`, {
       x: 40,
       y: height - 92,
-      size: 9,
+      size: 8.5,
       font: fontRegular,
       color: rgb(0.85, 0.92, 0.98),
     });
 
     // Embed QR code
-    const qrDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 1 });
-    const qrBytes = Buffer.from(qrDataUrl.split(',')[1], 'base64');
-    const qrImg = await pdfDoc.embedPng(qrBytes);
-    page.drawImage(qrImg, {
-      x: width - 115,
-      y: height - 105,
-      width: 80,
-      height: 80,
-    });
-    page.drawText('Scan to Verify', {
-      x: width - 110,
-      y: height - 115,
-      size: 7,
-      font: fontBold,
-      color: rgb(1, 1, 1),
-    });
+    try {
+      const qrDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 1 });
+      const qrBytes = Buffer.from(qrDataUrl.split(',')[1], 'base64');
+      const qrImg = await pdfDoc.embedPng(qrBytes);
+      page.drawImage(qrImg, {
+        x: width - 115,
+        y: height - 105,
+        width: 80,
+        height: 80,
+      });
+      page.drawText('Scan to Verify', {
+        x: width - 110,
+        y: height - 115,
+        size: 7,
+        font: fontBold,
+        color: rgb(1, 1, 1),
+      });
+    } catch {
+      // QR optional
+    }
 
     // Client & Tour Package Box
     page.drawRectangle({
@@ -118,22 +132,31 @@ export async function GET(
     });
 
     let rowY = height - 172;
-    page.drawText(`Lead Passenger: ${booking.client_name}`, { x: 55, y: rowY, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
-    page.drawText(`Tour Package: ${pkg?.package_name || 'Northern Areas Tour'}`, { x: 300, y: rowY, size: 10, font: fontBold, color: rgb(0.08, 0.45, 0.65) });
+    const clientName = toAsciiSafe(booking.client_name, 'LEAD PASSENGER').toUpperCase();
+    const packageName = toAsciiSafe(pkg?.package_name, 'Holiday Tour Package');
+    page.drawText(`Lead Passenger: ${clientName}`, { x: 55, y: rowY, size: 9.5, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(`Tour Package: ${packageName}`, { x: 300, y: rowY, size: 9.5, font: fontBold, color: rgb(0.08, 0.45, 0.65) });
 
     rowY -= 20;
-    page.drawText(`Phone: ${booking.phone || 'N/A'} | CNIC: ${booking.cnic || 'N/A'}`, { x: 55, y: rowY, size: 9, font: fontRegular, color: rgb(0.2, 0.2, 0.2) });
-    page.drawText(`Destination: ${pkg?.destination || 'Hunza & Skardu'} (${pkg?.duration_days || 5} Days)`, { x: 300, y: rowY, size: 9, font: fontRegular, color: rgb(0.2, 0.2, 0.2) });
+    const clientPhone = toAsciiSafe(booking.phone, 'N/A');
+    const clientCnic = toAsciiSafe(booking.cnic, 'N/A');
+    const destination = toAsciiSafe(pkg?.destination, 'Northern Pakistan');
+    const durationDays = pkg?.duration_days || 5;
+    page.drawText(`Phone: ${clientPhone} | CNIC: ${clientCnic}`, { x: 55, y: rowY, size: 8.5, font: fontRegular, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Destination: ${destination} (${durationDays} Days)`, { x: 300, y: rowY, size: 8.5, font: fontRegular, color: rgb(0.2, 0.2, 0.2) });
 
     rowY -= 20;
-    page.drawText(`Total Persons: ${booking.persons} Adult(s)`, { x: 55, y: rowY, size: 9, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
-    page.drawText(`Departure Date: ${booking.travel_date || 'Scheduled'}`, { x: 300, y: rowY, size: 9, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+    const travelDate = toAsciiSafe(booking.travel_date, 'Scheduled on Confirmation');
+    page.drawText(`Total Persons: ${booking.persons || 1} Adult(s)`, { x: 55, y: rowY, size: 8.5, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(`Departure Date: ${travelDate}`, { x: 300, y: rowY, size: 8.5, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
 
     rowY -= 20;
-    page.drawText(`Booking Reference: #${booking.id.slice(0, 8).toUpperCase()}`, { x: 55, y: rowY, size: 9, font: fontRegular, color: rgb(0.3, 0.3, 0.3) });
-    page.drawText(`Tour Type: ${pkg?.type?.toUpperCase() || 'DOMESTIC'} PACKAGE`, { x: 300, y: rowY, size: 9, font: fontBold, color: rgb(0.08, 0.45, 0.65) });
+    const bookingRef = booking.id.slice(0, 8).toUpperCase();
+    const pkgType = toAsciiSafe(pkg?.type, 'DOMESTIC').toUpperCase();
+    page.drawText(`Booking Reference: #${bookingRef}`, { x: 55, y: rowY, size: 8.5, font: fontRegular, color: rgb(0.3, 0.3, 0.3) });
+    page.drawText(`Tour Type: ${pkgType} PACKAGE`, { x: 300, y: rowY, size: 8.5, font: fontBold, color: rgb(0.08, 0.45, 0.65) });
 
-    // FINANCIAL HISAB SUMMARY BOX
+    // FINANCIAL SUMMARY BOX
     page.drawRectangle({
       x: 40,
       y: height - 340,
@@ -144,17 +167,17 @@ export async function GET(
       borderWidth: 1,
     });
 
-    page.drawText('PAYMENT & FINANCIAL SUMMARY', { x: 55, y: height - 290, size: 10, font: fontBold, color: rgb(0.1, 0.5, 0.3) });
+    page.drawText('PAYMENT AND FINANCIAL SUMMARY', { x: 55, y: height - 290, size: 9.5, font: fontBold, color: rgb(0.1, 0.5, 0.3) });
 
     const totalAmt = booking.total_amount || 0;
     const advance = booking.advance || 0;
     const remaining = Math.max(0, totalAmt - advance);
 
-    page.drawText(`Total Package Cost: PKR ${totalAmt.toLocaleString()}`, { x: 55, y: height - 312, size: 9, font: fontRegular, color: rgb(0.2, 0.2, 0.2) });
-    page.drawText(`Advance Received: PKR ${advance.toLocaleString()}`, { x: 230, y: height - 312, size: 9, font: fontBold, color: rgb(0.1, 0.5, 0.3) });
-    page.drawText(`Balance Due: PKR ${remaining.toLocaleString()}`, { x: 400, y: height - 312, size: 9, font: fontBold, color: remaining > 0 ? rgb(0.8, 0.2, 0.2) : rgb(0.1, 0.5, 0.3) });
+    page.drawText(`Total Package Cost: PKR ${totalAmt.toLocaleString()}`, { x: 55, y: height - 312, size: 8.5, font: fontRegular, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Advance Received: PKR ${advance.toLocaleString()}`, { x: 230, y: height - 312, size: 8.5, font: fontBold, color: rgb(0.1, 0.5, 0.3) });
+    page.drawText(`Balance Due: PKR ${remaining.toLocaleString()}`, { x: 400, y: height - 312, size: 8.5, font: fontBold, color: remaining > 0 ? rgb(0.8, 0.2, 0.2) : rgb(0.1, 0.5, 0.3) });
 
-    // TOUR INCLUSIONS & ITINERARY
+    // TOUR INCLUSIONS & INSTRUCTIONS
     page.drawRectangle({
       x: 40,
       y: height - 440,
@@ -165,32 +188,33 @@ export async function GET(
       borderWidth: 1,
     });
 
-    page.drawText('PACKAGE INCLUSIONS & SERVICES:', { x: 55, y: height - 370, size: 10, font: fontBold, color: rgb(0.1, 0.2, 0.4) });
-    page.drawText(`• Includes: ${pkg?.includes || 'Luxury Accommodation, Private 4x4 Transportation, Daily Breakfast & Professional Guide'}`, {
+    const includesText = toAsciiSafe(pkg?.includes, 'Luxury Accommodation, Private 4x4 Transportation, Daily Breakfast, Guide');
+    page.drawText('PACKAGE INCLUSIONS AND SERVICES:', { x: 55, y: height - 370, size: 9.5, font: fontBold, color: rgb(0.1, 0.2, 0.4) });
+    page.drawText(`Includes: ${includesText}`, {
       x: 55,
       y: height - 390,
-      size: 9,
+      size: 8,
       font: fontRegular,
       color: rgb(0.2, 0.2, 0.2),
     });
-    page.drawText('• Support: Dedicated local coordinator available throughout the tour trip.', {
+    page.drawText('Support: Dedicated local tour coordinator available throughout the journey.', {
       x: 55,
       y: height - 408,
-      size: 9,
+      size: 8,
       font: fontRegular,
       color: rgb(0.3, 0.3, 0.3),
     });
-    page.drawText('• Instructions: Please report at departure point 30 minutes prior to scheduled departure.', {
+    page.drawText('Instructions: Please report at departure point 30 minutes prior to scheduled departure.', {
       x: 55,
       y: height - 425,
-      size: 9,
+      size: 8,
       font: fontRegular,
       color: rgb(0.3, 0.3, 0.3),
     });
 
     // STAMP & FOOTER
-    page.drawText('Agency Operations Manager: ______________________', { x: 55, y: 70, size: 9, font: fontRegular, color: rgb(0.3, 0.3, 0.3) });
-    page.drawText('Authorized Booking Seal: [ VALID VOUCHER ]', { x: 330, y: 70, size: 9, font: fontBold, color: rgb(0.08, 0.45, 0.65) });
+    page.drawText('Agency Operations Manager: ______________________', { x: 55, y: 70, size: 8.5, font: fontRegular, color: rgb(0.3, 0.3, 0.3) });
+    page.drawText('Authorized Seal: [ VALID VOUCHER ]', { x: 330, y: 70, size: 8.5, font: fontBold, color: rgb(0.08, 0.45, 0.65) });
 
     page.drawRectangle({
       x: 0,
@@ -200,10 +224,10 @@ export async function GET(
       color: rgb(0.96, 0.97, 0.99),
     });
 
-    page.drawText(`Issued by ${agencyName} | Verified Tour Operations | Hotline: ${agency?.phone || '0300-1234567'}`, {
+    page.drawText(`Issued by ${agencyName} | Verified Tour Operations | Helpline: ${agencyPhone}`, {
       x: 40,
       y: 15,
-      size: 8,
+      size: 7.5,
       font: fontRegular,
       color: rgb(0.4, 0.4, 0.4),
     });
@@ -214,11 +238,11 @@ export async function GET(
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="tour-voucher-${booking.client_name.replace(/\s+/g, '_')}.pdf"`,
+        'Content-Disposition': `inline; filename="tour-voucher-${bookingRef}.pdf"`,
       },
     });
   } catch (err: any) {
     console.error('Tour voucher PDF error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'PDF generation failed: ' + (err?.message || 'Unknown error') }, { status: 500 });
   }
 }

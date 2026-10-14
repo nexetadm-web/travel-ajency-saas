@@ -22,6 +22,8 @@ import {
   Check,
 } from 'lucide-react';
 import { formatDate, formatCurrency } from '@/lib/utils';
+import PremiumCard from '@/components/ui/premium-card';
+import ContentCard from '@/components/ui/content-card';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -47,6 +49,11 @@ export default function PilgrimsDirectoryPage() {
 
   const pilgrims = data?.pilgrims || [];
 
+  const totalPilgrims = pilgrims.length;
+  const docsPending = pilgrims.filter((p: any) => p.visa_status === 'document_pending' || !p.visa_status).length;
+  const visaProcessing = pilgrims.filter((p: any) => p.visa_status === 'in_embassy' || p.visa_status === 'submitted').length;
+  const ticketPending = pilgrims.filter((p: any) => p.ticket_status === 'pending' || !p.ticket_status).length;
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -55,7 +62,7 @@ export default function PilgrimsDirectoryPage() {
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-gray-900">زائرین ڈائریکٹری اور پاسپورٹ سرچ</h1>
             <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-              کل رجسٹرڈ: {pilgrims.length}
+              کل رجسٹرڈ: {totalPilgrims}
             </span>
           </div>
           <p className="text-xs text-gray-500 mt-1">
@@ -74,49 +81,86 @@ export default function PilgrimsDirectoryPage() {
         </div>
       </div>
 
-      {/* FILTERS & SEARCH */}
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="پاسپورٹ نمبر، نام، شناختی کارڈ یا فون نمبر درج کریں..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm"
-          />
-        </div>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Filter className="w-4 h-4 text-gray-400" />
-          <select
-            value={visaFilter}
-            onChange={(e) => setVisaFilter(e.target.value)}
-            className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-800 focus:outline-none focus:border-emerald-500 shadow-sm"
-          >
-            <option value="all">تمام ویزہ سٹیٹس</option>
-            <option value="document_pending">دستاویزات زیرِ التواء</option>
-            <option value="in_embassy">سفارت خانے میں (In Embassy)</option>
-            <option value="printed">ویزہ پرنٹ شدہ (Printed)</option>
-            <option value="returned">واپس موصول (Returned)</option>
-          </select>
-        </div>
+      {/* Top 4 Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <PremiumCard
+          title="ٹوٹل حجاج / زائرین"
+          value={totalPilgrims}
+          subtitle="تمام رجسٹرڈ مسافر"
+          icon={Users}
+          gradient="violet"
+          trend="کل تعداد"
+        />
+        <PremiumCard
+          title="دستاویزات پینڈنگ"
+          value={docsPending}
+          subtitle="کاغذات جمع ہونا باقی"
+          icon={FileText}
+          gradient="amber"
+          trend="پینڈنگ"
+        />
+        <PremiumCard
+          title="سفارت خانے میں (Visa)"
+          value={visaProcessing}
+          subtitle="پراسیسنگ جاری ہے"
+          icon={Clock}
+          gradient="rose"
+          trend="ایمبیسی"
+        />
+        <PremiumCard
+          title="ٹکٹ پینڈنگ"
+          value={ticketPending}
+          subtitle="سیٹ کنفرمیشن باقی"
+          icon={CheckCircle}
+          gradient="cyan"
+          trend="ٹکٹنگ"
+        />
       </div>
 
-      {/* PILGRIMS TABLE */}
-      {isLoading ? (
-        <div className="py-20 text-center text-gray-400">
-          <div className="inline-block animate-spin text-2xl mb-2">⏳</div>
-          <p className="text-xs">زائرین لسٹ لوڈ ہو رہی ہے...</p>
+      <ContentCard>
+        {/* FILTERS & SEARCH */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+          <div className="relative flex-1 w-full">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="پاسپورٹ نمبر، نام، شناختی کارڈ یا فون نمبر درج کریں..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 transition"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Filter className="w-4 h-4 text-gray-400" />
+            <select
+              value={visaFilter}
+              onChange={(e) => setVisaFilter(e.target.value)}
+              className="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-800 focus:outline-none focus:border-emerald-500 transition"
+            >
+              <option value="all">تمام ویزہ سٹیٹس</option>
+              <option value="document_pending">دستاویزات زیرِ التواء</option>
+              <option value="in_embassy">سفارت خانے میں (In Embassy)</option>
+              <option value="printed">ویزہ پرنٹ شدہ (Printed)</option>
+              <option value="returned">واپس موصول (Returned)</option>
+            </select>
+          </div>
         </div>
-      ) : pilgrims.length === 0 ? (
-        <div className="p-12 text-center rounded-[24px] bg-white border border-gray-100 text-gray-400 shadow-sm">
-          <Users className="w-10 h-10 mx-auto mb-2 opacity-30 text-emerald-500" />
-          <p className="text-sm font-semibold">کوئی زائر نہیں ملا</p>
-        </div>
-      ) : (
-        <div className="rounded-[24px] border border-gray-100 bg-white overflow-x-auto shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-          <table className="w-full text-left text-xs text-gray-700">
+
+        {/* PILGRIMS TABLE */}
+        {isLoading ? (
+          <div className="py-20 text-center text-gray-400">
+            <div className="inline-block animate-spin text-2xl mb-2">⏳</div>
+            <p className="text-xs">زائرین لسٹ لوڈ ہو رہی ہے...</p>
+          </div>
+        ) : pilgrims.length === 0 ? (
+          <div className="p-12 text-center rounded-2xl bg-gray-50/50 border border-gray-100 text-gray-400">
+            <Users className="w-10 h-10 mx-auto mb-2 opacity-30 text-emerald-500" />
+            <p className="text-sm font-semibold">کوئی زائر نہیں ملا</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-gray-100">
+            <table className="w-full text-left text-xs text-gray-700">
             <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="p-4">نام زائر</th>
@@ -219,6 +263,7 @@ export default function PilgrimsDirectoryPage() {
           </table>
         </div>
       )}
+      </ContentCard>
     </div>
   );
 }

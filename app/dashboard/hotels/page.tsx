@@ -21,6 +21,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import PremiumCard from '@/components/ui/premium-card';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -270,44 +271,39 @@ export default function HotelsAndTransportPage() {
       </div>
 
       {/* METRICS CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold opacity-90">رجسٹرڈ ہوٹلز</span>
-            <Building2 className="w-5 h-5 opacity-80" />
-          </div>
-          <div className="text-3xl font-black mt-3">{hotels.length}</div>
-          <div className="text-[11px] opacity-80 mt-1">مکہ و مدینہ پراپرٹیز</div>
-        </div>
-
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold opacity-90">گروپ ہوٹل بکنگز</span>
-            <Calendar className="w-5 h-5 opacity-80" />
-          </div>
-          <div className="text-3xl font-black mt-3">{bookings.length}</div>
-          <div className="text-[11px] opacity-80 mt-1">فعال گروپ ریزرویشنز</div>
-        </div>
-
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-gradient-to-br from-orange-400 to-pink-500 text-white">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold opacity-90">ٹرانسپورٹ روٹس</span>
-            <Car className="w-5 h-5 opacity-80" />
-          </div>
-          <div className="text-3xl font-black mt-3">{transportList.length}</div>
-          <div className="text-[11px] opacity-80 mt-1">بس اور وی آئی پی روٹس</div>
-        </div>
-
-        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-white border-2 border-emerald-100">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-bold text-gray-500">کل بکنگ لاگت</span>
-            <DollarSign className="w-5 h-5 text-emerald-500" />
-          </div>
-          <div className="text-3xl font-black text-emerald-600 mt-3">
-            {formatCurrency(totalBookingCost)}
-          </div>
-          <div className="text-[11px] text-gray-400 mt-1">مجموعی ہوٹل اخراجات</div>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <PremiumCard
+          title="مکہ مکرمہ ہوٹلز"
+          value={hotels.filter((h: any) => (h.city || '').toLowerCase().includes('mak') || (h.city || '').includes('مکہ')).length || hotels.length}
+          subtitle="حرم شریف کے قریبی ہوٹل"
+          icon={Building2}
+          gradient="violet"
+          trend="مکہ ہوٹلز"
+        />
+        <PremiumCard
+          title="مدینہ منورہ ہوٹلز"
+          value={hotels.filter((h: any) => (h.city || '').toLowerCase().includes('mad') || (h.city || '').includes('مدینہ')).length}
+          subtitle="مسجد نبوی کے قریبی ہوٹل"
+          icon={MapPin}
+          gradient="emerald"
+          trend="مدینہ ہوٹلز"
+        />
+        <PremiumCard
+          title="ٹرانسپورٹ گاڑیاں"
+          value={transportList.length}
+          subtitle="بس اور وی آئی پی روٹس"
+          icon={Car}
+          gradient="cyan"
+          trend="گاڑیاں"
+        />
+        <PremiumCard
+          title="کل بکنگ لاگت"
+          value={formatCurrency(totalBookingCost)}
+          subtitle="مجموعی ہوٹل اخراجات"
+          icon={DollarSign}
+          gradient="rose"
+          trend="اخراجات"
+        />
       </div>
 
       {/* TABS NAVIGATION */}
@@ -316,7 +312,7 @@ export default function HotelsAndTransportPage() {
           onClick={() => setActiveTab('bookings')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
             activeTab === 'bookings'
-              ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
+              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-200'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
@@ -328,7 +324,7 @@ export default function HotelsAndTransportPage() {
           onClick={() => setActiveTab('hotels')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
             activeTab === 'hotels'
-              ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
+              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-200'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
@@ -340,7 +336,7 @@ export default function HotelsAndTransportPage() {
           onClick={() => setActiveTab('transport')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
             activeTab === 'transport'
-              ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
+              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-200'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >

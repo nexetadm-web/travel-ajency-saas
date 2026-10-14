@@ -17,6 +17,8 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import PremiumCard from '@/components/ui/premium-card';
+import ContentCard from '@/components/ui/content-card';
 import {
   ResponsiveContainer,
   BarChart,
@@ -114,60 +116,33 @@ export default function CashBookPage() {
       </div>
 
       {/* TOP 3 SUMMARY CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Card 1: Today In */}
-        <div className="bg-white rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border-2 border-emerald-100 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wide text-gray-500 block mb-1">
-              آج کی آمدنی (Today Cash In)
-            </span>
-            <span className="text-3xl font-black text-emerald-600 tracking-tight block">
-              {formatCurrency(todayIn)}
-            </span>
-            <span className="text-[11px] text-emerald-700/80 mt-1 block font-medium">
-              وصول شدہ رقوم اور ایڈوانس
-            </span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <ArrowDownRight className="w-6 h-6" />
-          </div>
-        </div>
-
-        {/* Card 2: Today Out */}
-        <div className="bg-white rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border-2 border-rose-100 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wide text-gray-500 block mb-1">
-              آج کے اخراجات (Today Cash Out)
-            </span>
-            <span className="text-3xl font-black text-rose-600 tracking-tight block">
-              {formatCurrency(todayOut)}
-            </span>
-            <span className="text-[11px] text-rose-700/80 mt-1 block font-medium">
-              ادائیگیاں اور دفتری اخراجات
-            </span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
-            <ArrowUpRight className="w-6 h-6" />
-          </div>
-        </div>
-
-        {/* Card 3: Cash In Hand */}
-        <div className="bg-gradient-to-br from-teal-500 to-emerald-700 text-white rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wide text-teal-100 block mb-1">
-              کل نقد ہاتھ میں (Cash in Hand)
-            </span>
-            <span className="text-3xl font-black tracking-tight block">
-              {formatCurrency(cashInHand)}
-            </span>
-            <span className="text-[11px] text-teal-100 mt-1 block font-medium">
-              ابتدائی بیلنس + آمدنی - اخراجات
-            </span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
-            <Wallet className="w-6 h-6" />
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <PremiumCard
+          title="کل نقد ہاتھ میں (Cash in Hand)"
+          value={formatCurrency(cashInHand)}
+          subtitle="ابتدائی بیلنس + آمدنی - اخراجات"
+          icon={Wallet}
+          gradient="emerald"
+          trend="موجودہ کیش"
+        />
+        <PremiumCard
+          title="آمدنی (Total Cash In)"
+          value={formatCurrency(todayIn)}
+          subtitle="وصول شدہ رقوم اور ایڈوانس"
+          icon={ArrowDownRight}
+          gradient="cyan"
+          trend="کیش ان فلو"
+          trendUp={true}
+        />
+        <PremiumCard
+          title="اخراجات (Total Cash Out)"
+          value={formatCurrency(todayOut)}
+          subtitle="ادائیگیاں اور دفتری اخراجات"
+          icon={ArrowUpRight}
+          gradient="rose"
+          trend="کیش آؤٹ فلو"
+          trendUp={false}
+        />
       </div>
 
       {/* 7 DAYS CASH FLOW CHART */}
@@ -230,64 +205,66 @@ export default function CashBookPage() {
       </div>
 
       {/* ENTRIES TABLE */}
-      <div className="rounded-[24px] border border-gray-100 bg-white overflow-x-auto shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-        <table className="w-full text-left text-xs text-gray-700">
-          <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
-            <tr>
-              <th className="p-4">تاریخ</th>
-              <th className="p-4">قسم (Type)</th>
-              <th className="p-4">کیٹگری (Category)</th>
-              <th className="p-4">تفصیل (Description)</th>
-              <th className="p-4">ادائیگی طریقہ</th>
-              <th className="p-4 text-right">رقم (Amount)</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {isLoading ? (
+      <ContentCard>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs text-gray-700">
+            <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
               <tr>
-                <td colSpan={6} className="p-8 text-center text-gray-400">
-                  کیش بک لوڈ ہو رہی ہے...
-                </td>
+                <th className="p-4">تاریخ</th>
+                <th className="p-4">قسم (Type)</th>
+                <th className="p-4">کیٹگری (Category)</th>
+                <th className="p-4">تفصیل (Description)</th>
+                <th className="p-4">ادائیگی طریقہ</th>
+                <th className="p-4 text-right">رقم (Amount)</th>
               </tr>
-            ) : entries.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="p-8 text-center text-gray-400">
-                  کوئی کیش اندراج نہیں ملا۔ نیا اندراج شامل کرنے کے لیے اوپر بٹن دبائیں۔
-                </td>
-              </tr>
-            ) : (
-              entries.map((entry: any) => (
-                <tr key={entry.id} className="hover:bg-gray-50/60 transition">
-                  <td className="p-4 font-mono text-gray-500">{formatDate(entry.date)}</td>
-                  <td className="p-4">
-                    <span
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase inline-flex items-center gap-1 ${
-                        entry.type === 'in'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-rose-50 text-rose-700 border border-rose-200'
-                      }`}
-                    >
-                      {entry.type === 'in' ? '↓ آمدنی (IN)' : '↑ اخراجات (OUT)'}
-                    </span>
-                  </td>
-                  <td className="p-4 font-bold text-gray-900">{entry.category || 'عمومی'}</td>
-                  <td className="p-4 text-gray-600 max-w-xs truncate">{entry.description || '-'}</td>
-                  <td className="p-4">
-                    <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 text-[11px] font-semibold uppercase">
-                      {entry.method}
-                    </span>
-                  </td>
-                  <td className={`p-4 text-right font-black text-sm ${
-                    entry.type === 'in' ? 'text-emerald-600' : 'text-rose-600'
-                  }`}>
-                    {entry.type === 'in' ? '+' : '-'} {formatCurrency(entry.amount)}
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-gray-400">
+                    کیش بک لوڈ ہو رہی ہے...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : entries.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-gray-400">
+                    کوئی کیش اندراج نہیں ملا۔ نیا اندراج شامل کرنے کے لیے اوپر بٹن دبائیں۔
+                  </td>
+                </tr>
+              ) : (
+                entries.map((entry: any) => (
+                  <tr key={entry.id} className="hover:bg-gray-50/60 transition">
+                    <td className="p-4 font-mono text-gray-500">{formatDate(entry.date)}</td>
+                    <td className="p-4">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase inline-flex items-center gap-1 ${
+                          entry.type === 'in'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200'
+                        }`}
+                      >
+                        {entry.type === 'in' ? '↓ آمدنی (IN)' : '↑ اخراجات (OUT)'}
+                      </span>
+                    </td>
+                    <td className="p-4 font-bold text-gray-900">{entry.category || 'عمومی'}</td>
+                    <td className="p-4 text-gray-600 max-w-xs truncate">{entry.description || '-'}</td>
+                    <td className="p-4">
+                      <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 text-[11px] font-semibold uppercase">
+                        {entry.method}
+                      </span>
+                    </td>
+                    <td className={`p-4 text-right font-black text-sm ${
+                      entry.type === 'in' ? 'text-emerald-600' : 'text-rose-600'
+                    }`}>
+                      {entry.type === 'in' ? '+' : '-'} {formatCurrency(entry.amount)}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </ContentCard>
 
       {/* ADD ENTRY MODAL */}
       {showAddModal && (
