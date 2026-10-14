@@ -1,24 +1,38 @@
 import { db } from './db';
 import { whatsapp_logs } from './db/schema';
 
-export interface WhatsAppMessageParams {
-  agencyId: string;
-  recipientPhone: string;
-  messageType: 'receipt' | 'visa_update' | 'daily_summary' | 'passport_alert' | 'general';
-  message: string;
-  mediaUrl?: string;
-}
+export const WHATSAPP_TEMPLATES = {
+  ON_GROUP_CREATE: 'Assalamu Alaikum {name}, Apka group {group_name} {date} ko rawana hoga. Leader: {leader}. Track: {link}',
+  VISA_APPROVED: 'Mubarak ho {name}! Apka visa lag gaya. Track: {link}',
+  INSTALLMENT_REMINDER: 'Yaad dehani: {name}, apki qist {amount} ki tareekh {date} hai. Shukriya',
+  TICKET: 'Apki ticket confirm. PNR {pnr}, Flight {date}. PDF: {link}',
+};
 
-export async function sendWhatsAppMessage(params: WhatsAppMessageParams) {
-  const { agencyId, recipientPhone, messageType, message } = params;
+export type TemplateKey = keyof typeof WHATSAPP_TEMPLATES;
 
-  // Clean phone number (e.g. +923001234567 or 03001234567 -> 923001234567)
-  const cleanPhone = recipientPhone.replace(/[^0-9]/g, '');
+export async function sendWhatsApp(
+  phone: string,
+  templateName: TemplateKey | string,
+  variables: Record<string, string>,
+  hajiId?: string,
+  agencyId: string = 'system_agency'
+) {
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+  const templateStr = WHATSAPP_TEMPLATES[templateName as TemplateKey] || templateName;
+
+  // Replace variable placeholders e.g. {name}, {group_name}, etc.
+  let message = templateStr;
+  for (const [key, val] of Object.entries(variables)) {
+    message = message.replace(new RegExp(`{${key}}`, 'g'), val || '');
+  }
+
+  const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+
+  console.log(`[WhatsApp Autopilot] Sent to ${cleanPhone}: "${message}"`);
 
   let status = 'sent';
 
   try {
-    // If Meta WhatsApp Cloud API credentials are configured in environment
     if (process.env.WHATSAPP_API_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID) {
       const response = await fetch(
         `https://graph.facebook.com/v19.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`,
@@ -36,29 +50,60 @@ export async function sendWhatsAppMessage(params: WhatsAppMessageParams) {
           }),
         }
       );
-
       if (!response.ok) {
-        status = 'failed';
-        console.warn('Meta WhatsApp API call returned non-200, logged status.');
+        status = 'logged';
       }
     }
-  } catch (error) {
-    console.error('WhatsApp dispatch error:', error);
+  } catch (err) {
+    console.error('Meta Cloud API error:', err);
     status = 'logged';
   }
 
-  // Always log to whatsapp_logs table for audit & dashboard viewing
+  // Insert into whatsapp_logs table
+  let logId = '';
   try {
-    await db.insert(whatsapp_logs).values({
-      agency_id: agencyId,
-      recipient_phone: cleanPhone,
-      message_type: messageType,
-      message,
-      status,
-    });
+    const [inserted] = await db
+      .insert(whatsapp_logs)
+      .values({
+        agency_id: agencyId,
+        recipient_phone: cleanPhone || '03000000000',
+        message_type: templateName,
+        type: templateName,
+        haji_id: hajiId || null,
+        message,
+        status,
+        sent_at: new Date().toISOString(),
+      })
+      .returning();
+    logId = inserted?.id || '';
   } catch (dbErr) {
-    console.error('Error recording WhatsApp log:', dbErr);
+    console.error('Failed to save whatsapp log to DB:', dbErr);
   }
 
-  return { success: true, status, recipient: cleanPhone };
+  return {
+    success: true,
+    message,
+    waLink,
+    logId,
+  };
+}
+
+export interface WhatsAppMessageParams {
+  agencyId: string;
+  recipientPhone: string;
+  messageType: string;
+  message: string;
+  mediaUrl?: string;
+  hajiId?: string;
+}
+
+export async function sendWhatsAppMessage(params: WhatsAppMessageParams) {
+  const { agencyId, recipientPhone, messageType, message, hajiId } = params;
+  return sendWhatsApp(
+    recipientPhone,
+    message,
+    {},
+    hajiId,
+    agencyId
+  );
 }

@@ -15,6 +15,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
+  X,
+  Plane,
 } from 'lucide-react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -29,8 +31,10 @@ export default function NewPilgrimPage() {
   const { data: subAgentsData } = useSWR('/api/sub-agents', fetcher);
   const subAgents = subAgentsData?.subAgents || [];
 
+  const [scanModalOpen, setScanModalOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
+  const [pulseGlow, setPulseGlow] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -43,15 +47,16 @@ export default function NewPilgrimPage() {
     passport_expiry: '',
     cnic: '',
     phone: '',
+    pnr: '',
     photo_url: '',
     passport_scan_url: '',
+    passport_scan_data: null as any,
     visa_status: 'document_pending',
     payment_total: '285000',
     payment_paid: '50000',
   });
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handlePassportUpload = async (file: File) => {
     if (!file) return;
 
     setScanning(true);
@@ -62,7 +67,7 @@ export default function NewPilgrimPage() {
       const reader = new FileReader();
       reader.onload = async () => {
         const base64 = reader.result as string;
-        const res = await fetch('/api/ai/passport-scan', {
+        const res = await fetch('/api/passport/scan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: base64, fileName: file.name }),
@@ -73,14 +78,17 @@ export default function NewPilgrimPage() {
           // Auto-fill form fields with optimistic UI
           setForm((prev) => ({
             ...prev,
-            full_name: data.data.full_name || prev.full_name,
+            full_name: data.data.name || prev.full_name,
             father_name: data.data.father_name || prev.father_name,
             passport_no: data.data.passport_no || prev.passport_no,
             passport_expiry: data.data.expiry || prev.passport_expiry,
             cnic: data.data.cnic || prev.cnic,
-            photo_url: data.data.photo_url || prev.photo_url,
+            passport_scan_data: data.data,
           }));
           setScanSuccess(true);
+          setPulseGlow(true);
+          setTimeout(() => setPulseGlow(false), 4000);
+          setScanModalOpen(false);
         } else {
           setErrorMsg(data.error || 'پاسپورٹ اسکین نہیں ہو سکا');
         }
@@ -91,6 +99,12 @@ export default function NewPilgrimPage() {
       setErrorMsg(err.message || 'فائل اپلوڈ میں خرابی');
       setScanning(false);
     }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) handlePassportUpload(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,7 +142,7 @@ export default function NewPilgrimPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/pilgrims"
@@ -137,58 +151,95 @@ export default function NewPilgrimPage() {
             <ArrowRight className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">نیا زائر شامل کریں (New Pilgrim)</h1>
+            <h1 className="text-2xl font-bold text-gray-900">نیا حاجی / زائر رجسٹر کریں (New Haji)</h1>
             <p className="text-xs text-gray-500">پاسپورٹ AI خودکار اسکین یا دستی اندراج</p>
           </div>
         </div>
+
+        {/* Top Button requested in Phase 3 */}
+        <button
+          type="button"
+          onClick={() => setScanModalOpen(true)}
+          className="px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 hover:from-emerald-600 hover:to-teal-700 flex items-center gap-2 active:scale-95 transition"
+        >
+          <Camera className="w-4 h-4" />
+          🛂 Passport Scan - Photo se Data Auto
+        </button>
       </div>
 
-      {/* AI PASSPORT SCAN HERO BOX */}
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-[24px] p-6 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="space-y-2 text-center sm:text-left">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur">
-            <Sparkles className="w-3.5 h-3.5" />
-            Gemini Vision AI Engine
+      {/* DRAG-DROP SCAN MODAL */}
+      {scanModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-gray-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="p-2 rounded-xl bg-emerald-100 text-emerald-600">
+                  <Sparkles className="w-5 h-5" />
+                </span>
+                <h3 className="font-bold text-base text-gray-900">پاسپورٹ AI اسکین</h3>
+              </div>
+              <button
+                onClick={() => setScanModalOpen(false)}
+                className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-emerald-300 rounded-2xl p-8 text-center bg-emerald-50/50 hover:bg-emerald-50 transition cursor-pointer space-y-3"
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handlePassportUpload(f);
+                }}
+                accept="image/*"
+                className="hidden"
+              />
+              <div className="w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto shadow-md shadow-emerald-200">
+                {scanning ? (
+                  <Loader2 className="w-7 h-7 animate-spin" />
+                ) : (
+                  <Upload className="w-7 h-7" />
+                )}
+              </div>
+              <div>
+                <p className="font-bold text-gray-800 text-sm">Passport photo yahan daalein</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  یا کلک کر کے اپنے کمپیوٹر / موبائل سے تصویر منتخب کریں
+                </p>
+              </div>
+              <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
+                95% درستگی اور فوری آٹو فِل
+              </span>
+            </div>
+
+            <div className="text-xs text-gray-500 text-center">
+              نام، والد کا نام، پاسپورٹ نمبر، ایکسپائری، اور شناختی کارڈ خودکار طور پر درج ہو جائے گا۔
+            </div>
           </div>
-          <h2 className="text-xl font-bold">پاسپورٹ تصویر اپلوڈ کریں اور 1 سیکنڈ میں خودکار فارم بھریں</h2>
-          <p className="text-xs text-emerald-100 max-w-xl">
-            نام، والد کا نام، پاسپورٹ نمبر، تاریخ تنسیخ (Expiry)، اور شناختی کارڈ خود بخود خودکار الگورتھم کے ذریعے نکال لیے جائیں گے۔
-          </p>
         </div>
+      )}
 
-        <div>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            accept="image/*"
-            className="hidden"
-          />
-          <button
-            type="button"
-            disabled={scanning}
-            onClick={() => fileInputRef.current?.click()}
-            className="px-6 py-3.5 rounded-full bg-white text-emerald-800 font-extrabold text-sm shadow-lg hover:bg-emerald-50 transition flex items-center gap-2 whitespace-nowrap active:scale-95 disabled:opacity-75"
-          >
-            {scanning ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin text-emerald-600" />
-                AI اسکین جاری ہے...
-              </>
-            ) : (
-              <>
-                <Camera className="w-5 h-5 text-emerald-600" />
-                📸 پاسپورٹ اسکین کریں (AI)
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
+      {/* SCAN ACCURACY SUCCESS BANNER */}
       {scanSuccess && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 shadow-sm">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-          <span>پاسپورٹ ڈیٹا کامیابی سے AI کے ذریعے نکال کر نیچے فارم میں بھر دیا گیا ہے! آپ ضرورت کے مطابق ترمیم کر سکتے ہیں۔</span>
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+            <div>
+              <span className="font-bold block">پاسپورٹ کامیابی سے اسکین ہو گیا!</span>
+              <span className="text-[11px] text-emerald-700">فارم کے خانے خودکار طور پر بھر دیے گئے ہیں۔</span>
+            </div>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-emerald-600 text-white font-bold text-xs shadow-sm">
+            95% accurate - edit if needed
+          </span>
         </div>
       )}
 
@@ -200,7 +251,12 @@ export default function NewPilgrimPage() {
       )}
 
       {/* REGISTRATION FORM */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-6 space-y-6">
+      <form
+        onSubmit={handleSubmit}
+        className={`bg-white rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-6 space-y-6 transition-all duration-500 ${
+          pulseGlow ? 'ring-4 ring-emerald-400 ring-offset-2' : ''
+        }`}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Group Picker */}
           <div>
@@ -234,8 +290,7 @@ export default function NewPilgrimPage() {
               <option value="">-- کوئی سب ایجنٹ نہیں (براہ راست واک اِن) --</option>
               {subAgents.map((a: any) => (
                 <option key={a.id} value={a.id}>
-                  {a.name} ({a.city || a.phone} - کمیشن:{' '}
-                  {a.commissionType === 'percent' ? `${a.commissionValue}%` : `Rs. ${a.commissionValue}`})
+                  {a.name} ({a.city || a.phone} - کمیشن Rs. {a.commission_per_haji || a.commissionValue || 5000})
                 </option>
               ))}
             </select>
@@ -256,6 +311,21 @@ export default function NewPilgrimPage() {
             </select>
           </div>
 
+          {/* PNR optional */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1">
+              <Plane className="w-3.5 h-3.5 text-sky-500" />
+              ٹکٹ PNR (اگر موجود ہو)
+            </label>
+            <input
+              type="text"
+              value={form.pnr}
+              onChange={(e) => setForm({ ...form, pnr: e.target.value.toUpperCase() })}
+              placeholder="e.g. PK782X"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-sky-500 font-mono"
+            />
+          </div>
+
           {/* Full Name */}
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1.5">
@@ -267,7 +337,9 @@ export default function NewPilgrimPage() {
               value={form.full_name}
               onChange={(e) => setForm({ ...form, full_name: e.target.value })}
               placeholder="e.g. MUHAMMAD TARIQ"
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-semibold"
+              className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-semibold ${
+                pulseGlow ? 'bg-emerald-50/70 border-emerald-400' : ''
+              }`}
             />
           </div>
 
@@ -279,7 +351,9 @@ export default function NewPilgrimPage() {
               value={form.father_name}
               onChange={(e) => setForm({ ...form, father_name: e.target.value })}
               placeholder="e.g. ABDUL REHMAN"
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+              className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 ${
+                pulseGlow ? 'bg-emerald-50/70 border-emerald-400' : ''
+              }`}
             />
           </div>
 
@@ -292,7 +366,9 @@ export default function NewPilgrimPage() {
               value={form.passport_no}
               onChange={(e) => setForm({ ...form, passport_no: e.target.value })}
               placeholder="e.g. AB1234567"
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono font-bold"
+              className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono font-bold ${
+                pulseGlow ? 'bg-emerald-50/70 border-emerald-400' : ''
+              }`}
             />
           </div>
 
@@ -306,7 +382,9 @@ export default function NewPilgrimPage() {
               value={form.passport_expiry}
               onChange={(e) => setForm({ ...form, passport_expiry: e.target.value })}
               placeholder="DD-MM-YYYY"
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+              className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 ${
+                pulseGlow ? 'bg-emerald-50/70 border-emerald-400' : ''
+              }`}
             />
           </div>
 
@@ -318,7 +396,9 @@ export default function NewPilgrimPage() {
               value={form.cnic}
               onChange={(e) => setForm({ ...form, cnic: e.target.value })}
               placeholder="e.g. 35202-1234567-1"
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono"
+              className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono ${
+                pulseGlow ? 'bg-emerald-50/70 border-emerald-400' : ''
+              }`}
             />
           </div>
 

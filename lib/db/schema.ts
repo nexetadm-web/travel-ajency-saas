@@ -54,12 +54,17 @@ export const pilgrims = sqliteTable('pilgrims', {
   payment_total: real('payment_total').default(0),
   payment_paid: real('payment_paid').default(0),
   sub_agent_id: text('sub_agent_id'),
+  passport_scan_data: text('passport_scan_data'),
+  tracking_code: text('tracking_code'),
+  pnr: text('pnr'),
   created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 }, (table) => ({
   agencyIdx: index('pilgrims_agency_idx').on(table.agency_id),
   groupIdx: index('pilgrims_group_idx').on(table.group_id),
   passportIdx: index('pilgrims_passport_idx').on(table.passport_no),
+  trackingIdx: index('pilgrims_tracking_idx').on(table.tracking_code),
 }));
+export const hujjaj = pilgrims;
 
 // 4. TICKETS TABLE
 export const tickets = sqliteTable('tickets', {
@@ -247,13 +252,17 @@ export const expenses = sqliteTable('expenses', {
 export const whatsapp_logs = sqliteTable('whatsapp_logs', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   agency_id: text('agency_id').notNull(),
+  haji_id: text('haji_id'),
   recipient_phone: text('recipient_phone').notNull(),
-  message_type: text('message_type').notNull(),
+  message_type: text('message_type'),
+  type: text('type'),
   message: text('message').notNull(),
   status: text('status').default('sent'),
+  sent_at: text('sent_at').default(sql`CURRENT_TIMESTAMP`),
   created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 }, (table) => ({
   agencyIdx: index('whatsapp_logs_agency_idx').on(table.agency_id),
+  hajiIdx: index('whatsapp_logs_haji_idx').on(table.haji_id),
 }));
 
 // 15. NOTIFICATIONS TABLE (AI ALERTS)
@@ -438,6 +447,7 @@ export const subAgents = sqliteTable('sub_agents', {
   city: text('city'),
   commissionType: text('commission_type').default('per_person'), // per_person, percent
   commissionValue: real('commission_value').default(5000), // 5000 Rs or 5%
+  commission_per_haji: real('commission_per_haji').default(5000),
   totalPilgrims: integer('total_pilgrims').default(0),
   totalEarned: real('total_earned').default(0),
   totalPaid: real('total_paid').default(0),
@@ -477,4 +487,83 @@ export const inventoryIssues = sqliteTable('inventory_issues', {
   itemIdx: index('inventory_issues_item_idx').on(table.itemId),
 }));
 export const inventory_issues = inventoryIssues;
+
+// 28. TRACKING CODES TABLE
+export const tracking_codes = sqliteTable('tracking_codes', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  haji_id: text('haji_id').notNull().references(() => pilgrims.id),
+  code: text('code').notNull().unique(), // e.g. ALH-12345
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  hajiIdx: index('tracking_codes_haji_idx').on(table.haji_id),
+  codeIdx: index('tracking_codes_code_idx').on(table.code),
+}));
+
+// 29. PAYMENTS TABLE
+export const payments = sqliteTable('payments', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  haji_id: text('haji_id').notNull().references(() => pilgrims.id),
+  total_amount: real('total_amount').notNull().default(0),
+  paid_amount: real('paid_amount').notNull().default(0),
+  remaining: real('remaining').notNull().default(0),
+  plan: text('plan'), // JSON string
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  hajiIdx: index('payments_haji_idx').on(table.haji_id),
+}));
+
+// 30. INSTALLMENTS TABLE
+export const installments = sqliteTable('installments', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  haji_id: text('haji_id').notNull().references(() => pilgrims.id),
+  amount: real('amount').notNull().default(0),
+  due_date: text('due_date').notNull(),
+  status: text('status').notNull().default('pending'), // 'paid' | 'pending' | 'overdue'
+  paid_at: text('paid_at'),
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  hajiIdx: index('installments_haji_idx').on(table.haji_id),
+}));
+
+// 31. SUB AGENT EARNINGS TABLE
+export const sub_agent_earnings = sqliteTable('sub_agent_earnings', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  sub_agent_id: text('sub_agent_id').notNull().references(() => subAgents.id),
+  haji_id: text('haji_id').notNull().references(() => pilgrims.id),
+  amount: real('amount').notNull().default(5000),
+  paid: integer('paid').default(0), // 0 or 1
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  subAgentIdx: index('sub_agent_earnings_agent_idx').on(table.sub_agent_id),
+  hajiIdx: index('sub_agent_earnings_haji_idx').on(table.haji_id),
+}));
+
+// 32. PNR CHECKS TABLE
+export const pnr_checks = sqliteTable('pnr_checks', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  haji_id: text('haji_id'),
+  pnr: text('pnr').notNull(),
+  airline: text('airline'),
+  last_status: text('last_status'), // JSON string
+  last_checked_at: text('last_checked_at').default(sql`CURRENT_TIMESTAMP`),
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  pnrIdx: index('pnr_checks_pnr_idx').on(table.pnr),
+  hajiIdx: index('pnr_checks_haji_idx').on(table.haji_id),
+}));
+
+// 33. GROUP EXPENSES TABLE
+export const group_expenses = sqliteTable('group_expenses', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  group_id: text('group_id').notNull().references(() => groups.id),
+  agency_id: text('agency_id').notNull(),
+  ticket_cost: real('ticket_cost').notNull().default(0),
+  hotel_cost: real('hotel_cost').notNull().default(0),
+  visa_cost: real('visa_cost').notNull().default(0),
+  other_cost: real('other_cost').notNull().default(0),
+  created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  groupIdx: index('group_expenses_group_idx').on(table.group_id),
+  agencyIdx: index('group_expenses_agency_idx').on(table.agency_id),
+}));
 

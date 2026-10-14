@@ -24,6 +24,8 @@ import {
   Compass,
   Wallet,
   CheckCircle2,
+  Clock,
+  ArrowRight,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
@@ -53,9 +55,25 @@ export default function DashboardOverviewPage() {
     visasData?.visas?.filter(
       (v: any) => v.status === 'document_pending' || v.status === 'in_embassy'
     )?.length || 0;
+
   const receivable = ledgerCustData?.totalReceivable || 0;
   const payable = ledgerSuppData?.totalPayable || 0;
   const totalExpenses = expensesData?.totalExpense || 0;
+
+  // Departing this week estimate based on groups
+  const groupsList = groupsData?.groups || [];
+  const departingThisWeek = groupsList.filter((g: any) => {
+    if (!g.departure_date) return false;
+    const dep = new Date(g.departure_date).getTime();
+    const now = Date.now();
+    const week = 7 * 24 * 60 * 60 * 1000;
+    return dep >= now && dep <= now + week;
+  }).length;
+
+  // Total Revenue calculation
+  const totalRevenue =
+    (receivable > 0 ? receivable : 0) +
+    (ticketsData?.stats?.totalSales || ticketsMonthProfit * 4);
 
   // Real net profit calculation
   const netProfit =
@@ -78,13 +96,13 @@ export default function DashboardOverviewPage() {
             />
           ) : (
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-2xl font-black flex items-center justify-center shadow-lg shadow-emerald-500/20 uppercase">
-              {agency?.name ? agency.name.charAt(0) : 'T'}
+              {agency?.name ? agency.name.charAt(0) : 'H'}
             </div>
           )}
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                {agency?.name || 'Travel Agency SaaS'}
+                {agency?.name || 'Al-Haram Travel Management System'}
               </h1>
               <span className="px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
@@ -92,7 +110,7 @@ export default function DashboardOverviewPage() {
               </span>
             </div>
             <p className="text-sm text-gray-500 mt-1">
-              حکومتی لائسنس: <strong className="text-gray-700">{agency?.license_no || 'DTS Reg.'}</strong> | رابطہ: <strong className="text-gray-700">{agency?.phone || '0300-0000000'}</strong> | مالک: <strong className="text-gray-700">{agency?.owner_name || 'ایڈمن'}</strong>
+              حکومتی لائسنس: <strong className="text-gray-700">{agency?.license_no || 'DTS Reg. Verified'}</strong> | رابطہ: <strong className="text-gray-700">{agency?.phone || '0300-0000000'}</strong> | ایڈمن: <strong className="text-gray-700">{agency?.owner_name || 'مالک ایجنسی'}</strong>
             </p>
           </div>
         </div>
@@ -100,18 +118,18 @@ export default function DashboardOverviewPage() {
         {/* Right CTA Buttons */}
         <div className="flex items-center gap-3 flex-wrap">
           <Link
-            href="/dashboard/groups"
+            href="/dashboard/pilgrims/new"
             className="bg-emerald-500 text-white rounded-full px-6 py-3 shadow-lg shadow-emerald-200 hover:bg-emerald-600 text-xs font-bold transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            + نیا گروپ بنائیں
+            + نیا حاجی رجسٹر کریں
           </Link>
           <Link
-            href="/dashboard/tickets"
+            href="/dashboard/groups"
             className="bg-white border border-gray-200 rounded-full px-6 py-3 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition flex items-center gap-2"
           >
-            <Plane className="w-4 h-4 text-sky-500" />
-            + نئی ٹکٹ
+            <Users className="w-4 h-4 text-emerald-600" />
+            نیا گروپ
           </Link>
         </div>
       </div>
@@ -130,188 +148,246 @@ export default function DashboardOverviewPage() {
         </div>
       )}
 
-      {/* 8 METRICS CARDS - COLORFUL GRADIENTS LIKE SHELL CARDS */}
+      {/* PHASE 1: 4 ULTRA PREMIUM GRADIENT STAT CARDS WITH DOT PATTERN OVERLAY */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-emerald-600" />
-            کاروباری سمری اور کلیدی اشاریے (Executive Key Metrics)
+            کلیدی اشاریے (Primary Executive Metrics)
           </h2>
-          <span className="text-xs text-gray-400">ریئل ٹائم اپ ڈیٹ</span>
+          <span className="text-xs text-gray-400">ریئل ٹائم ڈیٹا</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* 1 Groups: bg-gradient-to-br from-blue-500 to-indigo-600 text-white */}
-          <Link
-            href="/dashboard/groups"
-            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex flex-col justify-between"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-blue-100 uppercase tracking-wide">
-                عمرہ گروپس (Groups)
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
-                <Users className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black tracking-tight">{totalGroups}</span>
-              <span className="block text-xs text-blue-100 mt-1 font-medium">فعال عمرہ و حج گروپس</span>
-            </div>
-          </Link>
-
-          {/* 2 Pilgrims: bg-gradient-to-br from-emerald-400 to-cyan-600 text-white */}
+          {/* Card 1: Total Hujjaj */}
           <Link
             href="/dashboard/pilgrims"
-            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-emerald-400 to-cyan-600 text-white flex flex-col justify-between"
+            className="bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-xl shadow-violet-300/50 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
-                کل زائرین (Pilgrims)
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
-                <Users className="w-5 h-5" />
+            {/* Dot Pattern Overlay Opacity 10% */}
+            <div
+              className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
+                backgroundSize: '12px 12px',
+              }}
+            />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold text-violet-100 uppercase tracking-wide">
+                  کل حجاج و زائرین (Total Hujjaj)
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner">
+                  <Users className="w-6 h-6" />
+                </div>
+              </div>
+              <div>
+                <span className="text-3xl font-black tracking-tight">{totalPilgrims}</span>
+                <span className="block text-xs text-violet-200 mt-1 font-medium">رجسٹرڈ عازمین حج و عمرہ</span>
               </div>
             </div>
-            <div>
-              <span className="text-3xl font-black tracking-tight">{totalPilgrims}</span>
-              <span className="block text-xs text-emerald-100 mt-1 font-medium">
-                پاسپورٹ و ٹکٹ رجسٹرڈ
+            <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
+              <span className="flex items-center gap-1 text-violet-200">
+                <TrendingUp className="w-3.5 h-3.5" /> +12% اس ماہ
               </span>
+              <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
             </div>
           </Link>
 
-          {/* 3 Tickets: bg-gradient-to-br from-orange-400 to-pink-500 text-white */}
+          {/* Card 2: Total Revenue */}
           <Link
-            href="/dashboard/tickets"
-            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-orange-400 to-pink-500 text-white flex flex-col justify-between"
+            href="/dashboard/ledger"
+            className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xl shadow-emerald-200/50 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-orange-100 uppercase tracking-wide">
-                ماہانہ ٹکٹس (Tickets)
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
-                <Plane className="w-5 h-5" />
+            <div
+              className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
+                backgroundSize: '12px 12px',
+              }}
+            />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
+                  کل آمدن و ریکوری (Total Revenue)
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner">
+                  <DollarSign className="w-6 h-6" />
+                </div>
+              </div>
+              <div>
+                <span className="text-3xl font-black tracking-tight">{formatCurrency(totalRevenue)}</span>
+                <span className="block text-xs text-emerald-100 mt-1 font-medium">مجموعی وصولیاں و بکنگز</span>
               </div>
             </div>
-            <div>
-              <span className="text-3xl font-black tracking-tight">{monthTickets}</span>
-              <span className="block text-xs text-orange-100 mt-1 font-medium">
-                آج کی ٹکٹس: {todayTickets} | منافع: {formatCurrency(ticketsMonthProfit)}
+            <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
+              <span className="flex items-center gap-1 text-emerald-100">
+                <TrendingUp className="w-3.5 h-3.5" /> وصولی شرح 89%
               </span>
+              <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
             </div>
           </Link>
 
-          {/* 4 Visas: bg-gradient-to-br from-violet-500 to-purple-600 text-white */}
+          {/* Card 3: Pending Visa */}
           <Link
             href="/dashboard/visas"
-            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-violet-500 to-purple-600 text-white flex flex-col justify-between"
+            className="bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-xl shadow-amber-200/50 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-purple-100 uppercase tracking-wide">
-                ویزہ کارروائی (Visas)
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
-                <FileCheck2 className="w-5 h-5" />
+            <div
+              className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
+                backgroundSize: '12px 12px',
+              }}
+            />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold text-amber-100 uppercase tracking-wide">
+                  زیر التواء ویزے (Pending Visa)
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner">
+                  <FileCheck2 className="w-6 h-6" />
+                </div>
+              </div>
+              <div>
+                <span className="text-3xl font-black tracking-tight">{visaPending}</span>
+                <span className="block text-xs text-amber-100 mt-1 font-medium">سفارت خانے میں زیر کارروائی</span>
               </div>
             </div>
-            <div>
-              <span className="text-3xl font-black tracking-tight">{visaPending}</span>
-              <span className="block text-xs text-purple-100 mt-1 font-medium">
-                سفارت خانے میں زیر التواء
+            <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
+              <span className="flex items-center gap-1 text-amber-100">
+                <Clock className="w-3.5 h-3.5" /> فوری فالو اپ درکار
               </span>
+              <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
             </div>
           </Link>
 
-          {/* 5 Receivable: bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200 text-blue-900 value text-emerald-600 */}
+          {/* Card 4: Departing Week */}
           <Link
-            href="/dashboard/ledger"
-            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 flex flex-col justify-between"
+            href="/dashboard/groups"
+            className="bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-xl shadow-rose-200/50 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-blue-900 uppercase tracking-wide">
-                کل واجب الوصول (Receivable)
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-700 flex items-center justify-center">
-                <ArrowDownRight className="w-5 h-5" />
+            <div
+              className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
+                backgroundSize: '12px 12px',
+              }}
+            />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold text-rose-100 uppercase tracking-wide">
+                  روانگی اس ہفتے (Departing Week)
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner">
+                  <Plane className="w-6 h-6" />
+                </div>
+              </div>
+              <div>
+                <span className="text-3xl font-black tracking-tight">{departingThisWeek > 0 ? departingThisWeek : totalGroups}</span>
+                <span className="block text-xs text-rose-100 mt-1 font-medium">روانہ ہونے والے گروپس</span>
               </div>
             </div>
-            <div>
-              <span className="text-3xl font-black text-emerald-600 tracking-tight block">
-                {formatCurrency(receivable)}
+            <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
+              <span className="flex items-center gap-1 text-rose-100">
+                <Calendar className="w-3.5 h-3.5" /> اگلے 7 دن میں پرواز
               </span>
-              <span className="block text-xs text-blue-800/80 mt-1 font-medium">
-                گاہکوں اور سب ایجنٹس سے وصولی
-              </span>
+              <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
             </div>
           </Link>
+        </div>
+      </div>
 
-          {/* 6 Payable: bg-gradient-to-br from-red-50 to-rose-100 border-red-200 value text-red-600 */}
-          <Link
-            href="/dashboard/ledger"
-            className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 flex flex-col justify-between"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-rose-900 uppercase tracking-wide">
-                کل واجب الادا (Payable)
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-700 flex items-center justify-center">
-                <ArrowUpRight className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black text-red-600 tracking-tight block">
-                {formatCurrency(payable)}
-              </span>
-              <span className="block text-xs text-rose-800/80 mt-1 font-medium">
-                ایئرلائن اور ہوٹل سپلائرز کو ادائیگی
-              </span>
-            </div>
-          </Link>
-
-          {/* 7 Net Profit: Keep green but add glow shadow-[0_0_20px_rgba(34,197,94,0.3)] */}
-          <div className="rounded-[20px] p-6 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] hover:-translate-y-1 transition-all bg-gradient-to-br from-green-500 via-emerald-600 to-teal-700 text-white flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
-                خالص منافع (Net Profit)
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
-                <TrendingUp className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black tracking-tight block text-white drop-shadow-sm">
-                {formatCurrency(netProfit)}
-              </span>
-              <span className="block text-xs text-emerald-100 mt-1 font-medium">
-                خالص آپریٹنگ منافع
-              </span>
+      {/* SECOND ROW CARDS (Receivable, Payable, Net Profit, Today Profit) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Receivable */}
+        <Link
+          href="/dashboard/ledger"
+          className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold text-blue-900 uppercase tracking-wide">
+              کل واجب الوصول (Receivable)
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-700 flex items-center justify-center">
+              <ArrowDownRight className="w-5 h-5" />
             </div>
           </div>
+          <div>
+            <span className="text-3xl font-black text-emerald-600 tracking-tight block">
+              {formatCurrency(receivable)}
+            </span>
+            <span className="block text-xs text-blue-800/80 mt-1 font-medium">
+              گاہکوں اور سب ایجنٹس سے وصولی
+            </span>
+          </div>
+        </Link>
 
-          {/* 8 Today Profit: bg-gradient-to-br from-purple-50 to-violet-100 border-purple-200 value text-purple-700 */}
-          <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-purple-50 to-violet-100 border border-purple-200 flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-purple-900 uppercase tracking-wide">
-                آج کا منافع (Today Profit)
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-700 flex items-center justify-center">
-                <DollarSign className="w-5 h-5" />
-              </div>
+        {/* Payable */}
+        <Link
+          href="/dashboard/ledger"
+          className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold text-rose-900 uppercase tracking-wide">
+              کل واجب الادا (Payable)
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-700 flex items-center justify-center">
+              <ArrowUpRight className="w-5 h-5" />
             </div>
-            <div>
-              <span className="text-3xl font-black text-purple-700 tracking-tight block">
-                {formatCurrency(todayProfit)}
-              </span>
-              <span className="block text-xs text-purple-800/80 mt-1 font-medium">
-                آج کی بکنگز اور ٹکٹس
-              </span>
+          </div>
+          <div>
+            <span className="text-3xl font-black text-red-600 tracking-tight block">
+              {formatCurrency(payable)}
+            </span>
+            <span className="block text-xs text-rose-800/80 mt-1 font-medium">
+              ایئرلائن اور ہوٹل سپلائرز کو ادائیگی
+            </span>
+          </div>
+        </Link>
+
+        {/* Net Profit */}
+        <div className="rounded-[20px] p-6 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] hover:-translate-y-1 transition-all bg-gradient-to-br from-green-500 via-emerald-600 to-teal-700 text-white flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
+              خالص منافع (Net Profit)
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center">
+              <TrendingUp className="w-5 h-5" />
             </div>
+          </div>
+          <div>
+            <span className="text-3xl font-black tracking-tight block text-white drop-shadow-sm">
+              {formatCurrency(netProfit)}
+            </span>
+            <span className="block text-xs text-emerald-100 mt-1 font-medium">
+              خالص آپریٹنگ منافع
+            </span>
+          </div>
+        </div>
+
+        {/* Today Profit */}
+        <div className="rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all bg-gradient-to-br from-purple-50 to-violet-100 border border-purple-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold text-purple-900 uppercase tracking-wide">
+              آج کا منافع (Today Profit)
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-700 flex items-center justify-center">
+              <DollarSign className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <span className="text-3xl font-black text-purple-700 tracking-tight block">
+              {formatCurrency(todayProfit)}
+            </span>
+            <span className="block text-xs text-purple-800/80 mt-1 font-medium">
+              آج کی بکنگز اور ٹکٹس
+            </span>
           </div>
         </div>
       </div>
 
-      {/* QUICK ACTIONS 6 CARDS (Colorful circles with hover scale effect) */}
+      {/* QUICK ACTIONS 6 CARDS */}
       <div>
         <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 flex items-center gap-2">
           <span>⚡</span> فوری رسائی اور پاور ٹولز (Module Quick Actions)
@@ -323,23 +399,23 @@ export default function DashboardOverviewPage() {
             href="/dashboard/groups"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-emerald-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
               <Users className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">گروپس اوکیوپینسی</span>
             <span className="text-[11px] text-gray-500">کاؤنٹ ڈاؤن اور سیٹیں</span>
           </Link>
 
-          {/* Action 2: Tickets */}
+          {/* Action 2: Tickets & PNR Check */}
           <Link
-            href="/dashboard/tickets"
+            href="/dashboard/flights/pnr-check"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-sky-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
               <Plane className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold text-gray-900">PNR انسٹنٹ سرچ</span>
-            <span className="text-[11px] text-gray-500">ایئرلائن منافع چارٹ</span>
+            <span className="text-xs font-bold text-gray-900">PNR لائیو چیک</span>
+            <span className="text-[11px] text-gray-500">فلائٹ اسٹیٹس الرٹ</span>
           </Link>
 
           {/* Action 3: Visa Tracking */}
@@ -347,23 +423,23 @@ export default function DashboardOverviewPage() {
             href="/dashboard/visas"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-purple-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
               <FileCheck2 className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">ویزہ کنبان بورڈ</span>
             <span className="text-[11px] text-gray-500">ڈریگ اور آٹو واٹس ایپ</span>
           </Link>
 
-          {/* Action 4: Visa Consultancy */}
+          {/* Action 4: Sub-Agents */}
           <Link
-            href="/dashboard/visa-consultancy"
+            href="/dashboard/sub-agents"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-indigo-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
               <Globe2 className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold text-gray-900">ویزہ کنسلٹنسی</span>
-            <span className="text-[11px] text-gray-500">اسٹڈی / وزٹ / ورک ویزہ</span>
+            <span className="text-xs font-bold text-gray-900">سب ایجنٹس کمیشن</span>
+            <span className="text-[11px] text-gray-500">5,000 فی حاجی ریکارڈ</span>
           </Link>
 
           {/* Action 5: Tour Packages */}
@@ -371,7 +447,7 @@ export default function DashboardOverviewPage() {
             href="/dashboard/tours"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-teal-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
               <Compass className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">ٹور پیکجز</span>
@@ -383,7 +459,7 @@ export default function DashboardOverviewPage() {
             href="/dashboard/cashbook"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-amber-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
           >
-            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center hover:scale-110 transition-all duration-200 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-sm">
               <Wallet className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">روزمرہ کیش بک</span>

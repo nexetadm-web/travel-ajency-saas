@@ -105,6 +105,7 @@ export async function POST(req: Request) {
 
     const totalVal = parseFloat(payment_total) || 0;
     const paidVal = parseFloat(payment_paid) || 0;
+    const trackingCode = 'ALH-' + Math.floor(10000 + Math.random() * 90000);
 
     const [newPilgrim] = await db
       .insert(pilgrims)
@@ -125,8 +126,40 @@ export async function POST(req: Request) {
         payment_total: totalVal,
         payment_paid: paidVal,
         sub_agent_id: sub_agent_id || null,
+        tracking_code: trackingCode,
+        pnr: body.pnr || null,
+        passport_scan_data: body.passport_scan_data ? JSON.stringify(body.passport_scan_data) : null,
       })
       .returning();
+
+    // Auto-create tracking_codes record
+    try {
+      const { tracking_codes, payments, sub_agent_earnings } = await import('@/lib/db/schema');
+      await db.insert(tracking_codes).values({
+        haji_id: newPilgrim.id,
+        code: trackingCode,
+      });
+
+      // Auto-create payments record
+      await db.insert(payments).values({
+        haji_id: newPilgrim.id,
+        total_amount: totalVal,
+        paid_amount: paidVal,
+        remaining: Math.max(0, totalVal - paidVal),
+      });
+
+      // If sub-agent attached, create sub_agent_earnings record
+      if (sub_agent_id) {
+        await db.insert(sub_agent_earnings).values({
+          sub_agent_id,
+          haji_id: newPilgrim.id,
+          amount: 5000,
+          paid: 0,
+        });
+      }
+    } catch (e) {
+      console.error('Tracking or payments insert notice:', e);
+    }
 
     // Auto-create customer ledger entry for this pilgrim
     await db.insert(customers_ledger).values({
@@ -152,7 +185,7 @@ export async function POST(req: Request) {
         if (agent.commissionType === 'percent') {
           earnedCommission = (totalVal * (agent.commissionValue || 0)) / 100;
         } else {
-          earnedCommission = agent.commissionValue || 0;
+          earnedCommission = (agent.commission_per_haji || agent.commissionValue || 5000);
         }
 
         const newTotalPilgrims = (agent.totalPilgrims || 0) + 1;
@@ -170,7 +203,7 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, pilgrim: newPilgrim });
+    return NextResponse.json({ success: true, pilgrim: newPilgrim, tracking_code: trackingCode });
   } catch (error: any) {
     console.error('Create pilgrim error:', error);
     return NextResponse.json({ error: 'زائر شامل کرنے میں خرابی', details: error.message }, { status: 500 });

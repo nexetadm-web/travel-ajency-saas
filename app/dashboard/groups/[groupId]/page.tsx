@@ -333,6 +333,14 @@ export default function GroupDetailsPage() {
           </button>
 
           <Link
+            href={`/dashboard/groups/${groupId}/documents`}
+            className="px-4 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-indigo-200"
+          >
+            <FileText className="w-4 h-4" />
+            <span>📑 دستاویزات و واؤچرز (PDF Center)</span>
+          </Link>
+
+          <Link
             href={`/dashboard/groups/${groupId}/profit`}
             className="px-4 py-2.5 rounded-full bg-white hover:bg-gray-50 text-teal-700 border border-teal-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
           >

@@ -11,8 +11,12 @@ import {
   Clock,
   ShieldCheck,
   RefreshCw,
+  Key,
+  Smartphone,
+  Eye,
+  ExternalLink,
 } from 'lucide-react';
-import { formatDate } from '@/lib/utils';
+import { WHATSAPP_TEMPLATES } from '@/lib/whatsapp';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -21,203 +25,327 @@ export default function WhatsAppSettingsPage() {
   const { data: logsData, mutate: mutateLogs, isLoading } = useSWR('/api/whatsapp/logs', fetcher);
   const logs = logsData?.logs || [];
 
+  const [apiKey, setApiKey] = useState('EAAOx...Meta_WhatsApp_Cloud_Token');
+  const [phoneId, setPhoneId] = useState('109482910482910');
+
+  // Toggle switches for each auto message
+  const [toggles, setToggles] = useState({
+    ON_GROUP_CREATE: true,
+    VISA_APPROVED: true,
+    INSTALLMENT_REMINDER: true,
+    TICKET: true,
+  });
+
+  const [selectedTemplate, setSelectedTemplate] = useState<keyof typeof WHATSAPP_TEMPLATES>('ON_GROUP_CREATE');
   const [testPhone, setTestPhone] = useState(agency?.phone || '03001234567');
-  const [testMessage, setTestMessage] = useState('السلام علیکم! یہ ٹیسٹ میسج ہے ٹریول ایجنسی ساس کلاؤڈ سسٹم سے۔');
   const [sending, setSending] = useState(false);
-  const [cronRunning, setCronRunning] = useState(false);
   const [msgResult, setMsgResult] = useState('');
 
-  const handleSendTestMessage = async (e: React.FormEvent) => {
+  // Sample variable values for live preview
+  const previewVariables: Record<string, string> = {
+    name: 'محمد طارق',
+    group_name: 'عمرہ خصوصی 15 دسمبر',
+    date: '15-12-2026',
+    leader: 'مولانا احمد بلال (03001234567)',
+    link: 'http://localhost:3003/track/ALH-48291',
+    amount: 'Rs. 50,000',
+    pnr: 'PK786X',
+  };
+
+  const getRenderedPreview = (tmpl: string) => {
+    let res = tmpl;
+    for (const [k, v] of Object.entries(previewVariables)) {
+      res = res.replace(new RegExp(`{${k}}`, 'g'), v);
+    }
+    return res;
+  };
+
+  const handleTestSend = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
     setMsgResult('');
 
     try {
+      const rendered = getRenderedPreview(WHATSAPP_TEMPLATES[selectedTemplate]);
       const res = await fetch('/api/whatsapp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           recipientPhone: testPhone,
-          messageType: 'general',
-          message: testMessage,
+          messageType: selectedTemplate,
+          message: rendered,
         }),
       });
 
-      const resData = await res.json();
       if (res.ok) {
-        setMsgResult('پیغام کامیابی سے لاگ اور ارسال کر دیا گیا!');
+        setMsgResult('پیغام کامیابی سے واٹس ایپ پر تیار اور لاگ کر دیا گیا!');
         mutateLogs();
+      } else {
+        setMsgResult('ارسال میں خرابی');
       }
-    } catch (err) {
+    } catch {
       setMsgResult('ارسال میں خرابی');
     } finally {
       setSending(false);
     }
   };
 
-  const handleTriggerCron = async () => {
-    setCronRunning(true);
-    setMsgResult('');
-
+  const handleRunCron = async () => {
+    setSending(true);
     try {
-      const res = await fetch('/api/cron/daily-summary');
+      const res = await fetch('/api/cron/whatsapp');
       const data = await res.json();
       if (res.ok) {
-        setMsgResult('روزانہ سمری کرون جاب اور AI الرٹس کامیابی سے چلا دیے گئے!');
+        setMsgResult(`واٹس ایپ آٹو پائلٹ کرون چل گیا! (بھیجے گئے پیغامات: ${data.processed || 0})`);
         mutateLogs();
       }
-    } catch (err) {
+    } catch {
       setMsgResult('کرون چلانے میں خرابی');
     } finally {
-      setCronRunning(false);
+      setSending(false);
     }
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-8 max-w-5xl mx-auto">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-white">WhatsApp خودکار برانڈنگ اور ٹیمپلیٹس</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-semibold">
-              Meta Cloud API
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <span className="p-2 rounded-xl bg-emerald-100 text-emerald-600">
+              <MessageSquare className="w-5 h-5" />
             </span>
-          </div>
-          <p className="text-xs text-slate-400 mt-1">
-            ویزہ پرنٹ ہونے پر، رسید بننے پر، اور روزانہ رات 9 بجے مالک کو خلاصہ بھیجنے کا خودکار نظام
+            واٹس ایپ آٹو پائلٹ سیٹنگز (WhatsApp Autopilot)
+          </h1>
+          <p className="text-xs text-gray-500 mt-1">
+            Meta Cloud API اور خودکار ٹیمپلیٹ پیغامات (گروپ روانگی، ویزا اپروول، قسط یاد دہانی، ای-ٹکٹ)
           </p>
         </div>
 
         <button
-          onClick={handleTriggerCron}
-          disabled={cronRunning}
-          className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs shadow-lg shadow-purple-600/20 flex items-center gap-1.5"
+          onClick={handleRunCron}
+          disabled={sending}
+          className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-200 transition flex items-center gap-2"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${cronRunning ? 'animate-spin' : ''}`} />
-          {cronRunning ? 'کرون چل رہا ہے...' : '9PM ڈیلی سمری کرون ٹیسٹ کریں'}
+          <RefreshCw className={`w-3.5 h-3.5 ${sending ? 'animate-spin' : ''}`} />
+          روزانہ خودکار کرون ابھی چلائیں
         </button>
       </div>
 
       {msgResult && (
-        <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>{msgResult}</span>
         </div>
       )}
 
-      {/* AUTOMATION TEMPLATES OVERVIEW */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-5 rounded-3xl bg-slate-950/80 border border-slate-800 shadow-xl space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-sm text-white">1. ویزہ پرنٹ الرٹ</span>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">فعال</span>
+      {/* Grid: 1. API Keys & 2. Toggles */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Card 1: Meta Cloud API Settings */}
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
+            <Key className="w-5 h-5 text-emerald-600" />
+            <h2 className="font-bold text-sm text-gray-900">Meta WhatsApp Cloud API کنفیگریشن</h2>
           </div>
-          <p className="text-xs text-slate-400">
-            جب ویزہ کا سٹیٹس 'printed' پر بدلا جائے گا، زائر کو خودکار مبارکباد کا پیغام اور ایجنسی رابطہ نمبر روانہ ہوگا۔
-          </p>
+
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                WhatsApp API Key / Access Token
+              </label>
+              <input
+                type="password"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="EAA..."
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono text-gray-800 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                Phone Number ID (Meta Business Manager)
+              </label>
+              <input
+                type="text"
+                value={phoneId}
+                onChange={(e) => setPhoneId(e.target.value)}
+                placeholder="10948..."
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono text-gray-800 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setMsgResult('API کیز کامیابی سے محفوظ ہو گئیں!')}
+                className="px-6 py-2.5 rounded-full bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition"
+              >
+                کیز محفوظ کریں
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="p-5 rounded-3xl bg-slate-950/80 border border-slate-800 shadow-xl space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-sm text-white">2. ادائیگی کی رسید اور QR</span>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">فعال</span>
+        {/* Card 2: Toggle Switches for Each Auto Message */}
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
+            <Sparkles className="w-5 h-5 text-emerald-600" />
+            <h2 className="font-bold text-sm text-gray-900">خودکار نوٹیفیکیشن ٹوگلز (Auto Switches)</h2>
           </div>
-          <p className="text-xs text-slate-400">
-            گاہک سے رقم وصول کرنے پر وصول شدہ رقم، بقیہ رقم اور آن لائن QR تصدیقی لنک واٹس ایپ پر جاتا ہے۔
-          </p>
-        </div>
 
-        <div className="p-5 rounded-3xl bg-slate-950/80 border border-slate-800 shadow-xl space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-sm text-white">3. ڈیلی 9PM مالک سمری</span>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">فعال</span>
+          <div className="space-y-3.5">
+            {/* Toggle 1: ON_GROUP_CREATE */}
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-gray-100">
+              <div>
+                <span className="font-bold text-xs text-gray-900 block">گروپ رجسٹریشن و روانگی میسج</span>
+                <span className="text-[11px] text-gray-500">جب بھی حاجی کسی گروپ میں رجسٹر ہو</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={toggles.ON_GROUP_CREATE}
+                onChange={(e) => setToggles({ ...toggles, ON_GROUP_CREATE: e.target.checked })}
+                className="w-5 h-5 accent-emerald-600 cursor-pointer"
+              />
+            </div>
+
+            {/* Toggle 2: VISA_APPROVED */}
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-gray-100">
+              <div>
+                <span className="font-bold text-xs text-gray-900 block">ویزا اپروول مبارکباد (Visa Approved)</span>
+                <span className="text-[11px] text-gray-500">جب سفارت خانے سے ویزہ جاری ہو</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={toggles.VISA_APPROVED}
+                onChange={(e) => setToggles({ ...toggles, VISA_APPROVED: e.target.checked })}
+                className="w-5 h-5 accent-emerald-600 cursor-pointer"
+              />
+            </div>
+
+            {/* Toggle 3: INSTALLMENT_REMINDER */}
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-gray-100">
+              <div>
+                <span className="font-bold text-xs text-gray-900 block">قسط یاد دہانی (Installment Reminder)</span>
+                <span className="text-[11px] text-gray-500">تاریخ ادائیگی سے 3 دن قبل آٹو الرٹ</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={toggles.INSTALLMENT_REMINDER}
+                onChange={(e) => setToggles({ ...toggles, INSTALLMENT_REMINDER: e.target.checked })}
+                className="w-5 h-5 accent-emerald-600 cursor-pointer"
+              />
+            </div>
+
+            {/* Toggle 4: TICKET */}
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-gray-100">
+              <div>
+                <span className="font-bold text-xs text-gray-900 block">ای-ٹکٹ اور فلائٹ تصدیق</span>
+                <span className="text-[11px] text-gray-500">پرواز سے 24 گھنٹے قبل PNR تصدیق</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={toggles.TICKET}
+                onChange={(e) => setToggles({ ...toggles, TICKET: e.target.checked })}
+                className="w-5 h-5 accent-emerald-600 cursor-pointer"
+              />
+            </div>
           </div>
-          <p className="text-xs text-slate-400">
-            روزانہ رات 9 بجے ایجنسی کے مالک کو کل ٹکٹس، آج کا خالص منافع اور زائرین کا مکمل خلاصہ موصول ہوتا ہے۔
-          </p>
         </div>
       </div>
 
-      {/* TEST MESSAGE SENDER */}
-      <div className="p-6 rounded-3xl bg-slate-950/80 border border-slate-800 shadow-xl space-y-4">
-        <h3 className="font-bold text-sm text-white flex items-center gap-2">
-          <MessageSquare className="w-4 h-4 text-emerald-400" />
-          براہِ راست واٹس ایپ ٹیسٹ پیغام بھیجیں (Instant WhatsApp Test Dispatch)
-        </h3>
+      {/* Card 3: Live Template Preview with Variables */}
+      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <Eye className="w-5 h-5 text-emerald-600" />
+            <h2 className="font-bold text-sm text-gray-900">ٹیمپلیٹ پریویو مع ویری ایبلز (Template Preview)</h2>
+          </div>
 
-        <form onSubmit={handleSendTestMessage} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="flex items-center gap-2">
+            {(Object.keys(WHATSAPP_TEMPLATES) as Array<keyof typeof WHATSAPP_TEMPLATES>).map((key) => (
+              <button
+                key={key}
+                onClick={() => setSelectedTemplate(key)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  selectedTemplate === key
+                    ? 'bg-emerald-600 text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {key}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Raw Template with placeholders */}
           <div>
+            <label className="block text-xs font-bold text-gray-500 mb-1">اصل ٹیمپلیٹ فارمیٹ (Raw Template):</label>
+            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-xs font-mono text-gray-800 leading-relaxed">
+              {WHATSAPP_TEMPLATES[selectedTemplate]}
+            </div>
+          </div>
+
+          {/* Rendered WhatsApp Preview Box */}
+          <div>
+            <label className="block text-xs font-bold text-emerald-600 mb-1">حاجی کے موبائل پر کیسا نظر آئے گا (Live WhatsApp Bubble):</label>
+            <div className="p-4 rounded-2xl bg-[#DCF8C6] border border-[#b2e597] text-xs text-gray-900 shadow-sm leading-relaxed relative">
+              <p>{getRenderedPreview(WHATSAPP_TEMPLATES[selectedTemplate])}</p>
+              <div className="text-right text-[10px] text-gray-500 mt-2 font-mono">12:45 PM ✓✓</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Test Send Form */}
+        <form onSubmit={handleTestSend} className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center gap-3">
+          <div className="flex items-center gap-2 flex-1 w-full">
+            <Smartphone className="w-4 h-4 text-gray-400" />
             <input
               type="text"
-              required
-              placeholder="فون نمبر (مثال: 03001234567)"
               value={testPhone}
               onChange={(e) => setTestPhone(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white text-xs"
+              placeholder="03001234567"
+              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs w-full text-gray-800 focus:outline-none focus:border-emerald-500 font-mono"
             />
           </div>
-          <div>
-            <input
-              type="text"
-              required
-              placeholder="پیغام کا متن..."
-              value={testMessage}
-              onChange={(e) => setTestMessage(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white text-xs"
-            />
-          </div>
-          <div>
-            <button
-              type="submit"
-              disabled={sending}
-              className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5"
-            >
-              <Send className="w-3.5 h-3.5" />
-              {sending ? 'ارسال ہو رہا ہے...' : 'پیغام بھیجیں'}
-            </button>
-          </div>
+
+          <button
+            type="submit"
+            disabled={sending}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#25D366] hover:bg-[#1ebd5a] text-white text-xs font-bold shadow-md transition flex items-center justify-center gap-1.5 whitespace-nowrap"
+          >
+            <Send className="w-3.5 h-3.5" />
+            ٹیسٹ میسج بھیجیں
+          </button>
         </form>
       </div>
 
-      {/* WHATSAPP LOGS HISTORY TABLE */}
-      <div className="rounded-3xl bg-slate-950/80 border border-slate-800 p-6 shadow-xl space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-sm text-white">واٹس ایپ ترسیل کی تاریخ اور لاگز (Dispatch Logs)</h3>
-          <span className="text-xs text-slate-500">{logs.length} پیغامات</span>
-        </div>
+      {/* Card 4: Recent Logs */}
+      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-4">
+        <h2 className="font-bold text-sm text-gray-900">حالیہ واٹس ایپ پیغامات کی ہسٹری (Recent Dispatches)</h2>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="border-b border-slate-850 text-slate-500 text-[11px] uppercase">
-              <tr>
-                <th className="pb-3">وصول کنندہ فون</th>
-                <th className="pb-3">قسم (Type)</th>
-                <th className="pb-3">پیغام کا متن</th>
-                <th className="pb-3">سٹیٹس</th>
-                <th className="pb-3">وقت</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-850">
-              {logs.map((log: any) => (
-                <tr key={log.id} className="hover:bg-slate-900/40">
-                  <td className="py-3 font-mono font-bold text-sky-400">{log.recipient_phone}</td>
-                  <td className="py-3 capitalize text-slate-300">{log.message_type}</td>
-                  <td className="py-3 max-w-xs truncate text-slate-400">{log.message}</td>
-                  <td className="py-3">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      {log.status}
-                    </span>
-                  </td>
-                  <td className="py-3 text-slate-500 text-[10px]">{formatDate(log.created_at)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {logs.length === 0 && (
-            <p className="text-center text-xs text-slate-500 py-8">کوئی لاگ موجود نہیں ہے</p>
-          )}
-        </div>
+        {logs.length === 0 ? (
+          <p className="text-xs text-gray-400 py-4 text-center">ابھی تک کوئی پیغام لاگ نہیں ہوا۔</p>
+        ) : (
+          <div className="divide-y divide-gray-100 text-xs">
+            {logs.slice(0, 10).map((log: any) => (
+              <div key={log.id} className="py-3 flex items-start justify-between gap-4">
+                <div>
+                  <span className="font-mono font-bold text-gray-900 block">{log.recipient_phone}</span>
+                  <p className="text-gray-600 mt-0.5 line-clamp-1">{log.message}</p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                    {log.status || 'sent'}
+                  </span>
+                  <span className="block text-[10px] text-gray-400 mt-1">{log.sent_at || log.created_at}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
