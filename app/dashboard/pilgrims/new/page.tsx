@@ -31,6 +31,33 @@ export default function NewPilgrimPage() {
   const { data: subAgentsData } = useSWR('/api/sub-agents', fetcher);
   const subAgents = subAgentsData?.subAgents || [];
 
+  if (typeof window !== 'undefined' && subAgents.length > 0) {
+    console.log("AGENTS FETCHED:", subAgents);
+  }
+
+  const getCommissionDisplay = (agent: any) => {
+    const type = agent.commissionType || agent.commission_type || agent.type || 'fixed';
+    const value =
+      agent.commissionValue !== undefined && agent.commissionValue !== null
+        ? agent.commissionValue
+        : agent.commission_value !== undefined && agent.commission_value !== null
+        ? agent.commission_value
+        : agent.commission_per_haji !== undefined && agent.commission_per_haji !== null
+        ? agent.commission_per_haji
+        : agent.commission || 0;
+
+    if (
+      type === 'percentage' ||
+      type === 'percent' ||
+      type === 'commission' ||
+      String(value).includes('%')
+    ) {
+      return `${value}% کمیشن`;
+    } else {
+      return `Rs. ${Number(value).toLocaleString()} کمیشن`;
+    }
+  };
+
   const [scanModalOpen, setScanModalOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
@@ -290,7 +317,7 @@ export default function NewPilgrimPage() {
               <option value="">-- کوئی سب ایجنٹ نہیں (براہ راست واک اِن) --</option>
               {subAgents.map((a: any) => (
                 <option key={a.id} value={a.id}>
-                  {a.name} ({a.city || a.phone} - کمیشن Rs. {a.commission_per_haji || a.commissionValue || 5000})
+                  {a.name} ({a.city || a.location || a.phone || ''} - {getCommissionDisplay(a)})
                 </option>
               ))}
             </select>

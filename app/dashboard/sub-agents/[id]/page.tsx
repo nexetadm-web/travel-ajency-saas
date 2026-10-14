@@ -139,9 +139,11 @@ export default function SubAgentDetailPage() {
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-black text-gray-900">{subAgent.name}</h1>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  {subAgent.commissionType === 'percent'
-                    ? `${subAgent.commissionValue}% کمیشن`
-                    : `${formatCurrency(subAgent.commissionValue)} فی حاجی`}
+                  {subAgent.commissionType === 'percent' ||
+                  subAgent.commission_type === 'percent' ||
+                  subAgent.commission_type === 'percentage'
+                    ? `${subAgent.commissionValue ?? subAgent.commission_value}% کمیشن`
+                    : `Rs. ${Number(subAgent.commissionValue ?? subAgent.commission_value ?? subAgent.commission_per_haji ?? 0).toLocaleString()} فی حاجی`}
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 mt-2">

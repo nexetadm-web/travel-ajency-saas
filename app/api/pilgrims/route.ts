@@ -148,14 +148,60 @@ export async function POST(req: Request) {
         remaining: Math.max(0, totalVal - paidVal),
       });
 
-      // If sub-agent attached, create sub_agent_earnings record
+      // If sub-agent attached, fetch commission, insert earnings & update agent totals
       if (sub_agent_id) {
-        await db.insert(sub_agent_earnings).values({
-          sub_agent_id,
-          haji_id: newPilgrim.id,
-          amount: 5000,
-          paid: 0,
-        });
+        const [agent] = await db
+          .select()
+          .from(subAgents)
+          .where(and(eq(subAgents.id, sub_agent_id), eq(subAgents.agencyId, session.agency_id)))
+          .limit(1);
+
+        if (agent) {
+          const isPercent =
+            agent.commissionType === 'percent' ||
+            (agent as any).commission_type === 'percent' ||
+            (agent as any).commission_type === 'percentage';
+
+          let commVal = 0;
+          if (agent.commissionValue !== undefined && agent.commissionValue !== null) {
+            commVal = Number(agent.commissionValue);
+          } else if ((agent as any).commission_value !== undefined && (agent as any).commission_value !== null) {
+            commVal = Number((agent as any).commission_value);
+          } else if (agent.commission_per_haji !== undefined && agent.commission_per_haji !== null) {
+            commVal = Number(agent.commission_per_haji);
+          } else {
+            commVal = isPercent ? 5 : 5000;
+          }
+
+          let earnedCommission = 0;
+          if (isPercent) {
+            earnedCommission = (totalVal * commVal) / 100;
+          } else {
+            earnedCommission = commVal;
+          }
+
+          // Auto-insert sub_agent_earnings record with ACTUAL dynamic commission
+          await db.insert(sub_agent_earnings).values({
+            sub_agent_id,
+            haji_id: newPilgrim.id,
+            amount: earnedCommission,
+            paid: 0,
+          });
+
+          // Update sub-agent stats
+          const newTotalPilgrims = (agent.totalPilgrims || 0) + 1;
+          const newTotalEarned = (agent.totalEarned || 0) + earnedCommission;
+          const newRemaining = newTotalEarned - (agent.totalPaid || 0);
+
+          await db
+            .update(subAgents)
+            .set({
+              totalPilgrims: newTotalPilgrims,
+              totalEarned: newTotalEarned,
+              remaining: newRemaining,
+            })
+            .where(eq(subAgents.id, sub_agent_id));
+        }
       }
     } catch (e) {
       console.error('Tracking or payments insert notice:', e);
@@ -171,37 +217,6 @@ export async function POST(req: Request) {
       total_paid: paidVal,
       type: 'individual',
     });
-
-    // If sub-agent is attached, update commission and count
-    if (sub_agent_id) {
-      const [agent] = await db
-        .select()
-        .from(subAgents)
-        .where(and(eq(subAgents.id, sub_agent_id), eq(subAgents.agencyId, session.agency_id)))
-        .limit(1);
-
-      if (agent) {
-        let earnedCommission = 0;
-        if (agent.commissionType === 'percent') {
-          earnedCommission = (totalVal * (agent.commissionValue || 0)) / 100;
-        } else {
-          earnedCommission = (agent.commission_per_haji || agent.commissionValue || 5000);
-        }
-
-        const newTotalPilgrims = (agent.totalPilgrims || 0) + 1;
-        const newTotalEarned = (agent.totalEarned || 0) + earnedCommission;
-        const newRemaining = newTotalEarned - (agent.totalPaid || 0);
-
-        await db
-          .update(subAgents)
-          .set({
-            totalPilgrims: newTotalPilgrims,
-            totalEarned: newTotalEarned,
-            remaining: newRemaining,
-          })
-          .where(eq(subAgents.id, sub_agent_id));
-      }
-    }
 
     return NextResponse.json({ success: true, pilgrim: newPilgrim, tracking_code: trackingCode });
   } catch (error: any) {

@@ -203,9 +203,11 @@ export default function SubAgentsPage() {
                     <td className="p-4 font-mono text-gray-500">{agent.cnic || '-'}</td>
                     <td className="p-4">
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                        {agent.commissionType === 'percent'
-                          ? `${agent.commissionValue}% فی بکنگ`
-                          : `${formatCurrency(agent.commissionValue)} فی حاجی`}
+                        {agent.commissionType === 'percent' ||
+                        agent.commission_type === 'percent' ||
+                        agent.commission_type === 'percentage'
+                          ? `${agent.commissionValue ?? agent.commission_value}% فی بکنگ`
+                          : `Rs. ${Number(agent.commissionValue ?? agent.commission_value ?? agent.commission_per_haji ?? 0).toLocaleString()} فی حاجی`}
                       </span>
                     </td>
                     <td className="p-4 text-center">

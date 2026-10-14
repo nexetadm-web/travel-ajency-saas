@@ -37,7 +37,16 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, phone, cnic, city, commissionType, commissionValue } = body;
+    const {
+      name,
+      phone,
+      cnic,
+      city,
+      commissionType,
+      commission_type,
+      commissionValue,
+      commission_value,
+    } = body;
 
     if (!name || !phone) {
       return NextResponse.json(
@@ -46,8 +55,14 @@ export async function POST(req: Request) {
       );
     }
 
-    const commType = commissionType === 'percent' ? 'percent' : 'per_person';
-    const commVal = parseFloat(commissionValue) || (commType === 'per_person' ? 5000 : 5);
+    const rawType = commissionType || commission_type || 'per_person';
+    const isPercent = rawType === 'percent' || rawType === 'percentage';
+    const commType = isPercent ? 'percent' : 'per_person';
+    const rawVal =
+      commissionValue !== undefined && commissionValue !== null
+        ? commissionValue
+        : commission_value;
+    const commVal = parseFloat(rawVal) || (isPercent ? 5 : 5000);
 
     const [created] = await db
       .insert(subAgents)
@@ -59,6 +74,7 @@ export async function POST(req: Request) {
         city: city ? city.trim() : null,
         commissionType: commType,
         commissionValue: commVal,
+        commission_per_haji: isPercent ? 0 : commVal,
         totalPilgrims: 0,
         totalEarned: 0,
         totalPaid: 0,
