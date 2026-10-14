@@ -96,9 +96,11 @@ export default function DashboardOverviewPage() {
               className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm"
             />
           ) : (
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md">
-              {agency?.name ? agency.name.charAt(0) : 'A'}
-            </div>
+            <img
+              src="/logo.png"
+              alt="Al-Haram Logo"
+              className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm"
+            />
           )}
           <div>
             <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">

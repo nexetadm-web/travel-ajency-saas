@@ -98,9 +98,11 @@ export default function AgencySignupPage() {
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-8">
         {/* Header Branding */}
         <div className="text-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-teal-500 mx-auto flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-3 text-white">
-            <Building2 className="w-8 h-8" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="Al-Haram Logo"
+            className="w-16 h-16 rounded-2xl mx-auto shadow-lg shadow-indigo-500/20 mb-3 object-cover border border-indigo-100"
+          />
           <span className="px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-bold inline-flex items-center gap-1 mb-2">
             <Sparkles className="w-3.5 h-3.5 text-violet-600" />
             100% کلاؤڈ ساس پلیٹ فارم

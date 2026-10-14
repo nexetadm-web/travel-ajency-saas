@@ -65,9 +65,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100">
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-3 text-white">
-            <Building2 className="w-8 h-8" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="Al-Haram Logo"
+            className="w-16 h-16 rounded-2xl mx-auto shadow-lg shadow-emerald-500/20 mb-3 object-cover border border-emerald-100"
+          />
           <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 inline-flex items-center gap-1 mb-2">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
             ٹریول ایجنسی مینجمنٹ سسٹم

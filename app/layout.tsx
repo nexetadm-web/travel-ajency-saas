@@ -2,8 +2,14 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Travel Agency SaaS - Umrah, Hajj & Ticketing ERP',
-  description: 'Enterprise Travel Agency SaaS with Turso DB, Drizzle ORM, WhatsApp Automation & Dynamic Agency Branding',
+  title: "Al-Haram Travels & Tours",
+  description: "Umrah Hajj Visa Tours Management SaaS",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

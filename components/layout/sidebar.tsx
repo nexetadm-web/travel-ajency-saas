@@ -77,9 +77,11 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                 className="w-11 h-11 rounded-lg object-cover"
               />
             ) : (
-              <div className="w-11 h-11 rounded-lg bg-emerald-600 text-white font-black text-xl flex items-center justify-center uppercase">
-                {agency?.name ? agency.name.charAt(0) : 'H'}
-              </div>
+              <img
+                src="/logo.png"
+                alt="Al-Haram Travel Logo"
+                className="w-11 h-11 rounded-lg object-cover shadow-sm"
+              />
             )}
           </div>
           <div className="overflow-hidden">
