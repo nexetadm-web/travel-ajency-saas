@@ -259,7 +259,7 @@ export default function TourPackagesPage() {
           <p className="text-xs text-gray-400 mt-1">نیا پیکیج بنانے کے لیے اوپر بٹن دبائیں۔</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {packages.map((pkg: any) => {
             const occupancyPct = Math.min(
               100,
@@ -268,17 +268,17 @@ export default function TourPackagesPage() {
             return (
               <div
                 key={pkg.id}
-                className="bg-white rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition flex flex-col justify-between group"
+                className="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] transition flex flex-col justify-between group"
               >
                 <div>
                   {/* Card Header Banner */}
-                  <div className={`p-5 text-white ${
+                  <div className={`p-4 text-white ${
                     pkg.type === 'international'
                       ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
                       : 'bg-gradient-to-r from-teal-500 to-emerald-600'
                   }`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur text-white text-[10px] font-bold uppercase">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="px-2 py-0.5 rounded-full bg-white/20 backdrop-blur text-white text-[10px] font-bold uppercase">
                         {pkg.type === 'international' ? 'International' : 'Domestic Tour'}
                       </span>
                       <span className="text-xs font-semibold text-white/90">
@@ -286,7 +286,7 @@ export default function TourPackagesPage() {
                       </span>
                     </div>
 
-                    <h3 className="text-xl font-black tracking-tight">{pkg.package_name}</h3>
+                    <h3 className="text-base font-black tracking-tight">{pkg.package_name}</h3>
                     <p className="text-xs text-white/90 flex items-center gap-1 mt-1">
                       <MapPin className="w-3.5 h-3.5" />
                       منزل: {pkg.destination}
@@ -294,18 +294,18 @@ export default function TourPackagesPage() {
                   </div>
 
                   {/* Card Content Body */}
-                  <div className="p-5 space-y-4">
+                  <div className="p-4 space-y-3">
                     {/* Price and Seats */}
-                    <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <div className="flex items-center justify-between pb-2.5 border-b border-gray-100">
                       <div>
                         <span className="text-[11px] text-gray-400 block">فی فرد قیمت:</span>
-                        <strong className="text-lg font-black text-gray-900">
+                        <strong className="text-[13px] font-bold text-gray-900">
                           {formatCurrency(pkg.price_per_person)}
                         </strong>
                       </div>
                       <div className="text-right">
                         <span className="text-[11px] text-gray-400 block">باقی سیٹیں:</span>
-                        <span className="text-sm font-black text-emerald-600">
+                        <span className="text-xs font-black text-emerald-600">
                           {pkg.availableSeats} / {pkg.max_seats}
                         </span>
                       </div>
@@ -317,7 +317,7 @@ export default function TourPackagesPage() {
                         <span>بکنگ تناسب:</span>
                         <span className="font-bold text-gray-700">{occupancyPct}%</span>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
+                      <div className="w-full h-1.5 rounded-full bg-gray-100 overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
                             occupancyPct > 80 ? 'bg-rose-500' : 'bg-emerald-500'
@@ -328,7 +328,7 @@ export default function TourPackagesPage() {
                     </div>
 
                     {/* Inclusions */}
-                    <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 text-xs">
+                    <div className="p-2.5 bg-gray-50 rounded-xl border border-gray-100 text-xs">
                       <span className="text-[10px] font-bold text-gray-400 block mb-0.5">شامل خدمات:</span>
                       <p className="text-gray-700 font-medium truncate">{pkg.includes || 'مکمل سہولیات'}</p>
                     </div>
@@ -336,7 +336,7 @@ export default function TourPackagesPage() {
                 </div>
 
                 {/* Card Action Footer */}
-                <div className="p-5 pt-0">
+                <div className="p-4 pt-0">
                   <button
                     onClick={() => setSelectedPkgId(pkg.id)}
                     className="w-full py-2.5 rounded-xl bg-gray-50 hover:bg-emerald-50 text-gray-800 hover:text-emerald-700 border border-gray-200 text-xs font-bold transition flex items-center justify-center gap-1.5"

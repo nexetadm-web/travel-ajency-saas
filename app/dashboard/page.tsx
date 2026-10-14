@@ -28,6 +28,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import PremiumCard from '@/components/ui/premium-card';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -86,47 +87,46 @@ export default function DashboardOverviewPage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* TOP AGENCY HEADER CARD (Shell/PSO Light Theme) */}
-      <div className="bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="flex items-center gap-5">
+      <div className="bg-white rounded-[20px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
           {agency?.logo_url ? (
             <img
               src={agency.logo_url}
-              alt={agency?.name}
-              className="w-14 h-14 rounded-2xl object-cover border border-emerald-200 shadow-md shadow-emerald-500/10"
+              alt={agency?.name || 'Al-Haram Travels & Tours'}
+              className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm"
             />
           ) : (
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-2xl font-black flex items-center justify-center shadow-lg shadow-emerald-500/20 uppercase">
-              {agency?.name ? agency.name.charAt(0) : 'H'}
+            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md">
+              {agency?.name ? agency.name.charAt(0) : 'A'}
             </div>
           )}
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                {agency?.name || 'Al-Haram Travel Management System'}
-              </h1>
-              <span className="px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                لائیو پورٹل
-              </span>
+            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              {agency?.name || 'Al-Haram Travels & Tours'}
+              <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-semibold">لائیو پورٹل</span>
+            </h1>
+            <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
+              <span className="flex items-center gap-1">👤 {agency?.owner_name || 'Haji Abdul Rehman'}</span>
+              <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+              <span className="flex items-center gap-1">📞 {agency?.phone || '+92 300 5556677'}</span>
+              <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+              <span className="flex items-center gap-1">🪪 لائسنس: {agency?.license_no || 'DTS-LHR-2026'}</span>
             </div>
-            <p className="text-sm text-gray-500 mt-1">
-              حکومتی لائسنس: <strong className="text-gray-700">{agency?.license_no || 'DTS Reg. Verified'}</strong> | رابطہ: <strong className="text-gray-700">{agency?.phone || '0300-0000000'}</strong> | ایڈمن: <strong className="text-gray-700">{agency?.owner_name || 'مالک ایجنسی'}</strong>
-            </p>
           </div>
         </div>
 
         {/* Right CTA Buttons */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <Link
             href="/dashboard/pilgrims/new"
-            className="bg-emerald-500 text-white rounded-full px-6 py-3 shadow-lg shadow-emerald-200 hover:bg-emerald-600 text-xs font-bold transition flex items-center gap-2"
+            className="bg-emerald-500 text-white rounded-full px-5 py-2.5 shadow-md shadow-emerald-200 hover:bg-emerald-600 text-xs font-bold transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             + نیا حاجی رجسٹر کریں
           </Link>
           <Link
             href="/dashboard/groups"
-            className="bg-white border border-gray-200 rounded-full px-6 py-3 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition flex items-center gap-2"
+            className="bg-white border border-gray-200 rounded-full px-5 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition flex items-center gap-2"
           >
             <Users className="w-4 h-4 text-emerald-600" />
             نیا گروپ
@@ -158,289 +158,82 @@ export default function DashboardOverviewPage() {
           <span className="text-xs text-gray-400">ریئل ٹائم ڈیٹا</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Card 1: Total Hujjaj */}
-          <Link
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <PremiumCard
+            title="کل حجاج و زائرین (Total Hujjaj)"
+            value={totalPilgrims}
+            subtitle="رجسٹرڈ عازمین حج و عمرہ"
+            icon={Users}
+            gradient="violet"
+            trend="+12% اس ماہ"
             href="/dashboard/pilgrims"
-            className="bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-xl shadow-violet-300/50 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
-          >
-            {/* Dot Pattern Overlay Opacity 10% */}
-            <div
-              className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
-              style={{
-                backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
-                backgroundSize: '12px 12px',
-              }}
-            />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold text-violet-100 uppercase tracking-wide">
-                  کل حجاج و زائرین (Total Hujjaj)
-                </span>
-                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner">
-                  <Users className="w-6 h-6" />
-                </div>
-              </div>
-              <div>
-                <span className="text-3xl font-black tracking-tight">{totalPilgrims}</span>
-                <span className="block text-xs text-violet-200 mt-1 font-medium">رجسٹرڈ عازمین حج و عمرہ</span>
-              </div>
-            </div>
-            <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
-              <span className="flex items-center gap-1 text-violet-200">
-                <TrendingUp className="w-3.5 h-3.5" /> +12% اس ماہ
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
-
-          {/* Card 2: Total Revenue */}
-          <Link
+          />
+          <PremiumCard
+            title="کل آمدن و ریکوری (Total Revenue)"
+            value={formatCurrency(totalRevenue)}
+            subtitle="مجموعی وصولیاں و بکنگز"
+            icon={DollarSign}
+            gradient="emerald"
+            trend="وصولی شرح 89%"
             href="/dashboard/ledger"
-            className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xl shadow-emerald-200/50 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
-          >
-            <div
-              className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
-              style={{
-                backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
-                backgroundSize: '12px 12px',
-              }}
-            />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
-                  کل آمدن و ریکوری (Total Revenue)
-                </span>
-                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner">
-                  <DollarSign className="w-6 h-6" />
-                </div>
-              </div>
-              <div>
-                <span className="text-3xl font-black tracking-tight">{formatCurrency(totalRevenue)}</span>
-                <span className="block text-xs text-emerald-100 mt-1 font-medium">مجموعی وصولیاں و بکنگز</span>
-              </div>
-            </div>
-            <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
-              <span className="flex items-center gap-1 text-emerald-100">
-                <TrendingUp className="w-3.5 h-3.5" /> وصولی شرح 89%
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
-
-          {/* Card 3: Pending Visa */}
-          <Link
+          />
+          <PremiumCard
+            title="زیر التواء ویزے (Pending Visa)"
+            value={visaPending}
+            subtitle="سفارت خانے میں زیر کارروائی"
+            icon={FileCheck2}
+            gradient="amber"
+            trend="فوری فالو اپ درکار"
             href="/dashboard/visas"
-            className="bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-xl shadow-amber-200/50 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
-          >
-            <div
-              className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
-              style={{
-                backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
-                backgroundSize: '12px 12px',
-              }}
-            />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold text-amber-100 uppercase tracking-wide">
-                  زیر التواء ویزے (Pending Visa)
-                </span>
-                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner">
-                  <FileCheck2 className="w-6 h-6" />
-                </div>
-              </div>
-              <div>
-                <span className="text-3xl font-black tracking-tight">{visaPending}</span>
-                <span className="block text-xs text-amber-100 mt-1 font-medium">سفارت خانے میں زیر کارروائی</span>
-              </div>
-            </div>
-            <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
-              <span className="flex items-center gap-1 text-amber-100">
-                <Clock className="w-3.5 h-3.5" /> فوری فالو اپ درکار
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
-
-          {/* Card 4: Departing Week */}
-          <Link
+          />
+          <PremiumCard
+            title="روانگی اس ہفتے (Departing Week)"
+            value={departingThisWeek > 0 ? departingThisWeek : totalGroups}
+            subtitle="روانہ ہونے والے گروپس"
+            icon={Plane}
+            gradient="rose"
+            trend="اگلے 7 دن میں پرواز"
             href="/dashboard/groups"
-            className="bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-xl shadow-rose-200/50 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
-          >
-            <div
-              className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
-              style={{
-                backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
-                backgroundSize: '12px 12px',
-              }}
-            />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold text-rose-100 uppercase tracking-wide">
-                  روانگی اس ہفتے (Departing Week)
-                </span>
-                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner">
-                  <Plane className="w-6 h-6" />
-                </div>
-              </div>
-              <div>
-                <span className="text-3xl font-black tracking-tight">{departingThisWeek > 0 ? departingThisWeek : totalGroups}</span>
-                <span className="block text-xs text-rose-100 mt-1 font-medium">روانہ ہونے والے گروپس</span>
-              </div>
-            </div>
-            <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
-              <span className="flex items-center gap-1 text-rose-100">
-                <Calendar className="w-3.5 h-3.5" /> اگلے 7 دن میں پرواز
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
+          />
         </div>
       </div>
 
       {/* SECOND ROW CARDS (Receivable, Payable, Net Profit, Today Profit) - ALL COLORFUL */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Receivable: cyan->blue */}
-        <Link
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <PremiumCard
+          title="کل واجب الوصول (Receivable)"
+          value={formatCurrency(receivable)}
+          subtitle="گاہکوں اور سب ایجنٹس سے وصولی"
+          icon={ArrowDownRight}
+          gradient="cyan"
+          trend="وصولی کھاتہ اوپن"
           href="/dashboard/ledger"
-          className="bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-xl shadow-cyan-500/20 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between"
-        >
-          <div
-            className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
-            style={{
-              backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
-              backgroundSize: '12px 12px',
-            }}
-          />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-cyan-100 uppercase tracking-wide">
-                کل واجب الوصول (Receivable)
-              </span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center shadow-inner">
-                <ArrowDownRight className="w-6 h-6" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black text-white tracking-tight block">
-                {formatCurrency(receivable)}
-              </span>
-              <span className="block text-xs text-cyan-100 mt-1 font-medium">
-                گاہکوں اور سب ایجنٹس سے وصولی
-              </span>
-            </div>
-          </div>
-          <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
-            <span>وصولی کھاتہ اوپن</span>
-            <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
-          </div>
-        </Link>
-
-        {/* Payable: if 0 slate gray else orange->red */}
-        <Link
+        />
+        <PremiumCard
+          title="کل واجب الادا (Payable)"
+          value={formatCurrency(payable)}
+          subtitle="ایئرلائن اور ہوٹل سپلائرز کو ادائیگی"
+          icon={ArrowUpRight}
+          gradient={payable === 0 ? 'slate' : 'rose'}
+          trend="سپلائرز بقایا بیلنس"
           href="/dashboard/ledger"
-          className={`text-white shadow-xl rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between ${
-            payable === 0
-              ? 'bg-gradient-to-br from-slate-600 to-slate-800 shadow-slate-600/20'
-              : 'bg-gradient-to-br from-orange-500 to-rose-600 shadow-rose-500/20'
-          }`}
-        >
-          <div
-            className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
-            style={{
-              backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
-              backgroundSize: '12px 12px',
-            }}
-          />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-white/90 uppercase tracking-wide">
-                کل واجب الادا (Payable)
-              </span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center shadow-inner">
-                <ArrowUpRight className="w-6 h-6" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black text-white tracking-tight block">
-                {formatCurrency(payable)}
-              </span>
-              <span className="block text-xs text-white/80 mt-1 font-medium">
-                ایئرلائن اور ہوٹل سپلائرز کو ادائیگی
-              </span>
-            </div>
-          </div>
-          <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
-            <span>سپلائرز بقایا بیلنس</span>
-            <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 transition" />
-          </div>
-        </Link>
-
-        {/* Net Profit: emerald->green */}
-        <div className="bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-xl shadow-emerald-500/20 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between">
-          <div
-            className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
-            style={{
-              backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
-              backgroundSize: '12px 12px',
-            }}
-          />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide">
-                خالص منافع (Net Profit)
-              </span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center shadow-inner">
-                <TrendingUp className="w-6 h-6" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black text-white tracking-tight block">
-                {formatCurrency(netProfit)}
-              </span>
-              <span className="block text-xs text-emerald-100 mt-1 font-medium">
-                خالص آپریٹنگ منافع
-              </span>
-            </div>
-          </div>
-          <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
-            <span>منافع مارجن 18.5%</span>
-            <Sparkles className="w-3.5 h-3.5 text-white/80" />
-          </div>
-        </div>
-
-        {/* Today Profit: purple->violet */}
-        <div className="bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-xl shadow-purple-500/20 rounded-2xl p-6 relative overflow-hidden group hover:scale-[1.02] transition duration-200 flex flex-col justify-between">
-          <div
-            className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
-            style={{
-              backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
-              backgroundSize: '12px 12px',
-            }}
-          />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-purple-100 uppercase tracking-wide">
-                آج کا منافع (Today Profit)
-              </span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur text-white flex items-center justify-center shadow-inner">
-                <DollarSign className="w-6 h-6" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black text-white tracking-tight block">
-                {formatCurrency(todayProfit)}
-              </span>
-              <span className="block text-xs text-purple-100 mt-1 font-medium">
-                آج کی بکنگز اور ٹکٹس
-              </span>
-            </div>
-          </div>
-          <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
-            <span>ریئل ٹائم بکنگ کاؤنٹر</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-white/80" />
-          </div>
-        </div>
+        />
+        <PremiumCard
+          title="خالص منافع (Net Profit)"
+          value={formatCurrency(netProfit)}
+          subtitle="خالص آپریٹنگ منافع"
+          icon={TrendingUp}
+          gradient="green"
+          trend="منافع مارجن 18.5%"
+        />
+        <PremiumCard
+          title="آج کا منافع (Today Profit)"
+          value={formatCurrency(todayProfit)}
+          subtitle="آج کی بکنگز اور ٹکٹس"
+          icon={DollarSign}
+          gradient="purple"
+          trend="ریئل ٹائم بکنگ کاؤنٹر"
+        />
       </div>
 
       {/* QUICK ACTIONS 6 CARDS */}
