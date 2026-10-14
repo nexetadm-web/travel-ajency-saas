@@ -11,6 +11,10 @@ export interface Agency {
   logo_url?: string | null;
   address?: string | null;
   license_no?: string | null;
+  city?: string | null;
+  status?: string | null;
+  plan?: string | null;
+  monthly_fee?: number | null;
   role: 'agency' | 'super_admin';
   created_at?: string;
 }

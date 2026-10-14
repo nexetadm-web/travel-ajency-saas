@@ -3,12 +3,24 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plane, Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import {
+  Building2,
+  Lock,
+  Mail,
+  ArrowRight,
+  ShieldCheck,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Sparkles,
+  UserPlus,
+} from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -32,93 +44,131 @@ export default function LoginPage() {
         return;
       }
 
+      // Persist to localStorage for client-side multi-tenancy & quick references
+      if (typeof window !== 'undefined' && data.agency) {
+        localStorage.setItem('agency_id', data.agency.id);
+        localStorage.setItem('agency_name', data.agency.name);
+        localStorage.setItem('agency_email', data.agency.email);
+        localStorage.setItem('agency_role', data.agency.role);
+      }
+
       router.push(data.redirect || '/dashboard');
       router.refresh();
     } catch (err: any) {
-      setError('کنکشن میں خرابی: براہ کرم دوبارہ کوشش کریں');
+      setError('کنکشن میں خرابی: براہ کرم انٹرنیٹ چیک کر کے دوبارہ کوشش کریں');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-slate-900/80 border border-slate-700/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl shadow-emerald-950/50">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-indigo-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100">
         {/* Brand Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4 text-slate-950">
-            <Plane className="w-8 h-8" />
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-3 text-white">
+            <Building2 className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-black text-white">ایجنسی لاگ ان پورٹل</h2>
-          <p className="text-sm text-slate-400 mt-1 font-light">Travel Agency SaaS Dashboard Login</p>
+          <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 inline-flex items-center gap-1 mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            ٹریول ایجنسی مینجمنٹ سسٹم
+          </span>
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight">ایجنسی لاگ ان پورٹل</h2>
+          <p className="text-xs text-gray-500 mt-1 font-medium">
+            Agency Portal Login • Manage Hujjaj, Visas & Ledger
+          </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+            <label className="block text-[11px] font-bold text-gray-700 mb-1.5">
               ای میل ایڈریس (Email Address)
             </label>
             <div className="relative">
-              <Mail className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="agency@example.com"
-                className="w-full pl-11 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition text-sm"
+                className="w-full pl-10 pr-4 h-11 bg-white border border-gray-200 rounded-xl text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+            <label className="block text-[11px] font-bold text-gray-700 mb-1.5">
               پاس ورڈ (Password)
             </label>
             <div className="relative">
-              <Lock className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-11 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition text-sm"
+                className="w-full pl-10 pr-10 h-11 bg-white border border-gray-200 rounded-xl text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold transition shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs transition shadow-lg shadow-emerald-500/25 disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
           >
             {loading ? (
-              <span className="inline-block animate-spin mr-2">⏳</span>
+              <span className="inline-flex items-center gap-2">
+                <span className="animate-spin text-base">⏳</span> تصدیق ہو رہی ہے...
+              </span>
             ) : (
               <>
-                لاگ ان کریں (Sign In)
+                <span>لاگ ان کریں (Sign In)</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-slate-800 text-center flex flex-col gap-3">
+        {/* Register Agency CTA */}
+        <div className="mt-5 p-3.5 bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-100 rounded-2xl flex items-center justify-between">
+          <div>
+            <span className="text-xs font-bold text-violet-900 block">نئی ایجنسی رجسٹر کریں؟</span>
+            <span className="text-[10px] text-violet-600">نیا اکاؤنٹ صرف 1 منٹ میں</span>
+          </div>
+          <Link
+            href="/signup"
+            className="px-3.5 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm"
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            رجسٹر کریں
+          </Link>
+        </div>
+
+        <div className="mt-6 pt-5 border-t border-gray-100 text-center flex flex-col gap-2">
           <Link
             href="/super-admin/login"
-            className="text-xs text-purple-400 hover:text-purple-300 inline-flex items-center justify-center gap-1.5 transition"
+            className="text-xs text-purple-600 hover:text-purple-700 font-semibold inline-flex items-center justify-center gap-1.5 transition"
           >
-            <ShieldCheck className="w-4 h-4" />
-            سپر ایڈمن پورٹل میں داخل ہوں (Super Admin Portal)
+            <ShieldCheck className="w-4 h-4 text-purple-600" />
+            سپر ایڈمن پورٹل لاگ ان (Super Admin Portal)
           </Link>
-          <Link href="/" className="text-xs text-slate-500 hover:text-slate-400 transition">
+          <Link href="/" className="text-xs text-gray-400 hover:text-gray-600 transition">
             ← مین ہوم پیج پر واپس جائیں
           </Link>
         </div>

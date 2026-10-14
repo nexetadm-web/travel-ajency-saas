@@ -4,6 +4,8 @@ import { agencies } from '@/lib/db/schema';
 import { getSession, isSuperAdmin, hashPassword } from '@/lib/auth';
 import { eq, desc } from 'drizzle-orm';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const session = await getSession();
@@ -21,13 +23,36 @@ export async function GET() {
         logo_url: agencies.logo_url,
         license_no: agencies.license_no,
         address: agencies.address,
+        city: agencies.city,
+        status: agencies.status,
+        plan: agencies.plan,
+        monthly_fee: agencies.monthly_fee,
+        last_login: agencies.last_login,
         role: agencies.role,
         created_at: agencies.created_at,
       })
       .from(agencies)
       .orderBy(desc(agencies.created_at));
 
-    return NextResponse.json({ agencies: allAgencies });
+    // Calculate executive SaaS stats
+    const totalAgencies = allAgencies.length;
+    const activeAgencies = allAgencies.filter((a) => a.status === 'active' || !a.status).length;
+    const disabledAgencies = allAgencies.filter((a) => a.status === 'disabled').length;
+    const totalRevenue = allAgencies.reduce(
+      (sum, a) => sum + (Number(a.monthly_fee) || 3000),
+      0
+    );
+
+    return NextResponse.json({
+      agencies: allAgencies,
+      stats: {
+        totalAgencies,
+        activeAgencies,
+        disabledAgencies,
+        totalRevenue,
+        pendingAgencies: disabledAgencies,
+      },
+    });
   } catch (error: any) {
     console.error('Fetch agencies error:', error);
     return NextResponse.json({ error: 'Failed to retrieve agencies' }, { status: 500 });
@@ -42,7 +67,19 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, owner_name, phone, email, password, logo_url, license_no, address } = body;
+    const {
+      name,
+      owner_name,
+      phone,
+      email,
+      password,
+      logo_url,
+      license_no,
+      address,
+      city,
+      plan,
+      monthly_fee,
+    } = body;
 
     if (!name || !owner_name || !email || !password || !phone) {
       return NextResponse.json(
@@ -80,6 +117,10 @@ export async function POST(req: Request) {
         logo_url: logo_url || null,
         license_no: license_no || null,
         address: address || null,
+        city: city || null,
+        plan: plan || 'starter',
+        monthly_fee: monthly_fee ? Number(monthly_fee) : 3000,
+        status: 'active',
         role: 'agency',
       })
       .returning({
@@ -89,6 +130,8 @@ export async function POST(req: Request) {
         email: agencies.email,
         phone: agencies.phone,
         license_no: agencies.license_no,
+        city: agencies.city,
+        status: agencies.status,
       });
 
     return NextResponse.json({

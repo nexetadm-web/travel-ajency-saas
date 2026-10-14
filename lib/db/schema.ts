@@ -11,6 +11,11 @@ export const agencies = sqliteTable('agencies', {
   logo_url: text('logo_url'),
   address: text('address'),
   license_no: text('license_no'),
+  city: text('city'),
+  status: text('status').default('active'), // 'active' | 'disabled' | 'deleted'
+  plan: text('plan').default('starter'), // 'starter' | 'pro' | 'enterprise'
+  monthly_fee: real('monthly_fee').default(3000),
+  last_login: text('last_login'),
   role: text('role').notNull().default('agency'), // 'agency' | 'super_admin'
   password_hash: text('password_hash').notNull(),
   created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),

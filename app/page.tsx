@@ -20,6 +20,12 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-3">
             <Link
+              href="/signup"
+              className="px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white transition shadow-md flex items-center gap-1.5"
+            >
+              + ایجنسی رجسٹر کریں
+            </Link>
+            <Link
               href="/login"
               className="px-4 py-2 rounded-xl text-sm font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition shadow-lg shadow-emerald-500/30 flex items-center gap-2"
             >
@@ -55,6 +61,13 @@ export default function HomePage() {
 
         {/* CTA Buttons */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            href="/signup"
+            className="px-8 py-4 rounded-2xl text-base font-bold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5 flex items-center gap-3"
+          >
+            + مفت ٹریول ایجنسی رجسٹر کریں (Sign Up)
+            <ArrowRight className="w-5 h-5" />
+          </Link>
           <Link
             href="/login"
             className="px-8 py-4 rounded-2xl text-base font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-xl shadow-emerald-500/30 transition transform hover:-translate-y-0.5 flex items-center gap-3"

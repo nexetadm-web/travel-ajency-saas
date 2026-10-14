@@ -27,6 +27,10 @@ export async function GET() {
         logo_url: agencies.logo_url,
         address: agencies.address,
         license_no: agencies.license_no,
+        city: agencies.city,
+        status: agencies.status,
+        plan: agencies.plan,
+        monthly_fee: agencies.monthly_fee,
         role: agencies.role,
         created_at: agencies.created_at,
       })
