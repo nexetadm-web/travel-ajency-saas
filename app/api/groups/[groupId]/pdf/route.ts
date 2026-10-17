@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { groups, pilgrims, agencies } from '@/lib/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { toAsciiSafe } from '@/lib/pdf-generator';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +35,7 @@ export async function GET(
       .orderBy(desc(pilgrims.created_at));
 
     // Fetch agency details for header branding
-    let agencyName = 'Travel Agency SaaS';
+    let agencyName = 'Pyary Travels & Tours';
     let agencyPhone = '';
     let agencyLicense = '';
     if (group.agency_id) {
@@ -44,9 +45,9 @@ export async function GET(
         .where(eq(agencies.id, group.agency_id))
         .limit(1);
       if (agency) {
-        agencyName = agency.name || agencyName;
-        agencyPhone = agency.phone || '';
-        agencyLicense = agency.license_no || '';
+        agencyName = toAsciiSafe(agency.name, agencyName);
+        agencyPhone = toAsciiSafe(agency.phone, '');
+        agencyLicense = toAsciiSafe(agency.license_no, '');
       }
     }
 
@@ -95,7 +96,11 @@ export async function GET(
       borderWidth: 1,
     });
 
-    page.drawText(`GROUP: ${(group.group_name || 'N/A').toUpperCase()}`, {
+    const safeGroupName = toAsciiSafe(group.group_name, 'UMRAH GROUP').toUpperCase();
+    const safeAirline = toAsciiSafe(group.airline, 'N/A');
+    const safeDeparture = toAsciiSafe(group.departure_date, 'N/A');
+
+    page.drawText(`GROUP: ${safeGroupName}`, {
       x: 48,
       y: pageHeight - 120,
       size: 10,
@@ -103,7 +108,7 @@ export async function GET(
       color: rgb(0.12, 0.15, 0.2),
     });
 
-    page.drawText(`AIRLINE: ${group.airline || 'N/A'}`, {
+    page.drawText(`AIRLINE: ${safeAirline}`, {
       x: 230,
       y: pageHeight - 120,
       size: 9,
@@ -111,7 +116,7 @@ export async function GET(
       color: rgb(0.3, 0.35, 0.45),
     });
 
-    page.drawText(`DEPARTURE: ${group.departure_date || 'N/A'}`, {
+    page.drawText(`DEPARTURE: ${safeDeparture}`, {
       x: 350,
       y: pageHeight - 120,
       size: 9,
@@ -194,10 +199,10 @@ export async function GET(
         });
 
         const safeIndex = `${index + 1}`;
-        const safeName = (pilgrimRecord.full_name || 'N/A').toUpperCase().substring(0, 32);
-        const safePassport = (pilgrimRecord.passport_no || 'N/A').toUpperCase();
-        const safeExpiry = pilgrimRecord.passport_expiry || '-';
-        const safeStatus = (pilgrimRecord.visa_status || 'document_pending').replace(/_/g, ' ').toUpperCase();
+        const safeName = toAsciiSafe(pilgrimRecord.full_name, 'Pilgrim').toUpperCase().substring(0, 32);
+        const safePassport = toAsciiSafe(pilgrimRecord.passport_no, 'N/A').toUpperCase();
+        const safeExpiry = toAsciiSafe(pilgrimRecord.passport_expiry, '-');
+        const safeStatus = toAsciiSafe(pilgrimRecord.visa_status, 'document_pending').replace(/_/g, ' ').toUpperCase();
 
         page.drawText(safeIndex, { x: 44, y: currentY, size: 8, font: fontRegular, color: rgb(0.2, 0.2, 0.2) });
         page.drawText(safeName, { x: 68, y: currentY, size: 8, font: fontRegular, color: rgb(0.1, 0.1, 0.1) });
@@ -237,12 +242,13 @@ export async function GET(
     });
 
     const pdfBytes = await pdfDoc.save();
+    const downloadFilename = `embassy-${safeGroupName.replace(/[^a-zA-Z0-9_-]/g, '_') || groupId}.pdf`;
 
     return new Response(Buffer.from(pdfBytes), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="embassy-${group.group_name.replace(/[^a-zA-Z0-9_-]/g, '_') || groupId}.pdf"`,
+        'Content-Disposition': `attachment; filename="${downloadFilename}"`,
         'Cache-Control': 'no-store',
       },
     });

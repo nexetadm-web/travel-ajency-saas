@@ -6,6 +6,13 @@ export interface GroupDocData {
   agency: any;
 }
 
+export function toAsciiSafe(str: any, fallback = 'N/A'): string {
+  if (str === null || str === undefined) return fallback;
+  const s = String(str);
+  const cleaned = s.replace(/[^\x20-\x7E]/g, ' ').replace(/\s+/g, ' ').trim();
+  return cleaned.length > 0 ? cleaned : fallback;
+}
+
 // 1. EMBASSY MANIFEST PDF GENERATOR
 export async function generateEmbassyManifestPdf({ group, pilgrims, agency }: GroupDocData): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
@@ -16,6 +23,15 @@ export async function generateEmbassyManifestPdf({ group, pilgrims, agency }: Gr
   const pageHeight = 841.89;
 
   let page = pdfDoc.addPage([pageWidth, pageHeight]);
+
+  const agencyName = toAsciiSafe(agency?.name, 'PYARY TRAVELS & TOURS').toUpperCase();
+  const agencyLic = toAsciiSafe(agency?.license_no, 'DTS Reg-Verified');
+  const agencyTel = toAsciiSafe(agency?.phone, 'N/A');
+
+  const groupName = toAsciiSafe(group?.group_name, 'UMRAH SPECIAL GROUP').toUpperCase();
+  const airline = toAsciiSafe(group?.airline, 'SAUDI AIRLINES / PIA');
+  const deptDate = toAsciiSafe(group?.departure_date, 'N/A');
+  const pilgrimsList = pilgrims || [];
 
   const drawHeader = (p: any) => {
     // Top banner
@@ -36,7 +52,7 @@ export async function generateEmbassyManifestPdf({ group, pilgrims, agency }: Gr
     });
 
     p.drawText(
-      `${(agency?.name || 'AL-HARAM TRAVEL MANAGEMENT').toUpperCase()} | LIC: ${agency?.license_no || 'DTS-4529'} | TEL: ${agency?.phone || '0300-1234567'}`,
+      `${agencyName} | LIC: ${agencyLic} | TEL: ${agencyTel}`,
       {
         x: 36,
         y: pageHeight - 58,
@@ -57,7 +73,7 @@ export async function generateEmbassyManifestPdf({ group, pilgrims, agency }: Gr
       borderWidth: 1,
     });
 
-    p.drawText(`GROUP: ${(group?.group_name || 'UMRAH SPECIAL GROUP').toUpperCase()}`, {
+    p.drawText(`GROUP: ${groupName}`, {
       x: 48,
       y: pageHeight - 120,
       size: 9.5,
@@ -65,7 +81,7 @@ export async function generateEmbassyManifestPdf({ group, pilgrims, agency }: Gr
       color: rgb(0.1, 0.15, 0.25),
     });
 
-    p.drawText(`AIRLINE: ${group?.airline || 'SAUDI AIRLINES / PIA'}`, {
+    p.drawText(`AIRLINE: ${airline}`, {
       x: 240,
       y: pageHeight - 120,
       size: 8.5,
@@ -73,7 +89,7 @@ export async function generateEmbassyManifestPdf({ group, pilgrims, agency }: Gr
       color: rgb(0.3, 0.35, 0.45),
     });
 
-    p.drawText(`DEPARTURE: ${group?.departure_date || 'N/A'}`, {
+    p.drawText(`DEPARTURE: ${deptDate}`, {
       x: 370,
       y: pageHeight - 120,
       size: 8.5,
@@ -81,7 +97,7 @@ export async function generateEmbassyManifestPdf({ group, pilgrims, agency }: Gr
       color: rgb(0.3, 0.35, 0.45),
     });
 
-    p.drawText(`TOTAL PILGRIMS: ${pilgrims?.length || 0}`, {
+    p.drawText(`TOTAL PILGRIMS: ${pilgrimsList.length}`, {
       x: 48,
       y: pageHeight - 136,
       size: 8.5,
@@ -119,49 +135,59 @@ export async function generateEmbassyManifestPdf({ group, pilgrims, agency }: Gr
   drawTableHeader(page, y);
   y -= 26;
 
-  (pilgrims || []).forEach((p, idx) => {
-    if (y < 60) {
-      page = pdfDoc.addPage([pageWidth, pageHeight]);
-      drawHeader(page);
-      y = pageHeight - 165;
-      drawTableHeader(page, y);
-      y -= 26;
-    }
-
-    if (idx % 2 === 0) {
-      page.drawRectangle({
-        x: 36,
-        y: y - 5,
-        width: pageWidth - 72,
-        height: 18,
-        color: rgb(0.97, 0.98, 0.99),
-      });
-    }
-
-    page.drawLine({
-      start: { x: 36, y: y - 5 },
-      end: { x: pageWidth - 36, y: y - 5 },
-      thickness: 0.5,
-      color: rgb(0.9, 0.92, 0.95),
+  if (pilgrimsList.length === 0) {
+    page.drawText('No pilgrims registered in this group yet.', {
+      x: 48,
+      y,
+      size: 9,
+      font: fontRegular,
+      color: rgb(0.5, 0.5, 0.5),
     });
+  } else {
+    pilgrimsList.forEach((p, idx) => {
+      if (y < 60) {
+        page = pdfDoc.addPage([pageWidth, pageHeight]);
+        drawHeader(page);
+        y = pageHeight - 165;
+        drawTableHeader(page, y);
+        y -= 26;
+      }
 
-    const safeName = (p.full_name || 'N/A').toUpperCase().substring(0, 28);
-    const safePassport = (p.passport_no || 'N/A').toUpperCase();
-    const safeFather = (p.father_name || '-').toUpperCase().substring(0, 20);
-    const safeExpiry = p.passport_expiry || '-';
+      if (idx % 2 === 0) {
+        page.drawRectangle({
+          x: 36,
+          y: y - 5,
+          width: pageWidth - 72,
+          height: 18,
+          color: rgb(0.97, 0.98, 0.99),
+        });
+      }
 
-    page.drawText(`${idx + 1}`, { x: 44, y, size: 8, font: fontRegular, color: rgb(0.2, 0.2, 0.2) });
-    page.drawText(safeName, { x: 72, y, size: 8, font: fontRegular, color: rgb(0.1, 0.1, 0.1) });
-    page.drawText(safePassport, { x: 230, y, size: 8, font: fontBold, color: rgb(0.15, 0.25, 0.4) });
-    page.drawText(safeFather, { x: 330, y, size: 8, font: fontRegular, color: rgb(0.3, 0.3, 0.3) });
-    page.drawText(safeExpiry, { x: 440, y, size: 8, font: fontRegular, color: rgb(0.3, 0.3, 0.3) });
+      page.drawLine({
+        start: { x: 36, y: y - 5 },
+        end: { x: pageWidth - 36, y: y - 5 },
+        thickness: 0.5,
+        color: rgb(0.9, 0.92, 0.95),
+      });
 
-    y -= 19;
-  });
+      const safeName = toAsciiSafe(p.full_name, 'Pilgrim').toUpperCase().substring(0, 28);
+      const safePassport = toAsciiSafe(p.passport_no, 'N/A').toUpperCase();
+      const safeFather = toAsciiSafe(p.father_name, '-').toUpperCase().substring(0, 20);
+      const safeExpiry = toAsciiSafe(p.passport_expiry, '-');
+
+      page.drawText(`${idx + 1}`, { x: 44, y, size: 8, font: fontRegular, color: rgb(0.2, 0.2, 0.2) });
+      page.drawText(safeName, { x: 72, y, size: 8, font: fontRegular, color: rgb(0.1, 0.1, 0.1) });
+      page.drawText(safePassport, { x: 230, y, size: 8, font: fontBold, color: rgb(0.15, 0.25, 0.4) });
+      page.drawText(safeFather, { x: 330, y, size: 8, font: fontRegular, color: rgb(0.3, 0.3, 0.3) });
+      page.drawText(safeExpiry, { x: 440, y, size: 8, font: fontRegular, color: rgb(0.3, 0.3, 0.3) });
+
+      y -= 19;
+    });
+  }
 
   // Footer note on all pages
   pdfDoc.getPages().forEach((p, i) => {
-    p.drawText(`Official Manifest Verified by ${agency?.name || 'Al-Haram Travel'} - Page ${i + 1}`, {
+    p.drawText(`Official Manifest Verified by ${agencyName} - Page ${i + 1}`, {
       x: 36,
       y: 18,
       size: 7.5,
@@ -182,7 +208,16 @@ export async function generateBulkTicketsPdf({ group, pilgrims, agency }: GroupD
   const pageWidth = 595.28;
   const pageHeight = 841.89;
 
-  (pilgrims || []).forEach((p, i) => {
+  const agencyName = toAsciiSafe(agency?.name, 'PYARY TRAVELS & TOURS').toUpperCase();
+  const agencyLic = toAsciiSafe(agency?.license_no, 'DTS Reg-Verified');
+  const safeAirline = toAsciiSafe(group?.airline, 'SAUDI AIRLINES / PIA');
+  const safeDept = toAsciiSafe(group?.departure_date, 'CONFIRMED ON SCHEDULE');
+
+  const pilgrimsList = pilgrims && pilgrims.length > 0 ? pilgrims : [
+    { full_name: 'SAMPLE PASSENGER / EMPTY GROUP', passport_no: 'N/A', pnr: 'PK-786' }
+  ];
+
+  pilgrimsList.forEach((p) => {
     const page = pdfDoc.addPage([pageWidth, pageHeight]);
 
     // Top Header
@@ -202,7 +237,7 @@ export async function generateBulkTicketsPdf({ group, pilgrims, agency }: GroupD
       color: rgb(1, 1, 1),
     });
 
-    page.drawText(`ISSUED BY: ${(agency?.name || 'AL-HARAM TRAVEL').toUpperCase()} | LIC: ${agency?.license_no || 'DTS-4529'}`, {
+    page.drawText(`ISSUED BY: ${agencyName} | LIC: ${agencyLic}`, {
       x: 54,
       y: pageHeight - 95,
       size: 8.5,
@@ -223,10 +258,10 @@ export async function generateBulkTicketsPdf({ group, pilgrims, agency }: GroupD
 
     // Passenger Name & PNR row
     page.drawText('PASSENGER NAME', { x: 54, y: pageHeight - 165, size: 8, font: fontRegular, color: rgb(0.4, 0.45, 0.5) });
-    page.drawText((p.full_name || 'N/A').toUpperCase(), { x: 54, y: pageHeight - 185, size: 13, font: fontBold, color: rgb(0.1, 0.15, 0.25) });
+    page.drawText(toAsciiSafe(p.full_name, 'N/A').toUpperCase(), { x: 54, y: pageHeight - 185, size: 13, font: fontBold, color: rgb(0.1, 0.15, 0.25) });
 
     page.drawText('BOOKING REF (PNR)', { x: 380, y: pageHeight - 165, size: 8, font: fontRegular, color: rgb(0.4, 0.45, 0.5) });
-    page.drawText((p.pnr || group?.airline || 'PK-786').toUpperCase(), { x: 380, y: pageHeight - 185, size: 14, font: fontBold, color: rgb(0.1, 0.45, 0.7) });
+    page.drawText(toAsciiSafe(p.pnr || group?.airline, 'PK-786').toUpperCase(), { x: 380, y: pageHeight - 185, size: 14, font: fontBold, color: rgb(0.1, 0.45, 0.7) });
 
     // Flight details
     page.drawLine({ start: { x: 54, y: pageHeight - 200 }, end: { x: pageWidth - 54, y: pageHeight - 200 }, thickness: 0.5, color: rgb(0.85, 0.88, 0.92) });
@@ -235,13 +270,13 @@ export async function generateBulkTicketsPdf({ group, pilgrims, agency }: GroupD
     page.drawText('PAKISTAN (LHE / ISB / KHI) <-> JEDDAH / MADINAH', { x: 54, y: pageHeight - 238, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
 
     page.drawText('FLIGHT DATE', { x: 380, y: pageHeight - 220, size: 8, font: fontRegular, color: rgb(0.4, 0.45, 0.5) });
-    page.drawText(group?.departure_date || 'CONFIRMED ON SCHEDULE', { x: 380, y: pageHeight - 238, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(safeDept, { x: 380, y: pageHeight - 238, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
 
     page.drawText('PASSPORT NO', { x: 54, y: pageHeight - 270, size: 8, font: fontRegular, color: rgb(0.4, 0.45, 0.5) });
-    page.drawText((p.passport_no || 'N/A').toUpperCase(), { x: 54, y: pageHeight - 288, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(toAsciiSafe(p.passport_no, 'N/A').toUpperCase(), { x: 54, y: pageHeight - 288, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
 
     page.drawText('AIRLINE CARRIER', { x: 220, y: pageHeight - 270, size: 8, font: fontRegular, color: rgb(0.4, 0.45, 0.5) });
-    page.drawText(group?.airline || 'SAUDI AIRLINES / PIA', { x: 220, y: pageHeight - 288, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(safeAirline, { x: 220, y: pageHeight - 288, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
 
     page.drawText('BAGGAGE ALLOWANCE', { x: 380, y: pageHeight - 270, size: 8, font: fontRegular, color: rgb(0.4, 0.45, 0.5) });
     page.drawText('2 PIECES (23KG EACH) + 7KG HAND CARRY', { x: 380, y: pageHeight - 288, size: 8.5, font: fontBold, color: rgb(0.1, 0.5, 0.2) });
@@ -266,7 +301,7 @@ export async function generateBulkTicketsPdf({ group, pilgrims, agency }: GroupD
       color: rgb(0.7, 0.2, 0.2),
     });
 
-    page.drawText(`Official E-Ticket generated by ${agency?.name || 'Al-Haram Travel'} - Verified PNR`, {
+    page.drawText(`Official E-Ticket generated by ${agencyName} - Verified PNR`, {
       x: 36,
       y: 20,
       size: 7.5,
@@ -289,6 +324,10 @@ export async function generateHotelVouchersPdf({ group, pilgrims, agency }: Grou
 
   const page = pdfDoc.addPage([pageWidth, pageHeight]);
 
+  const agencyName = toAsciiSafe(agency?.name, 'PYARY TRAVELS & TOURS').toUpperCase();
+  const groupName = toAsciiSafe(group?.group_name, 'UMRAH GROUP').toUpperCase();
+  const pilgrimsList = pilgrims || [];
+
   // Main Header
   page.drawRectangle({
     x: 36,
@@ -306,7 +345,7 @@ export async function generateHotelVouchersPdf({ group, pilgrims, agency }: Grou
     color: rgb(1, 1, 1),
   });
 
-  page.drawText(`GROUP: ${(group?.group_name || 'UMRAH GROUP').toUpperCase()} | TOTAL GUESTS: ${pilgrims?.length || 0}`, {
+  page.drawText(`GROUP: ${groupName} | TOTAL GUESTS: ${pilgrimsList.length}`, {
     x: 54,
     y: pageHeight - 72,
     size: 8.5,
@@ -342,10 +381,10 @@ export async function generateHotelVouchersPdf({ group, pilgrims, agency }: Grou
   });
 
   page.drawText('HOTEL NAME:', { x: 54, y: pageHeight - 170, size: 8.5, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
-  page.drawText(group?.makkah_hotel || 'SWISSOTEL AL MAQAM MAKKAH (5 STAR)', { x: 54, y: pageHeight - 190, size: 12, font: fontBold, color: rgb(0.1, 0.2, 0.15) });
+  page.drawText(toAsciiSafe(group?.makkah_hotel, 'SWISSOTEL AL MAQAM MAKKAH (5 STAR)'), { x: 54, y: pageHeight - 190, size: 12, font: fontBold, color: rgb(0.1, 0.2, 0.15) });
 
   page.drawText('CHECK-IN DATE', { x: 54, y: pageHeight - 220, size: 8, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
-  page.drawText(group?.departure_date || 'ON FLIGHT ARRIVAL', { x: 54, y: pageHeight - 238, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+  page.drawText(toAsciiSafe(group?.departure_date, 'ON FLIGHT ARRIVAL'), { x: 54, y: pageHeight - 238, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
 
   page.drawText('ROOM CATEGORY', { x: 220, y: pageHeight - 220, size: 8, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
   page.drawText('STANDARD QUAD / TRIPLE BED ROOMS', { x: 220, y: pageHeight - 238, size: 9.5, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
@@ -353,8 +392,9 @@ export async function generateHotelVouchersPdf({ group, pilgrims, agency }: Grou
   page.drawText('MEAL PLAN', { x: 420, y: pageHeight - 220, size: 8, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
   page.drawText('BED & BREAKFAST (BUFFET)', { x: 420, y: pageHeight - 238, size: 9.5, font: fontBold, color: rgb(0.1, 0.5, 0.2) });
 
+  const leadPassenger = pilgrimsList[0]?.full_name ? toAsciiSafe(pilgrimsList[0].full_name, 'GROUP LEADER').toUpperCase() : 'GROUP LEADER';
   page.drawText('PASSENGER REPS:', { x: 54, y: pageHeight - 270, size: 8, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
-  page.drawText(`${(pilgrims[0]?.full_name || 'GROUP LEADER').toUpperCase()} + ${Math.max(0, (pilgrims?.length || 1) - 1)} MORE PILGRIMS`, {
+  page.drawText(`${leadPassenger} + ${Math.max(0, pilgrimsList.length - 1)} MORE PILGRIMS`, {
     x: 54,
     y: pageHeight - 288,
     size: 9.5,
@@ -390,7 +430,7 @@ export async function generateHotelVouchersPdf({ group, pilgrims, agency }: Grou
   });
 
   page.drawText('HOTEL NAME:', { x: 54, y: 300, size: 8.5, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
-  page.drawText(group?.madina_hotel || 'PULLMAN ZAMZAM MADINA (5 STAR)', { x: 54, y: 280, size: 12, font: fontBold, color: rgb(0.1, 0.15, 0.3) });
+  page.drawText(toAsciiSafe(group?.madina_hotel, 'PULLMAN ZAMZAM MADINA (5 STAR)'), { x: 54, y: 280, size: 12, font: fontBold, color: rgb(0.1, 0.15, 0.3) });
 
   page.drawText('CHECK-IN DATE', { x: 54, y: 250, size: 8, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
   page.drawText('AFTER MAKKAH STAY', { x: 54, y: 232, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
@@ -401,7 +441,7 @@ export async function generateHotelVouchersPdf({ group, pilgrims, agency }: Grou
   page.drawText('DISTANCE TO HARAM', { x: 420, y: 250, size: 8, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
   page.drawText('WITHIN 150 METERS', { x: 420, y: 232, size: 9.5, font: fontBold, color: rgb(0.1, 0.45, 0.6) });
 
-  page.drawText(`Official Vouchers verified by ${agency?.name || 'Al-Haram Travel Management'}`, {
+  page.drawText(`Official Vouchers verified by ${agencyName}`, {
     x: 36,
     y: 20,
     size: 7.5,
@@ -417,14 +457,14 @@ export function generateEmbassyExcelCsv({ group, pilgrims, agency }: GroupDocDat
   const headers = ['Sr', 'Full Name as Passport', 'Passport Number', 'Father Name', 'Passport Expiry', 'CNIC', 'Phone', 'Visa Status', 'Group Name'];
   const rows = (pilgrims || []).map((p, idx) => [
     idx + 1,
-    `"${(p.full_name || '').replace(/"/g, '""')}"`,
-    `"${(p.passport_no || '').replace(/"/g, '""')}"`,
-    `"${(p.father_name || '').replace(/"/g, '""')}"`,
-    `"${p.passport_expiry || ''}"`,
-    `"${p.cnic || ''}"`,
-    `"${p.phone || ''}"`,
-    `"${p.visa_status || ''}"`,
-    `"${(group?.group_name || '').replace(/"/g, '""')}"`,
+    `"${(toAsciiSafe(p.full_name, '')).replace(/"/g, '""')}"`,
+    `"${(toAsciiSafe(p.passport_no, '')).replace(/"/g, '""')}"`,
+    `"${(toAsciiSafe(p.father_name, '')).replace(/"/g, '""')}"`,
+    `"${toAsciiSafe(p.passport_expiry, '')}"`,
+    `"${toAsciiSafe(p.cnic, '')}"`,
+    `"${toAsciiSafe(p.phone, '')}"`,
+    `"${toAsciiSafe(p.visa_status, '')}"`,
+    `"${(toAsciiSafe(group?.group_name, '')).replace(/"/g, '""')}"`,
   ]);
 
   return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');

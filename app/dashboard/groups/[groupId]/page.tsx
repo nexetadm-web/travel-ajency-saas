@@ -310,93 +310,94 @@ export default function GroupDetailsPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-2.5 w-full lg:w-auto">
           {/* FEATURE 2 BUTTON: BULK GROUP WHATSAPP */}
           <button
             onClick={() => {
               setWaSuccessMsg('');
               setShowWhatsAppModal(true);
             }}
-            className="px-4 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-200 transition flex items-center gap-2"
+            className="w-full lg:w-auto px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2"
           >
-            <MessageCircle className="w-4 h-4" />
-            📢 پورے گروپ کو WhatsApp
+            <MessageCircle className="w-4 h-4 shrink-0" />
+            <span>📢 پورے گروپ کو WhatsApp</span>
           </button>
 
           <button
             onClick={handleExportEmbassyPdf}
             disabled={loadingPdf}
-            className="px-4 py-2.5 rounded-full bg-white hover:bg-gray-50 text-purple-700 border border-purple-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+            className="w-full lg:w-auto px-4 py-2.5 rounded-xl bg-white hover:bg-gray-50 text-purple-700 border border-purple-200 text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
           >
-            {loadingPdf ? <Loader2 className="w-4 h-4 animate-spin text-purple-600" /> : <FileDown className="w-4 h-4" />}
+            {loadingPdf ? <Loader2 className="w-4 h-4 animate-spin text-purple-600" /> : <FileDown className="w-4 h-4 shrink-0" />}
             <span>{loadingPdf ? 'PDF ڈاؤن لوڈ ہو رہی ہے...' : 'سفارت خانہ لسٹ (PDF)'}</span>
           </button>
 
           <Link
             href={`/dashboard/groups/${groupId}/documents`}
-            className="px-4 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-indigo-200"
+            className="w-full lg:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-md shadow-indigo-200"
           >
-            <FileText className="w-4 h-4" />
+            <FileText className="w-4 h-4 shrink-0" />
             <span>📑 دستاویزات و واؤچرز (PDF Center)</span>
           </Link>
 
           <Link
             href={`/dashboard/groups/${groupId}/profit`}
-            className="px-4 py-2.5 rounded-full bg-white hover:bg-gray-50 text-teal-700 border border-teal-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+            className="w-full lg:w-auto px-4 py-2.5 rounded-xl bg-white hover:bg-gray-50 text-teal-700 border border-teal-200 text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm"
           >
-            <span>💰</span> گروپ منافع
+            <span>💰</span>
+            <span>گروپ منافع</span>
           </Link>
         </div>
       </div>
 
       {/* TABS NAVIGATION */}
-      <div className="flex items-center gap-2 border-b border-gray-200 pb-2">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 border-b border-gray-200 -mx-1 px-1 sm:mx-0 sm:px-0">
         <button
           onClick={() => setActiveTab('pilgrims')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+          className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
             activeTab === 'pilgrims'
               ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
-          <Users className="w-4 h-4" />
-          زائرین لسٹ ({pilgrims.length})
+          <Users className="w-4 h-4 shrink-0" />
+          <span>زائرین لسٹ ({pilgrims.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab('documents')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+          className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
             activeTab === 'documents'
               ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
-          <FileText className="w-4 h-4" />
-          دستاویزات اور پاسپورٹ اسکینز
+          <FileText className="w-4 h-4 shrink-0" />
+          <span>دستاویزات اور اسکینز</span>
         </button>
 
         <button
           onClick={() => setActiveTab('accounts')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+          className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
             activeTab === 'accounts'
               ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
-          <DollarSign className="w-4 h-4" />
-          اکاؤنٹس سمری (Accounts)
+          <DollarSign className="w-4 h-4 shrink-0" />
+          <span>اکاؤنٹس سمری</span>
         </button>
 
         <button
           onClick={() => setActiveTab('kits')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+          className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
             activeTab === 'kits'
               ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
-          <Package className="w-4 h-4" />
-          🧳 کٹ تقسیم ({groupIssuesList.length})
+          <Package className="w-4 h-4 shrink-0" />
+          <span>🧳 کٹ تقسیم ({groupIssuesList.length})</span>
         </button>
       </div>
 
@@ -418,7 +419,7 @@ export default function GroupDetailsPage() {
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 transition flex items-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 transition flex items-center justify-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
                 + نیا زائر شامل کریں
@@ -426,9 +427,9 @@ export default function GroupDetailsPage() {
             </div>
           </div>
 
-          {/* TABLE */}
-          <div className="rounded-[24px] border border-gray-100 bg-white overflow-x-auto shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-            <table className="w-full text-left text-xs text-gray-700">
+          {/* DESKTOP TABLE */}
+          <div className="hidden md:block rounded-[24px] border border-gray-100 bg-white overflow-x-auto shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+            <table className="w-full text-left text-xs text-gray-700 min-w-full">
               <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="p-4">نام زائر</th>
@@ -486,6 +487,76 @@ export default function GroupDetailsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* MOBILE CARDS VIEW */}
+          <div className="block md:hidden space-y-3">
+            {filteredPilgrims.length === 0 ? (
+              <div className="p-8 text-center bg-white rounded-2xl border border-gray-100 text-gray-500 text-xs">
+                کوئی زائر موجود نہیں۔
+              </div>
+            ) : (
+              filteredPilgrims.map((p: any) => (
+                <div key={p.id} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm">{p.full_name}</h4>
+                      <p className="text-[11px] text-gray-500 mt-0.5">والد: {p.father_name || '-'}</p>
+                    </div>
+                    <a
+                      href={`/api/pdf/dua-card/${p.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-[11px] font-bold border border-emerald-200 shrink-0"
+                    >
+                      دعا کارڈ PDF
+                    </a>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 p-2.5 rounded-xl">
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">پاسپورٹ نمبر</span>
+                      <span className="font-mono text-emerald-700 font-bold">{p.passport_no}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">میعاد تنسیخ</span>
+                      <span className="text-gray-700">{formatDate(p.passport_expiry)}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">ادا شدہ</span>
+                      <span className="font-bold text-emerald-700">{formatCurrency(p.payment_paid)}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">بقایا واجب الادا</span>
+                      <span className="font-bold text-rose-600">
+                        {formatCurrency((p.payment_total || 0) - (p.payment_paid || 0))}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] text-gray-400 block mb-1">ویزہ سٹیٹس (ون کلک تبدیل کریں)</label>
+                    <select
+                      disabled={updatingId === p.id}
+                      value={p.visa_status || 'document_pending'}
+                      onChange={(e) => handleVisaStatusChange(p.id, e.target.value)}
+                      className={`w-full px-3 py-2 rounded-xl text-xs font-bold border ${
+                        p.visa_status === 'printed'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : p.visa_status === 'in_embassy'
+                          ? 'bg-sky-50 text-sky-700 border-sky-200'
+                          : 'bg-amber-50 text-amber-700 border-amber-200'
+                      }`}
+                    >
+                      <option value="document_pending">دستاویزات جمع (Pending)</option>
+                      <option value="in_embassy">سفارت خانے میں (In Embassy)</option>
+                      <option value="printed">ویزہ جاری (Printed)</option>
+                      <option value="returned">واپس موصول (Returned)</option>
+                    </select>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}

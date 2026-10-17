@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Al-Haram Travels & Tours",
-  description: "Umrah Hajj Visa Tours Management SaaS",
+  title: "Pyary Travels - Umrah Management System",
+  description: "Pyary Travels & Tours - Umrah, Hajj, Visa & Tours Management SaaS Portal",
   icons: {
     icon: "/icon.png",
     shortcut: "/favicon.ico",

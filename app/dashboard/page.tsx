@@ -85,53 +85,53 @@ export default function DashboardOverviewPage() {
   const notifications = notifData?.notifications || [];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-8 max-w-7xl mx-auto px-2 sm:px-4">
       {/* TOP AGENCY HEADER CARD (Shell/PSO Light Theme) */}
       <div className="bg-white rounded-[20px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           {agency?.logo_url ? (
             <img
               src={agency.logo_url}
-              alt={agency?.name || 'Al-Haram Travels & Tours'}
-              className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm"
+              alt={agency?.name || 'Pyary Travels & Tours'}
+              className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm shrink-0"
             />
           ) : (
             <img
               src="/logo.png"
-              alt="Al-Haram Logo"
-              className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm"
+              alt="Pyary Logo"
+              className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm shrink-0"
             />
           )}
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              {agency?.name || 'Al-Haram Travels & Tours'}
-              <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-semibold">لائیو پورٹل</span>
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2 flex-wrap">
+              <span className="truncate">{agency?.name || 'Pyary Travels & Tours'}</span>
+              <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0">لائیو پورٹل</span>
             </h1>
-            <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs text-gray-500">
               <span className="flex items-center gap-1">👤 {agency?.owner_name || 'Haji Abdul Rehman'}</span>
-              <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+              <span className="w-1 h-1 bg-gray-300 rounded-full hidden sm:inline-block"></span>
               <span className="flex items-center gap-1">📞 {agency?.phone || '+92 300 5556677'}</span>
-              <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-              <span className="flex items-center gap-1">🪪 لائسنس: {agency?.license_no || 'DTS-LHR-2026'}</span>
+              <span className="w-1 h-1 bg-gray-300 rounded-full hidden sm:inline-block"></span>
+              <span className="flex items-center gap-1">🪪 {agency?.license_no || 'DTS-LHR-2026'}</span>
             </div>
           </div>
         </div>
 
         {/* Right CTA Buttons */}
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2.5 w-full md:w-auto">
           <Link
             href="/dashboard/pilgrims/new"
-            className="bg-emerald-500 text-white rounded-full px-5 py-2.5 shadow-md shadow-emerald-200 hover:bg-emerald-600 text-xs font-bold transition flex items-center gap-2"
+            className="bg-emerald-500 text-white rounded-full px-4 sm:px-5 py-2.5 shadow-md shadow-emerald-200 hover:bg-emerald-600 text-xs font-bold transition flex items-center justify-center gap-1.5"
           >
-            <Plus className="w-4 h-4" />
-            + نیا حاجی رجسٹر کریں
+            <Plus className="w-4 h-4 shrink-0" />
+            <span className="truncate">+ نیا حاجی</span>
           </Link>
           <Link
             href="/dashboard/groups"
-            className="bg-white border border-gray-200 rounded-full px-5 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition flex items-center gap-2"
+            className="bg-white border border-gray-200 rounded-full px-4 sm:px-5 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition flex items-center justify-center gap-1.5"
           >
-            <Users className="w-4 h-4 text-emerald-600" />
-            نیا گروپ
+            <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span className="truncate">نیا گروپ</span>
           </Link>
         </div>
       </div>

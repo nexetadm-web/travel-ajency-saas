@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import useSWR from 'swr';
@@ -38,65 +39,87 @@ export default function GroupProfitPage() {
     totalExpenses: 0,
     netProfit: 0,
   };
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const pilgrimsCount = data?.pilgrimsCount || 0;
 
   const handleExportProfitPdf = async () => {
     try {
-      const { generateGroupProfitPdf } = await import('@/lib/pdf/generator');
-      const pdfBytes = await generateGroupProfitPdf({
-        agency: {
-          name: agency?.name || 'Travel Agency',
-          license_no: agency?.license_no || 'Reg DTS',
-          phone: agency?.phone || '',
-          address: agency?.address || '',
-          logo_url: agency?.logo_url || null,
-        },
-        groupName: group?.group_name || 'Group',
-        totalReceived: f.totalReceived,
-        ticketsCost: f.ticketsCost,
-        hotelsCost: f.hotelsCost,
-        transportCost: f.transportCost,
-        visasCost: f.visasCost,
-        otherExpenses: 0,
-        totalExpenses: f.totalExpenses,
-        netProfit: f.netProfit,
-        pilgrimsCount,
-      });
-
-      const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
+      setDownloadingPdf(true);
+      const res = await fetch(`/api/groups/${groupId}/profit/pdf`, { cache: 'no-store' });
+      if (!res.ok) {
+        throw new Error('Server PDF export failed');
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `group-profit-${group?.group_name || 'group'}.pdf`;
+      a.download = `group-profit-${group?.group_name ? group.group_name.replace(/[^a-zA-Z0-9_-]/g, '_') : groupId}.pdf`;
+      document.body.appendChild(a);
       a.click();
-    } catch (err) {
-      console.error(err);
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err: any) {
+      console.error('Profit PDF error:', err);
+      try {
+        const { generateGroupProfitPdf } = await import('@/lib/pdf/generator');
+        const pdfBytes = await generateGroupProfitPdf({
+          agency: {
+            name: agency?.name || 'Pyary Travels',
+            license_no: agency?.license_no || 'Reg DTS',
+            phone: agency?.phone || '',
+            address: agency?.address || '',
+            logo_url: agency?.logo_url || null,
+          },
+          groupName: group?.group_name || 'Group',
+          totalReceived: f.totalReceived,
+          ticketsCost: f.ticketsCost,
+          hotelsCost: f.hotelsCost,
+          transportCost: f.transportCost,
+          visasCost: f.visasCost,
+          otherExpenses: 0,
+          totalExpenses: f.totalExpenses,
+          netProfit: f.netProfit,
+          pilgrimsCount,
+        });
+
+        const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `group-profit-${groupId}.pdf`;
+        a.click();
+      } catch (clientErr: any) {
+        alert('PDF ڈاؤن لوڈ کرنے میں خرابی پیش آگئی: ' + (err?.message || 'Error'));
+      }
+    } finally {
+      setDownloadingPdf(false);
     }
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto px-2 sm:px-4">
       {/* Header */}
-      <div className="flex items-center justify-between bg-slate-950/80 border border-slate-800 p-6 rounded-3xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-950/80 border border-slate-800 p-4 sm:p-6 rounded-3xl">
         <div className="flex items-center gap-3">
           <Link
             href={`/dashboard/groups/${groupId}`}
-            className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
+            className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition shrink-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white">گروپ مالیاتی آڈٹ اور منافع رپورٹ</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-white">گروپ مالیاتی آڈٹ اور منافع رپورٹ</h1>
             <p className="text-xs text-slate-400 mt-0.5">گروپ: {group?.group_name || 'لوڈ ہو رہا ہے...'}</p>
           </div>
         </div>
 
         <button
           onClick={handleExportProfitPdf}
-          className="px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-bold transition flex items-center gap-1.5"
+          disabled={downloadingPdf}
+          className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/40 text-purple-200 border border-purple-500/40 text-xs font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
         >
           <FileDown className="w-4 h-4" />
-          منافع رپورٹ PDF ڈاؤن لوڈ
+          <span>{downloadingPdf ? 'PDF ڈاؤن لوڈ ہو رہی ہے...' : 'منافع رپورٹ PDF ڈاؤن لوڈ'}</span>
         </button>
       </div>
 

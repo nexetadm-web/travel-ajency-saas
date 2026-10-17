@@ -57,22 +57,22 @@ export default function GroupDocumentsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 px-2 sm:px-4">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link
             href={`/dashboard/groups/${groupId}`}
-            className="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 shadow-sm"
+            className="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 shadow-sm shrink-0"
           >
             <ArrowRight className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-indigo-100 text-indigo-600">
+            <h1 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2 flex-wrap">
+              <span className="p-2 rounded-xl bg-indigo-100 text-indigo-600 shrink-0">
                 <FileText className="w-5 h-5" />
               </span>
-              گروپ دستاویزات و پی ڈی ایف سینٹر (Documents Center)
+              <span>گروپ دستاویزات و پی ڈی ایف سینٹر (Documents Center)</span>
             </h1>
             <p className="text-xs text-gray-500 mt-1">
               گروپ: <strong className="text-gray-800">{group?.group_name || 'لوڈ ہو رہا ہے...'}</strong> | کل مسافر:{' '}

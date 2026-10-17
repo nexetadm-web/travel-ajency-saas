@@ -31,10 +31,6 @@ export default function NewPilgrimPage() {
   const { data: subAgentsData } = useSWR('/api/sub-agents', fetcher);
   const subAgents = subAgentsData?.subAgents || [];
 
-  if (typeof window !== 'undefined' && subAgents.length > 0) {
-    console.log("AGENTS FETCHED:", subAgents);
-  }
-
   const getCommissionDisplay = (agent: any) => {
     const type = agent.commissionType || agent.commission_type || agent.type || 'fixed';
     const value =
@@ -167,7 +163,7 @@ export default function NewPilgrimPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">

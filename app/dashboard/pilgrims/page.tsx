@@ -55,9 +55,9 @@ export default function PilgrimsDirectoryPage() {
   const ticketPending = pilgrims.filter((p: any) => p.ticket_status === 'pending' || !p.ticket_status).length;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-gray-900">زائرین ڈائریکٹری اور پاسپورٹ سرچ</h1>
@@ -159,8 +159,10 @@ export default function PilgrimsDirectoryPage() {
             <p className="text-sm font-semibold">کوئی زائر نہیں ملا</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-gray-100">
-            <table className="w-full text-left text-xs text-gray-700">
+          <>
+            {/* DESKTOP TABLE */}
+            <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-100">
+          <table className="w-full text-left text-xs text-gray-700 min-w-full">
             <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="p-4">نام زائر</th>
@@ -262,6 +264,91 @@ export default function PilgrimsDirectoryPage() {
             </tbody>
           </table>
         </div>
+
+        {/* MOBILE CARDS VIEW */}
+        <div className="block md:hidden space-y-3">
+          {pilgrims.map((p: any) => (
+            <div key={p.id} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h4 className="font-bold text-gray-900 text-sm">{p.full_name}</h4>
+                  <p className="text-[11px] font-mono text-emerald-700 font-bold mt-0.5">{p.passport_no}</p>
+                </div>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 ${
+                    p.visa_status === 'printed'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : p.visa_status === 'in_embassy'
+                      ? 'bg-sky-50 text-sky-700 border border-sky-200'
+                      : 'bg-amber-50 text-amber-700 border border-amber-200'
+                  }`}
+                >
+                  {p.visa_status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 p-2.5 rounded-xl">
+                <div>
+                  <span className="text-[10px] text-gray-400 block">فون</span>
+                  <span className="text-gray-800 font-medium">{p.phone || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-gray-400 block">میعاد پاسپورٹ</span>
+                  <span className="text-gray-700">{formatDate(p.passport_expiry)}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-gray-400 block">ادائیگی</span>
+                  <span className="font-bold text-emerald-700">{formatCurrency(p.payment_paid)}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-gray-400 block">ٹکٹ</span>
+                  <span className="text-gray-700 font-medium">{p.ticket_status || 'pending'}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-1">
+                <Link
+                  href={`/dashboard/pilgrims/${p.id}/installments`}
+                  className="px-2 py-2 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-[11px] border border-indigo-200 transition flex items-center justify-center gap-1"
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>اقساط</span>
+                </Link>
+
+                {p.phone ? (
+                  <a
+                    href={`https://wa.me/${p.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`السلام علیکم جناب ${p.full_name}! آپ کے عمرہ/حج کیس کا لائیو سٹیٹس اور ویزہ معلومات درج ذیل لنک پر دستیاب ہیں:\n${typeof window !== 'undefined' ? window.location.origin : ''}/track/${p.passport_no}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-[11px] border border-emerald-200 transition flex items-center justify-center gap-1"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    <span>WhatsApp</span>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => handleCopyTrackLink(p.passport_no)}
+                    className="px-2 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 font-bold text-[11px] transition flex items-center justify-center gap-1"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>ٹریکنگ</span>
+                  </button>
+                )}
+
+                <a
+                  href={`/api/pdf/dua-card/${p.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2 py-2 rounded-xl bg-gray-50 text-gray-700 hover:bg-gray-100 font-bold text-[11px] border border-gray-200 transition flex items-center justify-center gap-1"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>دعا کارڈ</span>
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+        </>
       )}
       </ContentCard>
     </div>

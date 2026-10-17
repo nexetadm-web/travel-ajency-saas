@@ -91,9 +91,9 @@ export default function GroupsPage() {
   const totalRevenue = groups.reduce((acc: number, g: any) => acc + ((g.booked_seats || 0) * (Number(g.price_per_person) || 0)), 0);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-gray-900">عمرہ و حج گروپ مینجمنٹ</h1>
@@ -290,8 +290,8 @@ export default function GroupsPage() {
 
       {/* CREATE GROUP MODAL */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white border border-gray-100 rounded-[28px] p-6 sm:p-8 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="w-full max-w-lg bg-white border border-gray-100 rounded-[28px] p-5 sm:p-8 shadow-2xl max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
               <h3 className="text-lg font-bold text-gray-900">+ نیا گروپ بنائیں</h3>
               <button

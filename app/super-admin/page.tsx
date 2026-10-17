@@ -286,27 +286,27 @@ export default function SuperAdminPortalPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-gray-900 flex flex-col">
       {/* Top Navbar */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3.5 sm:py-4 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-md shadow-violet-500/20 text-white font-black text-xl">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-md shadow-violet-500/20 text-white font-black text-lg sm:text-xl shrink-0">
               🛡️
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black text-gray-900">Master SaaS Administration</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg sm:text-xl font-black text-gray-900">Master SaaS Administration</h1>
                 <span className="px-2.5 py-0.5 rounded-full bg-violet-100 text-violet-700 text-xs font-bold border border-violet-200">
                   سپر ایڈمن کنٹرول
                 </span>
               </div>
-              <p className="text-xs text-gray-500">تمام ٹریول ایجنسیوں کا مرکزی انتظام، سبسکرپشن اور مانیٹرنگ</p>
+              <p className="text-[11px] sm:text-xs text-gray-500">تمام ٹریول ایجنسیوں کا مرکزی انتظام، سبسکرپشن اور مانیٹرنگ</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 self-end sm:self-auto">
             <Link
               href="/dashboard"
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition flex items-center gap-1.5"
+              className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition flex items-center gap-1.5"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               لائیو ڈیش بورڈ
@@ -316,7 +316,7 @@ export default function SuperAdminPortalPage() {
                 await fetch('/api/auth/logout', { method: 'POST' });
                 router.push('/super-admin/login');
               }}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 transition flex items-center gap-1.5"
+              className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 transition flex items-center gap-1.5"
             >
               <LogOut className="w-3.5 h-3.5" />
               لاگ آؤٹ
@@ -326,7 +326,7 @@ export default function SuperAdminPortalPage() {
       </header>
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-6">
+      <main className="max-w-7xl mx-auto px-2 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-6">
         {/* Floating Notification */}
         {message && (
           <div

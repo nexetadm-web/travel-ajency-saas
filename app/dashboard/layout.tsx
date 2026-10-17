@@ -23,18 +23,25 @@ export default function DashboardLayout({
       </div>
 
       {/* MOBILE NAVBAR */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500 text-white font-bold flex items-center justify-center text-sm shadow-sm">
-            {agency?.name ? agency.name.charAt(0) : 'H'}
+      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 shadow-sm">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-bold flex items-center justify-center text-sm shadow-md shadow-emerald-500/20 shrink-0">
+            {agency?.name ? agency.name.charAt(0).toUpperCase() : 'P'}
           </div>
-          <span className="font-bold text-sm text-gray-900 truncate max-w-[180px]">
-            {agency?.name || 'Al-Haram Travel'}
-          </span>
+          <div className="min-w-0">
+            <div className="font-extrabold text-sm text-gray-900 truncate flex items-center gap-1.5">
+              <span className="truncate">{agency?.name || 'Pyary Travels'}</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
+            </div>
+            <div className="text-[10px] text-gray-500 truncate font-medium">
+              {agency?.license_no ? `لائسنس: ${agency.license_no}` : 'عمرہ مینجمنٹ پورٹل'}
+            </div>
+          </div>
         </div>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-lg bg-gray-50 text-gray-700 border border-gray-200"
+          className="p-2 rounded-xl bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200 transition shadow-sm"
+          aria-label="Toggle navigation menu"
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
@@ -52,12 +59,12 @@ export default function DashboardLayout({
 
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 bg-[#F8FAFF] overflow-y-auto">
-        {/* Top Header bar with Quick Details */}
-        <header className="px-6 py-3.5 border-b border-gray-100 bg-white/80 backdrop-blur flex items-center justify-between text-xs sticky top-0 z-20">
+        {/* Desktop Top Header bar (hidden on mobile to prevent clutter) */}
+        <header className="hidden md:flex px-6 py-3.5 border-b border-gray-100 bg-white/80 backdrop-blur items-center justify-between text-xs sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="text-gray-500">
-              لائیو ایجنسی سیشن: <strong className="text-gray-900">{agency?.name || 'Al-Haram Travel Management'}</strong>
+              لائیو ایجنسی سیشن: <strong className="text-gray-900">{agency?.name || 'Pyary Travels Management'}</strong>
             </span>
           </div>
 
@@ -80,7 +87,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Content Children */}
-        <main className="p-4 sm:p-6 lg:p-8 flex-1">
+        <main className="p-3 sm:p-6 lg:p-8 flex-1 w-full max-w-full">
           {children}
         </main>
       </div>
