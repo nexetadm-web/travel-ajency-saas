@@ -66,18 +66,18 @@ export default function OwnerSecretProfitPage() {
   const groupBreakdown = data?.groupBreakdown || [];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="w-full max-w-full overflow-x-hidden max-w-6xl mx-auto space-y-6 sm:space-y-8 px-2 sm:px-4">
       {/* Top Secret Header with Lock */}
-      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white rounded-[28px] p-6 sm:p-8 border border-emerald-500/30 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white rounded-2xl sm:rounded-[28px] p-4 sm:p-6 md:p-8 border border-emerald-500/30 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 overflow-hidden">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
             <Lock className="w-3.5 h-3.5 text-emerald-400" />
             Sirf Malik Ke Liye - Secret Profit Dashboard
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2">
+          <h1 className="font-urdu text-[18px] sm:text-[24px] md:text-[28px] font-bold leading-[1.4] break-words text-white tracking-tight flex items-center gap-2">
             <span>🔒</span> خالص کاروباری منافع اور اخراجات (Owner Confidential)
           </h1>
-          <p className="text-xs text-slate-400 max-w-xl">
+          <p className="text-xs text-slate-400 max-w-xl break-words leading-relaxed">
             یہ پورٹل صرف ایجنسی اونر کے لیے مخصوص ہے۔ عملہ یا دیگر ارکان کو اس صفحے تک رسائی حاصل نہیں۔
           </p>
         </div>
@@ -85,7 +85,7 @@ export default function OwnerSecretProfitPage() {
         {/* Button "Numbers Chupayen" */}
         <button
           onClick={() => setBlurred(!blurred)}
-          className={`px-5 py-3 rounded-full text-xs font-bold transition flex items-center gap-2 shadow-lg active:scale-95 ${
+          className={`w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg active:scale-95 ${
             blurred
               ? 'bg-emerald-500 text-white shadow-emerald-500/20 hover:bg-emerald-600'
               : 'bg-white/10 hover:bg-white/20 text-white border border-white/15'
@@ -93,12 +93,12 @@ export default function OwnerSecretProfitPage() {
         >
           {blurred ? (
             <>
-              <Eye className="w-4 h-4" />
+              <Eye className="w-4 h-4 shrink-0" />
               نمبرز دکھائیں (Show Numbers)
             </>
           ) : (
             <>
-              <EyeOff className="w-4 h-4 text-emerald-400" />
+              <EyeOff className="w-4 h-4 text-emerald-400 shrink-0" />
               Numbers Chupayen (پرائیویسی بلر)
             </>
           )}
@@ -164,40 +164,40 @@ export default function OwnerSecretProfitPage() {
 
       {/* BIG GREEN CARD: NET PROFIT & AVG HAJI PROFIT */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="md:col-span-2 bg-gradient-to-br from-emerald-600 via-emerald-600 to-green-700 text-white rounded-3xl p-8 shadow-2xl shadow-emerald-500/20 border border-emerald-400/30 flex flex-col justify-between relative overflow-hidden">
+        <div className="md:col-span-2 bg-gradient-to-br from-emerald-600 via-emerald-600 to-green-700 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl shadow-emerald-500/20 border border-emerald-400/30 flex flex-col justify-between relative overflow-hidden">
           <div className="relative z-10 flex items-center justify-between">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
               حتمی بچت و منافع (Net Operating Profit)
             </div>
-            <TrendingUp className="w-8 h-8 text-emerald-200" />
+            <TrendingUp className="w-8 h-8 text-emerald-200 shrink-0" />
           </div>
 
           <div className="relative z-10 my-4">
             <span className="text-xs font-bold text-emerald-100 uppercase tracking-wide block">
               خالص محفوظ منافع (Wusooli - Kharcha - Commission):
             </span>
-            <span className={`text-4xl sm:text-5xl font-black text-white tracking-tight block mt-1 drop-shadow-sm ${blurred ? 'blur-md select-none' : ''}`}>
+            <span className={`text-2xl sm:text-3xl md:text-5xl font-black text-white tracking-tight block mt-1 drop-shadow-sm break-words ${blurred ? 'blur-md select-none' : ''}`}>
               {formatCurrency(summary.netProfit)}
             </span>
           </div>
 
-          <div className="relative z-10 pt-4 border-t border-white/20 flex items-center justify-between text-xs text-emerald-100 font-medium">
+          <div className="relative z-10 pt-4 border-t border-white/20 flex flex-wrap items-center justify-between gap-2 text-xs text-emerald-100 font-medium">
             <span>تمام ٹیکس و اخراجات نکالنے کے بعد کا خالص کیش</span>
             <span className="bg-white/20 px-3 py-1 rounded-full text-white font-bold">منافع کا مارجن 18.5%</span>
           </div>
         </div>
 
         {/* Per Haji Avg Profit */}
-        <div className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-3xl p-8 border border-slate-800 shadow-xl flex flex-col justify-between">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-800 shadow-xl flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block">
               فی حاجی اوسط منافع (Per Haji Profit)
             </span>
-            <span className={`text-3xl font-black text-emerald-400 tracking-tight block mt-3 ${blurred ? 'blur-md select-none' : ''}`}>
+            <span className={`text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight block mt-3 break-words ${blurred ? 'blur-md select-none' : ''}`}>
               {formatCurrency(summary.avgProfitPerHaji)}
             </span>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+            <p className="text-xs text-slate-400 mt-2 leading-relaxed break-words">
               کل رجسٹرڈ حجاج: <strong className="text-white">{summary.hajiCount}</strong>
             </p>
           </div>

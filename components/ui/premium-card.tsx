@@ -76,11 +76,11 @@ export default function PremiumCard({
 
   const content = (
     <div
-      className={`relative overflow-hidden rounded-2xl p-4 min-h-[110px] text-white bg-gradient-to-br ${config.bg} shadow-lg ${config.shadow} border border-white/10 group hover:scale-[1.02] transition-all duration-200 flex flex-col justify-between ${className}`}
+      className={`w-full relative overflow-hidden rounded-xl sm:rounded-2xl p-3 sm:p-4 min-h-[100px] sm:min-h-[110px] text-white bg-gradient-to-br ${config.bg} shadow-lg ${config.shadow} border border-white/10 group hover:scale-[1.02] transition-all duration-200 flex flex-col justify-between ${className}`}
     >
       {/* 10% Opacity Dot Pattern Overlay */}
       <div
-        className="absolute inset-0 opacity-10 pointer-events-none rounded-2xl"
+        className="absolute inset-0 opacity-10 pointer-events-none rounded-xl sm:rounded-2xl"
         style={{
           backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
           backgroundSize: '12px 12px',

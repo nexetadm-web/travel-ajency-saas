@@ -326,7 +326,7 @@ export default function SuperAdminPortalPage() {
       </header>
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-2 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-6">
+      <main className="w-full max-w-full overflow-x-hidden max-w-7xl mx-auto px-2 sm:px-6 py-6 sm:py-8 flex-1 space-y-6">
         {/* Floating Notification */}
         {message && (
           <div

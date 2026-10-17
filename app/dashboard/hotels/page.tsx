@@ -205,7 +205,7 @@ export default function HotelsAndTransportPage() {
   const totalBookingCost = bookings.reduce((sum: number, b: any) => sum + (b.total_cost || 0), 0);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Toast Alert */}
       {toastMsg && (
         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 shadow-lg animate-in fade-in slide-in-from-top-2">
@@ -215,31 +215,31 @@ export default function HotelsAndTransportPage() {
       )}
 
       {/* Top Header Card */}
-      <div className="bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-hidden">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-xl shadow-md">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-xl shadow-md shrink-0">
               🏨
             </div>
             <div>
-              <h1 className="text-2xl font-black text-gray-900">ہوٹل اور ٹرانسپورٹیشن مینجمنٹ</h1>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <h1 className="font-urdu text-[20px] sm:text-[26px] md:text-[32px] font-bold leading-[1.4] break-words text-gray-900">ہوٹل اور ٹرانسپورٹیشن مینجمنٹ</h1>
+              <p className="text-xs text-gray-500 mt-0.5 break-words leading-relaxed">
                 مکہ و مدینہ ہوٹل بکنگز، روم و بیڈ الاٹمنٹ، بسیں اور روٹس
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap w-full md:w-auto">
           {activeTab === 'bookings' && (
             <button
               onClick={() => {
                 setErrorMsg('');
                 setShowBookingModal(true);
               }}
-              className="px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center gap-1.5"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-1.5"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 shrink-0" />
               + نئی ہوٹل بکنگ
             </button>
           )}

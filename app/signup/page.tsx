@@ -94,23 +94,23 @@ export default function AgencySignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-indigo-50 flex items-center justify-center p-4 sm:p-6 py-12">
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-indigo-50 flex items-center justify-center p-3 sm:p-6 py-8 sm:py-12 w-full max-w-full overflow-x-hidden">
+      <div className="w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 p-4 sm:p-8 overflow-hidden">
         {/* Header Branding */}
         <div className="text-center mb-6">
           <img
             src="/logo.png"
             alt="Al-Haram Logo"
-            className="w-16 h-16 rounded-2xl mx-auto shadow-lg shadow-indigo-500/20 mb-3 object-cover border border-indigo-100"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl mx-auto shadow-lg shadow-indigo-500/20 mb-3 object-cover border border-indigo-100"
           />
           <span className="px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-bold inline-flex items-center gap-1 mb-2">
             <Sparkles className="w-3.5 h-3.5 text-violet-600" />
             100% کلاؤڈ ساس پلیٹ فارم
           </span>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+          <h1 className="font-urdu text-[20px] sm:text-[24px] font-black text-gray-900 tracking-tight break-words">
             اپنی ٹریول ایجنسی رجسٹر کریں
           </h1>
-          <p className="text-xs text-gray-500 mt-1 font-medium">
+          <p className="text-xs text-gray-500 mt-1 font-medium break-words">
             Register Your Travel Agency • Start Managing Umrah, Visas & Tours
           </p>
         </div>

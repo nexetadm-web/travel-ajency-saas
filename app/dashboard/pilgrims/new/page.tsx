@@ -163,19 +163,19 @@ export default function NewPilgrimPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
+    <div className="w-full max-w-full overflow-x-hidden max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 overflow-hidden">
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/pilgrims"
-            className="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 shadow-sm"
+            className="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 shadow-sm shrink-0"
           >
             <ArrowRight className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">نیا حاجی / زائر رجسٹر کریں (New Haji)</h1>
-            <p className="text-xs text-gray-500">پاسپورٹ AI خودکار اسکین یا دستی اندراج</p>
+            <h1 className="font-urdu text-[18px] sm:text-[22px] md:text-[26px] font-bold leading-[1.4] break-words text-gray-900">نیا حاجی / زائر رجسٹر کریں (New Haji)</h1>
+            <p className="text-xs text-gray-500 break-words">پاسپورٹ AI خودکار اسکین یا دستی اندراج</p>
           </div>
         </div>
 

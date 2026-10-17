@@ -61,21 +61,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-indigo-50 flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-indigo-50 flex items-center justify-center p-3 sm:p-6 w-full max-w-full overflow-x-hidden">
+      <div className="w-full max-w-md bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-gray-100 overflow-hidden">
         {/* Brand Header */}
         <div className="text-center mb-6">
           <img
             src="/logo.png"
             alt="Al-Haram Logo"
-            className="w-16 h-16 rounded-2xl mx-auto shadow-lg shadow-emerald-500/20 mb-3 object-cover border border-emerald-100"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl mx-auto shadow-lg shadow-emerald-500/20 mb-3 object-cover border border-emerald-100"
           />
           <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 inline-flex items-center gap-1 mb-2">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
             ٹریول ایجنسی مینجمنٹ سسٹم
           </span>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">ایجنسی لاگ ان پورٹل</h2>
-          <p className="text-xs text-gray-500 mt-1 font-medium">
+          <h2 className="font-urdu text-[20px] sm:text-[24px] font-black text-gray-900 tracking-tight break-words">ایجنسی لاگ ان پورٹل</h2>
+          <p className="text-xs text-gray-500 mt-1 font-medium break-words">
             Agency Portal Login • Manage Hujjaj, Visas & Ledger
           </p>
         </div>

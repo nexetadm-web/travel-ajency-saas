@@ -50,12 +50,12 @@ export default async function VerifyPilgrimPage({
     : [null];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFF] flex items-center justify-center p-4 antialiased">
-      <div className="max-w-lg w-full bg-white rounded-[28px] border border-gray-100 shadow-[0_12px_40px_rgba(0,0,0,0.08)] overflow-hidden">
+    <div className="min-h-screen bg-[#F8FAFF] flex items-center justify-center p-3 sm:p-4 antialiased w-full max-w-full overflow-x-hidden">
+      <div className="max-w-lg w-full bg-white rounded-2xl sm:rounded-[28px] border border-gray-100 shadow-[0_12px_40px_rgba(0,0,0,0.08)] overflow-hidden">
         {/* Verification Success Banner */}
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-6 text-white text-center">
-          <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center mx-auto mb-3 shadow-inner">
-            <ShieldCheck className="w-8 h-8" />
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-4 sm:p-6 text-white text-center">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <ShieldCheck className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
           <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider backdrop-blur mb-1">
             ✓ مستند زائر تصدیق (Verified Pilgrim)

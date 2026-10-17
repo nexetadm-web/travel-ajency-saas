@@ -85,9 +85,9 @@ export default function DashboardOverviewPage() {
   const notifications = notifData?.notifications || [];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-2 sm:px-4">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 sm:space-y-8 max-w-7xl mx-auto px-2 sm:px-4">
       {/* TOP AGENCY HEADER CARD (Shell/PSO Light Theme) */}
-      <div className="bg-white rounded-[20px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white rounded-[20px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-hidden">
         <div className="flex items-center gap-3 min-w-0">
           {agency?.logo_url ? (
             <img

@@ -83,21 +83,21 @@ export default function PublicHajiTrackingPage() {
   const { pilgrim, agency, group, steps, progress } = data;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFF] py-8 px-4 flex flex-col items-center justify-start text-slate-800 antialiased">
+    <div className="min-h-screen bg-[#F8FAFF] py-6 sm:py-8 px-2 sm:px-4 flex flex-col items-center justify-start text-slate-800 antialiased w-full max-w-full overflow-x-hidden">
       {/* Light Shell Centered Card (max-w-2xl) */}
-      <div className="max-w-2xl w-full bg-white rounded-[28px] shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden">
+      <div className="max-w-2xl w-full bg-white rounded-2xl sm:rounded-[28px] shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden">
         {/* Top Header Card */}
-        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-6 sm:p-8 relative">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
-            <div className="flex items-center gap-4">
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-4 sm:p-6 md:p-8 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-5 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4">
               {pilgrim.photo_url ? (
                 <img
                   src={pilgrim.photo_url}
                   alt={pilgrim.full_name}
-                  className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg"
+                  className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg shrink-0"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-2xl flex items-center justify-center shadow-lg uppercase">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-2xl flex items-center justify-center shadow-lg uppercase shrink-0">
                   {pilgrim.full_name?.charAt(0) || 'H'}
                 </div>
               )}
@@ -106,19 +106,19 @@ export default function PublicHajiTrackingPage() {
                   <ShieldCheck className="w-3.5 h-3.5" />
                   تصدیق شدہ مسافر ٹریکنگ
                 </span>
-                <h1 className="text-xl sm:text-2xl font-black text-white mt-0.5">
+                <h1 className="font-urdu text-lg sm:text-2xl font-black text-white mt-0.5 break-words">
                   {pilgrim.full_name}
                 </h1>
-                <p className="text-xs text-slate-300 mt-0.5">
+                <p className="text-xs text-slate-300 mt-0.5 break-words">
                   پاسپورٹ: <span className="font-mono font-bold text-white">{pilgrim.passport_no}</span> | کوڈ: <span className="font-mono text-emerald-300 font-bold">{pilgrim.tracking_code}</span>
                 </p>
               </div>
             </div>
 
             {/* Agency Badge */}
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-3 border border-white/10 text-center sm:text-right">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-3 border border-white/10 text-center sm:text-right w-full sm:w-auto">
               <span className="text-[10px] text-slate-400 block">مجاز ٹریول ایجنسی:</span>
-              <strong className="text-xs text-emerald-300 block truncate max-w-[170px]">
+              <strong className="text-xs text-emerald-300 block truncate max-w-full sm:max-w-[170px]">
                 {agency.name}
               </strong>
               <span className="text-[10px] text-slate-300 block">لائسنس: {agency.license_no}</span>

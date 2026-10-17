@@ -284,26 +284,26 @@ export default function GroupDetailsPage() {
   );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Back button and Group Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border border-gray-100 p-6 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border border-gray-100 p-4 sm:p-6 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/dashboard/groups"
-            className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition shadow-sm"
+            className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition shadow-sm shrink-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="font-urdu text-[18px] sm:text-[22px] md:text-[26px] font-bold leading-[1.4] break-words text-gray-900">
                 {group?.group_name || 'گروپ تفصیلات'}
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 shrink-0">
                 {pilgrims.length} / {group?.total_seats || 40} زائرین
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed">
               روانگی: {formatDate(group?.departure_date)} | ایئرلائن: {group?.airline || 'Scheduled'} | مکہ: {group?.makkah_hotel}
             </p>
           </div>

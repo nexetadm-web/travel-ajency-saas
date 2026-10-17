@@ -52,21 +52,21 @@ export default function SuperAdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-indigo-50 flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-indigo-50 flex items-center justify-center p-3 sm:p-6 w-full max-w-full overflow-x-hidden">
+      <div className="w-full max-w-md bg-white border border-gray-100 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 mx-auto flex items-center justify-center shadow-lg shadow-violet-500/25 mb-3 text-white">
-            <ShieldCheck className="w-8 h-8" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 mx-auto flex items-center justify-center shadow-lg shadow-violet-500/25 mb-3 text-white">
+            <ShieldCheck className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-bold mb-2">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Master Super Admin Portal</span>
           </div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+          <h2 className="font-urdu text-[20px] sm:text-[24px] font-black text-gray-900 tracking-tight break-words">
             سپر ایڈمن پورٹل لاگ ان
           </h2>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1 break-words">
             مجاز ایڈمنسٹریٹرز: mnuhbhatti333@gmail.com / mnuhbhattii333@gmail.com
           </p>
         </div>

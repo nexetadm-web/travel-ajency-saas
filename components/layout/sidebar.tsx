@@ -24,6 +24,7 @@ import {
   Lock,
   Search,
   FileText,
+  X,
 } from 'lucide-react';
 
 export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
@@ -65,33 +66,44 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   };
 
   return (
-    <aside className="w-72 bg-[#0f172a] bg-gradient-to-b from-slate-900 to-slate-950 text-white shadow-2xl border-r border-slate-800/80 p-5 flex flex-col justify-between h-full select-none overflow-y-auto">
+    <aside className="w-full md:w-72 max-w-[320px] bg-[#0f172a] bg-gradient-to-b from-slate-900 to-slate-950 text-white shadow-2xl border-r border-slate-800/80 p-4 sm:p-5 flex flex-col justify-between h-full select-none overflow-y-auto">
       <div>
         {/* Dynamic Agency Branding Header */}
-        <div className="flex items-center gap-3.5 pb-5 border-b border-white/10">
-          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-1 rounded-xl shadow-lg shadow-emerald-500/25 flex-shrink-0">
-            {agency?.logo_url ? (
-              <img
-                src={agency.logo_url}
-                alt={agency?.name || 'Agency Logo'}
-                className="w-11 h-11 rounded-lg object-cover"
-              />
-            ) : (
-              <img
-                src="/logo.png"
-                alt="Al-Haram Travel Logo"
-                className="w-11 h-11 rounded-lg object-cover shadow-sm"
-              />
-            )}
+        <div className="flex items-center justify-between pb-4 sm:pb-5 border-b border-white/10 gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-1 rounded-xl shadow-lg shadow-emerald-500/25 flex-shrink-0">
+              {agency?.logo_url ? (
+                <img
+                  src={agency.logo_url}
+                  alt={agency?.name || 'Agency Logo'}
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg object-cover"
+                />
+              ) : (
+                <img
+                  src="/logo.png"
+                  alt="Al-Haram Travel Logo"
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg object-cover shadow-sm"
+                />
+              )}
+            </div>
+            <div className="overflow-hidden min-w-0">
+              <h2 className="font-extrabold text-sm text-white truncate tracking-tight">
+                {agency?.name || (isLoading ? 'لوڈ ہو رہا ہے...' : 'Al-Haram Travel')}
+              </h2>
+              <span className="block text-[11px] text-slate-400 font-medium truncate">
+                لائسنس: {agency?.license_no || 'DTS Reg. Verified'}
+              </span>
+            </div>
           </div>
-          <div className="overflow-hidden">
-            <h2 className="font-extrabold text-sm text-white truncate tracking-tight">
-              {agency?.name || (isLoading ? 'لوڈ ہو رہا ہے...' : 'Al-Haram Travel')}
-            </h2>
-            <span className="block text-[11px] text-slate-400 font-medium truncate">
-              لائسنس: {agency?.license_no || 'DTS Reg. Verified'}
-            </span>
-          </div>
+          {onCloseMobile && (
+            <button
+              onClick={onCloseMobile}
+              className="md:hidden p-1.5 rounded-lg bg-white/10 text-slate-300 hover:text-white transition shrink-0"
+              aria-label="بند کریں"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Super Admin Portal Button */}

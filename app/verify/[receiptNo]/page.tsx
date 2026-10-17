@@ -56,19 +56,19 @@ export default async function VerifyReceiptPage({
   const remaining = Math.max(0, totalPayable - totalPaid);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white flex items-center justify-center p-4">
-      <div className="max-w-lg w-full bg-slate-900/90 border border-emerald-500/40 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-2xl shadow-emerald-950/60 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white flex items-center justify-center p-3 sm:p-4 w-full max-w-full overflow-x-hidden">
+      <div className="max-w-lg w-full bg-slate-900/90 border border-emerald-500/40 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl shadow-emerald-950/60 space-y-6 overflow-hidden">
         {/* Verification Success Badge */}
         <div className="text-center space-y-2">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <CheckCircle2 className="w-9 h-9" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <CheckCircle2 className="w-8 h-8 sm:w-9 sm:h-9" />
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
-            <ShieldCheck className="w-4 h-4" />
+            <ShieldCheck className="w-4 h-4 shrink-0" />
             <span>تصدیق شدہ اصلی رسید (Verified Authentic)</span>
           </div>
-          <h1 className="text-2xl font-black text-white">{agency?.name || 'Travel Agency'}</h1>
-          <p className="text-xs text-slate-400">
+          <h1 className="font-urdu text-[20px] sm:text-[24px] font-black text-white break-words">{agency?.name || 'Travel Agency'}</h1>
+          <p className="text-xs text-slate-400 break-words">
             حکومتی لائسنس: {agency?.license_no || 'Registered'} | فون: {agency?.phone || '-'}
           </p>
         </div>

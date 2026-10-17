@@ -57,9 +57,9 @@ export default function GroupDocumentsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 px-2 sm:px-4">
+    <div className="w-full max-w-full overflow-x-hidden max-w-5xl mx-auto space-y-6 sm:space-y-8 px-2 sm:px-4">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-hidden">
         <div className="flex items-center gap-3">
           <Link
             href={`/dashboard/groups/${groupId}`}
@@ -68,20 +68,20 @@ export default function GroupDocumentsPage() {
             <ArrowRight className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2 flex-wrap">
+            <h1 className="font-urdu text-[16px] sm:text-[20px] md:text-[24px] font-bold leading-[1.4] break-words text-gray-900 flex items-center gap-2 flex-wrap">
               <span className="p-2 rounded-xl bg-indigo-100 text-indigo-600 shrink-0">
                 <FileText className="w-5 h-5" />
               </span>
               <span>گروپ دستاویزات و پی ڈی ایف سینٹر (Documents Center)</span>
             </h1>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1 break-words">
               گروپ: <strong className="text-gray-800">{group?.group_name || 'لوڈ ہو رہا ہے...'}</strong> | کل مسافر:{' '}
               <strong className="text-gray-800">{pilgrims.length}</strong>
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full font-bold">
+        <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full font-bold shrink-0">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
           سرکاری ایجنسی لیٹرہیڈ و برانڈنگ
         </div>

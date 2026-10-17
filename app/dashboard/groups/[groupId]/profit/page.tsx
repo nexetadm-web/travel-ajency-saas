@@ -97,9 +97,9 @@ export default function GroupProfitPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto px-2 sm:px-4">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-5xl mx-auto px-2 sm:px-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-950/80 border border-slate-800 p-4 sm:p-6 rounded-3xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-950/80 border border-slate-800 p-4 sm:p-6 rounded-2xl sm:rounded-3xl overflow-hidden">
         <div className="flex items-center gap-3">
           <Link
             href={`/dashboard/groups/${groupId}`}
@@ -108,8 +108,8 @@ export default function GroupProfitPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-lg sm:text-xl font-bold text-white">گروپ مالیاتی آڈٹ اور منافع رپورٹ</h1>
-            <p className="text-xs text-slate-400 mt-0.5">گروپ: {group?.group_name || 'لوڈ ہو رہا ہے...'}</p>
+            <h1 className="font-urdu text-[18px] sm:text-[22px] md:text-[26px] font-bold leading-[1.4] break-words text-white">گروپ مالیاتی آڈٹ اور منافع رپورٹ</h1>
+            <p className="text-xs text-slate-400 mt-0.5 break-words">گروپ: {group?.group_name || 'لوڈ ہو رہا ہے...'}</p>
           </div>
         </div>
 
@@ -118,21 +118,21 @@ export default function GroupProfitPage() {
           disabled={downloadingPdf}
           className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/40 text-purple-200 border border-purple-500/40 text-xs font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
         >
-          <FileDown className="w-4 h-4" />
+          <FileDown className="w-4 h-4 shrink-0" />
           <span>{downloadingPdf ? 'PDF ڈاؤن لوڈ ہو رہی ہے...' : 'منافع رپورٹ PDF ڈاؤن لوڈ'}</span>
         </button>
       </div>
 
       {/* FORMULA HIGHLIGHT */}
-      <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-xs text-slate-300 flex items-center gap-2">
+      <div className="p-3 sm:p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-xs text-slate-300 flex flex-wrap items-center gap-2">
         <span className="font-bold text-emerald-400">فارمولا:</span>
-        <span>
+        <span className="break-words leading-relaxed">
           خالص منافع = زائرین سے وصول شدہ کل رقم - (ٹکٹیں + ہوٹل بکنگ + ٹرانسپورٹ + ویزہ فیس)
         </span>
       </div>
 
       {/* BIG GREEN PROFIT CARD */}
-      <div className={`p-8 rounded-3xl border shadow-2xl ${
+      <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border shadow-2xl ${
         f.netProfit >= 0
           ? 'bg-gradient-to-br from-slate-950 via-emerald-950/40 to-slate-950 border-emerald-500/40 shadow-emerald-950/30'
           : 'bg-gradient-to-br from-slate-950 via-rose-950/40 to-slate-950 border-rose-500/40 shadow-rose-950/30'
@@ -142,7 +142,7 @@ export default function GroupProfitPage() {
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
               NET GROUP PROFIT / خالص منافع
             </span>
-            <div className="text-4xl sm:text-5xl font-black text-white mt-1 tracking-tight">
+            <div className="text-2xl sm:text-3xl md:text-5xl font-black text-white mt-1 tracking-tight break-words">
               {formatCurrency(f.netProfit)}
             </div>
             <p className="text-xs text-slate-400 mt-2">

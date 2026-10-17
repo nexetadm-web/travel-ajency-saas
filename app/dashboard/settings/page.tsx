@@ -77,35 +77,35 @@ export default function AgencySettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-4xl mx-auto px-2 sm:px-4">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-black text-white">ایجنسی سیٹنگز اور برانڈنگ (Agency Branding)</h1>
-          <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-semibold">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h1 className="font-urdu text-[20px] sm:text-[24px] font-black text-gray-900 tracking-tight break-words">ایجنسی سیٹنگز اور برانڈنگ (Agency Branding)</h1>
+          <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 shrink-0">
             100% متحرک
           </span>
         </div>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed">
           یہاں اپنی ٹریول ایجنسی کا نام، لوگو اور رابطہ تبدیل کریں۔ یہ تبدیلیاں تمام پی ڈی ایف رسیدوں، ویزہ لسٹوں اور ہیڈر میں فوری لاگو ہوں گی۔
         </p>
       </div>
 
       {successMsg && (
-        <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+        <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 text-xs flex items-center gap-2.5">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs">
+        <div className="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-700 text-xs">
           {errorMsg}
         </div>
       )}
 
       {/* Main Settings Card */}
-      <div className="p-8 rounded-3xl bg-slate-950/80 border border-slate-800 shadow-2xl">
+      <div className="p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl bg-slate-950/80 border border-slate-800 shadow-2xl overflow-hidden">
         {/* Current Branding Preview */}
         <div className="flex items-center gap-4 pb-6 mb-6 border-b border-slate-850">
           {formData.logo_url ? (

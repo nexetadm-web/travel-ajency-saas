@@ -21,7 +21,7 @@ export default function ContentCard({
 }: ContentCardProps) {
   return (
     <div
-      className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 ${className}`}
+      className={`w-full bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-3 sm:p-4 md:p-6 overflow-hidden ${className}`}
     >
       {(title || action) && (
         <div

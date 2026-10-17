@@ -11,6 +11,16 @@
   }
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 body {
   color: var(--foreground);
   background-color: #f8fafc;
@@ -18,10 +28,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Responsive media safeguards to prevent horizontal scroll */
+img, svg, video, canvas, audio, iframe, embed, object {
+  max-width: 100%;
+}
+
 /* Urdu typography helper */
 .font-urdu {
   font-family: 'Noto Nastaliq Urdu', -apple-system, sans-serif;
-  line-height: 2.2;
+  line-height: 1.45;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 /* Custom scrollbars */

@@ -49,16 +49,19 @@ export default function DashboardLayout({
 
       {/* MOBILE DROPDOWN DRAWER */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-          <div className="relative z-10 w-72 max-w-[80vw] h-full shadow-2xl">
+        <div className="md:hidden fixed inset-0 z-50 overflow-hidden">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="fixed inset-y-0 left-0 z-50 w-[85vw] max-w-[320px] h-full shadow-2xl overflow-y-auto bg-[#0f172a]">
             <Sidebar onCloseMobile={() => setMobileMenuOpen(false)} />
           </div>
         </div>
       )}
 
       {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col min-w-0 bg-[#F8FAFF] overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#F8FAFF] overflow-x-hidden overflow-y-auto w-full max-w-full">
         {/* Desktop Top Header bar (hidden on mobile to prevent clutter) */}
         <header className="hidden md:flex px-6 py-3.5 border-b border-gray-100 bg-white/80 backdrop-blur items-center justify-between text-xs sticky top-0 z-20">
           <div className="flex items-center gap-3">
@@ -87,7 +90,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Content Children */}
-        <main className="p-3 sm:p-6 lg:p-8 flex-1 w-full max-w-full">
+        <main className="p-3 sm:p-4 md:p-6 flex-1 w-full max-w-full overflow-x-hidden pb-12 sm:pb-8">
           {children}
         </main>
       </div>

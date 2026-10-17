@@ -107,17 +107,17 @@ export default function WhatsAppSettingsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 sm:space-y-8 max-w-5xl mx-auto px-2 sm:px-4">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-hidden">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-emerald-100 text-emerald-600">
+          <h1 className="font-urdu text-[18px] sm:text-[22px] md:text-[26px] font-bold leading-[1.4] break-words text-gray-900 flex items-center gap-2 flex-wrap">
+            <span className="p-2 rounded-xl bg-emerald-100 text-emerald-600 shrink-0">
               <MessageSquare className="w-5 h-5" />
             </span>
-            واٹس ایپ آٹو پائلٹ سیٹنگز (WhatsApp Autopilot)
+            <span>واٹس ایپ آٹو پائلٹ سیٹنگز (WhatsApp Autopilot)</span>
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed">
             Meta Cloud API اور خودکار ٹیمپلیٹ پیغامات (گروپ روانگی، ویزا اپروول، قسط یاد دہانی، ای-ٹکٹ)
           </p>
         </div>
@@ -125,10 +125,10 @@ export default function WhatsAppSettingsPage() {
         <button
           onClick={handleRunCron}
           disabled={sending}
-          className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-200 transition flex items-center gap-2"
+          className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${sending ? 'animate-spin' : ''}`} />
-          روزانہ خودکار کرون ابھی چلائیں
+          <RefreshCw className={`w-3.5 h-3.5 shrink-0 ${sending ? 'animate-spin' : ''}`} />
+          <span>روزانہ خودکار کرون ابھی چلائیں</span>
         </button>
       </div>
 

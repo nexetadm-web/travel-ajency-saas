@@ -75,22 +75,22 @@ export default function PnrCheckPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="w-full max-w-full overflow-x-hidden max-w-5xl mx-auto space-y-6 sm:space-y-8 px-2 sm:px-4">
       {/* Top Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <span className="p-2 rounded-xl bg-sky-100 text-sky-600">
+      <div className="overflow-hidden">
+        <h1 className="font-urdu text-[18px] sm:text-[22px] md:text-[26px] font-bold leading-[1.4] break-words text-gray-900 flex items-center gap-2 flex-wrap">
+          <span className="p-2 rounded-xl bg-sky-100 text-sky-600 shrink-0">
             <Plane className="w-5 h-5" />
           </span>
-          ایئرلائن PNR لائیو چیک و اسٹیٹس (PNR Auto Check)
+          <span>ایئرلائن PNR لائیو چیک و اسٹیٹس (PNR Auto Check)</span>
         </h1>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed">
           تمام بڑی ایئرلائنز کی لائیو سیٹ ریزرویشن، فلائٹ کا وقت، ٹرمینل اور سامان الاؤنس فوری معلوم کریں
         </p>
       </div>
 
       {/* PNR Search Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-6">
+      <div className="w-full bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-6 overflow-hidden">
         <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
           {/* PNR Input */}
           <div className="sm:col-span-1">

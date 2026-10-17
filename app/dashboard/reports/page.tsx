@@ -127,29 +127,29 @@ export default function ReportsAnalyticsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto print:p-0">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4 print:p-0">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="font-urdu text-[20px] sm:text-[26px] md:text-[32px] font-bold leading-[1.4] break-words text-gray-900">
               📊 اسمارٹ رپورٹس اور AI منافع پیش گوئی
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 shrink-0">
               تاریخ: {todayStr} (Asia/Karachi)
             </span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed">
             ایجنسی: <strong className="text-gray-900">{agency?.name || 'Travel Agency'}</strong> | لائسنس: {agency?.license_no || 'DTS Reg'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 print:hidden">
+        <div className="flex items-center gap-2.5 print:hidden w-full sm:w-auto">
           <button
             onClick={handlePrint}
-            className="px-5 py-2.5 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-bold text-xs shadow-sm transition flex items-center gap-2"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-bold text-xs shadow-sm transition flex items-center justify-center gap-2"
           >
-            <Printer className="w-4 h-4 text-gray-500" />
+            <Printer className="w-4 h-4 text-gray-500 shrink-0" />
             رپورٹ پرنٹ کریں (Print)
           </button>
         </div>
@@ -170,7 +170,7 @@ export default function ReportsAnalyticsPage() {
           </p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white/10 backdrop-blur border border-white/20 text-center min-w-[200px]">
+        <div className="w-full md:w-auto min-w-0 md:min-w-[200px] p-4 rounded-2xl bg-white/10 backdrop-blur border border-white/20 text-center">
           <span className="text-[11px] text-purple-200 block uppercase font-bold">پیش گوئی گروتھ</span>
           <span className="text-3xl font-black text-amber-300 block my-0.5">+15.2%</span>
           <span className="text-[10px] text-purple-200 block">ہائی کانفیڈنس اسکور (94%)</span>
@@ -178,10 +178,10 @@ export default function ReportsAnalyticsPage() {
       </div>
 
       {/* TABS NAVIGATION */}
-      <div className="flex items-center gap-2 border-b border-gray-200 pb-2 overflow-x-auto print:hidden">
+      <div className="flex items-center gap-2 border-b border-gray-200 pb-2 overflow-x-auto no-scrollbar print:hidden">
         <button
           onClick={() => setActiveTab('overall')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${
+          className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${
             activeTab === 'overall'
               ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'

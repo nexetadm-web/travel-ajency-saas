@@ -145,28 +145,28 @@ export default function TourPackagesPage() {
   const netProfit = Math.round(tourRevenue * 0.22);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="font-urdu text-[20px] sm:text-[26px] md:text-[32px] font-bold leading-[1.4] break-words text-gray-900">
               ✈️ ٹور پیکجز (Domestic & International Tours)
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 text-xs font-bold border border-teal-200">
+            <span className="px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 text-xs font-bold border border-teal-200 shrink-0">
               اندرون و بیرون ملک
             </span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed">
             ہنزہ، اسکردو، سوات، دبئی، باکو اور ترکیہ کے ٹور پیکجز، سیٹیں، واؤچرز اور مکمل منافع کھاتہ
           </p>
         </div>
 
         <button
           onClick={() => setShowNewPkgModal(true)}
-          className="px-6 py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center gap-2 active:scale-95"
+          className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2 active:scale-95"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 shrink-0" />
           + نیا ٹور پیکیج بنائیں (Add Package)
         </button>
       </div>
