@@ -215,17 +215,17 @@ export default function HotelsAndTransportPage() {
       )}
 
       {/* Top Header Card */}
-      <div className="bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-hidden">
+      <div className="bg-white rounded-2xl p-4 md:p-5 lg:p-5 xl:p-6 shadow-sm border border-gray-100 lg:min-h-[90px] xl:min-h-[100px] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-hidden transform-none" style={{ transform: 'none' }}>
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-xl shadow-md shrink-0">
+            <div className="w-10 h-10 lg:w-9 lg:h-9 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-lg lg:text-base shadow-md shrink-0">
               🏨
             </div>
             <div dir="rtl" className="text-right" style={{ transform: 'none' }}>
-              <h1 className="font-urdu text-[24px] md:text-[28px] font-bold leading-[1.8] break-words text-gray-900" style={{ transform: 'none' }}>
+              <h1 className="font-urdu text-[22px] md:text-[24px] lg:text-[22px] xl:text-[24px] font-bold leading-[1.6] break-words text-gray-900" style={{ transform: 'none' }}>
                 ہوٹل اور ٹرانسپورٹیشن مینجمنٹ
               </h1>
-              <p className="text-xs text-gray-500 mt-0.5 break-words leading-relaxed">
+              <p className="font-urdu text-[12px] lg:text-[11px] text-gray-500 mt-1 break-words leading-relaxed">
                 مکہ و مدینہ ہوٹل بکنگز، روم و بیڈ الاٹمنٹ، بسیں اور روٹس
               </p>
             </div>
@@ -239,7 +239,8 @@ export default function HotelsAndTransportPage() {
                 setErrorMsg('');
                 setShowBookingModal(true);
               }}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md transition flex items-center justify-center gap-1.5 shrink-0"
+              style={{ transform: 'none' }}
             >
               <Plus className="w-4 h-4 shrink-0" />
               + نئی ہوٹل بکنگ
@@ -251,7 +252,8 @@ export default function HotelsAndTransportPage() {
                 setErrorMsg('');
                 setShowHotelModal(true);
               }}
-              className="px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center gap-1.5"
+              className="text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md transition flex items-center gap-1.5 shrink-0"
+              style={{ transform: 'none' }}
             >
               <Plus className="w-4 h-4" />
               + نیا ہوٹل شامل کریں
@@ -263,7 +265,8 @@ export default function HotelsAndTransportPage() {
                 setErrorMsg('');
                 setShowTransportModal(true);
               }}
-              className="px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center gap-1.5"
+              className="text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md transition flex items-center gap-1.5 shrink-0"
+              style={{ transform: 'none' }}
             >
               <Plus className="w-4 h-4" />
               + نئی ٹرانسپورٹ بکنگ

@@ -87,23 +87,23 @@ export default function DashboardOverviewPage() {
   return (
     <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-[1440px] space-y-6 sm:space-y-8">
       {/* TOP AGENCY HEADER CARD (Shell/PSO Light Theme) */}
-      <div className="bg-white rounded-[20px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-5 md:p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 overflow-hidden">
+      <div className="bg-white rounded-[20px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-5 md:p-6 lg:p-4 xl:p-5 lg:min-h-[90px] xl:min-h-[100px] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 overflow-hidden">
         <div className="flex items-center gap-3 min-w-0">
           {agency?.logo_url ? (
             <img
               src={agency.logo_url}
               alt={agency?.name || 'Pyary Travels & Tours'}
-              className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm shrink-0"
+              className="w-12 h-12 lg:w-10 lg:h-10 rounded-xl object-cover border border-emerald-200 shadow-sm shrink-0"
             />
           ) : (
             <img
               src="/logo.png"
               alt="Pyary Logo"
-              className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm shrink-0"
+              className="w-12 h-12 lg:w-10 lg:h-10 rounded-xl object-cover border border-emerald-200 shadow-sm shrink-0"
             />
           )}
           <div className="min-w-0" dir="rtl">
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2 flex-wrap">
+            <h1 className="text-lg sm:text-xl lg:text-lg font-bold text-gray-900 flex items-center gap-2 flex-wrap">
               <span className="truncate">{agency?.name || 'Pyary Travels & Tours'}</span>
               <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0">لائیو پورٹل</span>
             </h1>
@@ -118,21 +118,21 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* Right CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto transform-none" style={{ transform: 'none' }}>
+        <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 w-full sm:w-auto transform-none" style={{ transform: 'none' }}>
           <Link
             href="/dashboard/pilgrims/new"
-            className="font-urdu bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-full flex items-center justify-center gap-2 transform-none shadow-md text-xs font-bold transition"
+            className="font-urdu bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full flex items-center justify-center gap-1.5 transform-none shadow-md font-bold transition shrink-0"
             style={{ transform: 'none' }}
           >
-            <span>+</span> <span>نیا حاجی</span> <span className="font-english text-xs">(New Pilgrim)</span>
+            <span>+</span> <span>نیا حاجی</span> <span className="font-english text-[11px]">(New Pilgrim)</span>
           </Link>
           <Link
             href="/dashboard/groups"
-            className="font-urdu bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded-full flex items-center justify-center gap-2 transform-none shadow-sm text-xs font-bold transition"
+            className="font-urdu bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full flex items-center justify-center gap-1.5 transform-none shadow-sm font-bold transition shrink-0"
             style={{ transform: 'none' }}
           >
             <Users className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>نیا گروپ</span> <span className="font-english text-xs">(New Group)</span>
+            <span>نیا گروپ</span> <span className="font-english text-[11px]">(New Group)</span>
           </Link>
         </div>
       </div>

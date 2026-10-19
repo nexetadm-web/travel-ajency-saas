@@ -129,27 +129,24 @@ export default function ReportsAnalyticsPage() {
   return (
     <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4 print:p-0">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden transform-none" style={{ transform: 'none' }}>
+      <div className="bg-white rounded-2xl p-4 md:p-5 lg:p-5 xl:p-6 shadow-sm border border-gray-100 lg:min-h-[90px] xl:min-h-[100px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-hidden transform-none" style={{ transform: 'none' }}>
         <div dir="rtl" className="text-right transform-none" style={{ transform: 'none' }}>
-          <h1 className="font-urdu text-[28px] md:text-[32px] font-bold text-right leading-[2.2] transform-none rotate-0 not-italic" dir="rtl" style={{ transform: 'none', fontStyle: 'normal' }}>
+          <h1 className="font-urdu text-[22px] md:text-[24px] lg:text-[22px] xl:text-[24px] font-bold text-right leading-[1.6] transform-none rotate-0 not-italic text-gray-900" dir="rtl" style={{ transform: 'none', fontStyle: 'normal' }}>
             📊 اسمارٹ رپورٹس اور <span className="font-english">AI</span> منافع پیش گوئی
           </h1>
-          <p className="font-urdu text-sm text-gray-600 text-right transform-none" dir="rtl">
-            تاریخ: <span className="font-english text-xs text-emerald-700 font-semibold">{todayStr} (Asia/Karachi)</span>
-          </p>
-          <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed transform-none">
-            ایجنسی: <strong className="text-gray-900">{agency?.name || 'Travel Agency'}</strong> | لائسنس: {agency?.license_no || 'DTS Reg'}
+          <p className="font-urdu text-[12px] lg:text-[11px] text-gray-500 mt-1 text-right transform-none" dir="rtl">
+            تاریخ: <span className="font-english text-[11px] text-emerald-700 font-semibold">{todayStr} (Asia/Karachi)</span> — ایجنسی: <strong className="text-gray-900">{agency?.name || 'Travel Agency'}</strong> | لائسنس: {agency?.license_no || 'DTS Reg'}
           </p>
         </div>
 
         <div className="flex items-center gap-2.5 print:hidden w-full sm:w-auto transform-none" style={{ transform: 'none' }}>
           <button
             onClick={handlePrint}
-            className="font-urdu bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-full flex items-center gap-2 transform-none shadow-md transition"
+            className="font-urdu bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full flex items-center gap-1.5 transform-none shadow-md transition shrink-0"
             style={{ transform: 'none' }}
           >
             <Printer className="w-4 h-4 shrink-0" />
-            <span>رپورٹ پرنٹ کریں</span> <span className="font-english text-xs">(Print)</span>
+            <span>رپورٹ پرنٹ کریں</span> <span className="font-english text-[11px]">(Print)</span>
           </button>
         </div>
       </div>

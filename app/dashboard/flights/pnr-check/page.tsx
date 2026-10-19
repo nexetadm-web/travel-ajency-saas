@@ -78,11 +78,11 @@ export default function PnrCheckPage() {
     <div className="w-full max-w-full overflow-x-hidden max-w-5xl mx-auto space-y-6 sm:space-y-8 px-2 sm:px-4">
       {/* Top Header */}
       <div className="overflow-hidden transform-none" dir="rtl" style={{ transform: 'none' }}>
-        <h1 className="font-urdu text-[28px] md:text-[32px] font-bold text-right leading-[2.2] transform-none rotate-0 not-italic text-gray-900" style={{ transform: 'none', fontStyle: 'normal' }}>
+        <h1 className="font-urdu text-[22px] md:text-[24px] lg:text-[22px] xl:text-[24px] font-bold text-right leading-[1.6] transform-none rotate-0 not-italic text-gray-900" style={{ transform: 'none', fontStyle: 'normal' }}>
           ایئرلائن <span className="font-english">PNR</span> لائیو چیک و اسٹیٹس
         </h1>
-        <p className="font-urdu text-sm text-gray-600 text-right transform-none" dir="rtl">
-          تمام بڑی ایئرلائنز کی لائیو سیٹ ریزرویشن، فلائٹ وقت اور سامان الاؤنس <span className="font-english text-xs text-sky-600">(PNR Auto Check)</span>
+        <p className="font-urdu text-[12px] lg:text-[11px] text-gray-500 text-right transform-none mt-1" dir="rtl">
+          تمام بڑی ایئرلائنز کی لائیو سیٹ ریزرویشن، فلائٹ وقت اور سامان الاؤنس <span className="font-english text-[11px] text-sky-600">(PNR Auto Check)</span>
         </p>
       </div>
 

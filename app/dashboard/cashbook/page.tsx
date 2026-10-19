@@ -93,22 +93,22 @@ export default function CashBookPage() {
   return (
     <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden transform-none" style={{ transform: 'none' }}>
+      <div className="bg-white rounded-2xl p-4 md:p-5 lg:p-5 xl:p-6 shadow-sm border border-gray-100 lg:min-h-[90px] xl:min-h-[100px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-hidden transform-none" style={{ transform: 'none' }}>
         <div dir="rtl" className="text-right transform-none" style={{ transform: 'none' }}>
-          <h1 className="font-urdu text-[28px] md:text-[32px] font-bold text-right leading-[2.2] transform-none rotate-0 not-italic" dir="rtl" style={{ transform: 'none', fontStyle: 'normal' }}>
+          <h1 className="font-urdu text-[22px] md:text-[24px] lg:text-[22px] xl:text-[24px] font-bold text-right leading-[1.6] transform-none rotate-0 not-italic text-gray-900" dir="rtl" style={{ transform: 'none', fontStyle: 'normal' }}>
             روزمرہ کیش بک
           </h1>
-          <p className="font-urdu text-sm text-gray-600 text-right transform-none" dir="rtl">
-            روزانہ نقد آمدنی، اخراجات اور کیش ان ہینڈ کا حساب کتاب <span className="font-english text-xs text-emerald-700 font-semibold">(Daily Cash Book)</span>
+          <p className="font-urdu text-[12px] lg:text-[11px] text-gray-500 mt-1 text-right transform-none" dir="rtl">
+            روزانہ نقد آمدنی، اخراجات اور کیش ان ہینڈ کا حساب کتاب <span className="font-english text-[11px] text-emerald-700 font-semibold">(Daily Cash Book)</span>
           </p>
         </div>
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="font-urdu bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-full flex items-center gap-2 transform-none shadow-md transition"
+          className="font-urdu bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full flex items-center gap-1.5 transform-none shadow-md transition shrink-0"
           style={{ transform: 'none' }}
         >
-          <span>+</span> <span>نیا کیش اندراج</span> <span className="font-english text-xs">(Add Entry)</span>
+          <span>+</span> <span>نیا کیش اندراج</span> <span className="font-english text-[11px]">(Add Entry)</span>
         </button>
       </div>
 

@@ -240,17 +240,17 @@ export default function VisasPage() {
   return (
     <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
+      <div className="bg-white rounded-2xl p-4 md:p-5 lg:p-5 xl:p-6 shadow-sm border border-gray-100 lg:min-h-[90px] xl:min-h-[100px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-hidden transform-none" style={{ transform: 'none' }}>
         <div dir="rtl" className="text-right" style={{ transform: 'none' }}>
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="font-urdu text-[24px] md:text-[28px] font-bold leading-[1.8] break-words text-gray-900" style={{ transform: 'none' }}>
+            <h1 className="font-urdu text-[22px] md:text-[24px] lg:text-[22px] xl:text-[24px] font-bold leading-[1.6] break-words text-gray-900" style={{ transform: 'none' }}>
               عمرہ ویزہ ٹریکنگ کنبان
             </h1>
             <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200 shrink-0">
               ڈریگ اینڈ ڈراپ فعال
             </span>
           </div>
-          <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed">
+          <p className="font-urdu text-[12px] lg:text-[11px] text-gray-500 mt-1 break-words leading-relaxed">
             مرحلہ وار ٹریکنگ، آٹو واٹس ایپ نوٹیفکیشن، اور میعاد ختم ہونے پر ریڈ الرٹ
           </p>
         </div>
@@ -280,7 +280,8 @@ export default function VisasPage() {
 
           <button
             onClick={() => setShowModal(true)}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 transition flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md transition flex items-center justify-center gap-1.5 shrink-0"
+            style={{ transform: 'none' }}
           >
             <Plus className="w-4 h-4 shrink-0" />
             + نیا ویزہ درج کریں

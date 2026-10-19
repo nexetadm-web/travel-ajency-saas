@@ -66,31 +66,31 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   };
 
   return (
-    <aside className="w-full md:w-72 max-w-[320px] bg-[#0f172a] bg-gradient-to-b from-slate-900 to-slate-950 text-white shadow-2xl border-r border-slate-800/80 p-4 sm:p-5 flex flex-col justify-between h-full select-none overflow-y-auto" style={{ transform: 'none' }}>
+    <aside className="w-full md:w-72 lg:w-[240px] xl:w-[260px] max-w-[320px] bg-[#0f172a] bg-gradient-to-b from-slate-900 to-slate-950 text-white shadow-2xl border-r border-slate-800/80 p-4 sm:p-5 lg:p-3 xl:p-4 flex flex-col justify-between h-full select-none overflow-y-auto" style={{ transform: 'none' }}>
       <div>
         {/* Dynamic Agency Branding Header */}
-        <div className="flex items-center justify-between pb-4 sm:pb-5 border-b border-white/10 gap-2">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center justify-between pb-4 sm:pb-5 lg:pb-3 border-b border-white/10 gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-1 rounded-xl shadow-lg shadow-emerald-500/25 flex-shrink-0">
               {agency?.logo_url ? (
                 <img
                   src={agency.logo_url}
                   alt={agency?.name || 'Agency Logo'}
-                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg object-cover"
+                  className="w-9 h-9 sm:w-10 sm:h-10 lg:w-9 lg:h-9 rounded-lg object-cover"
                 />
               ) : (
                 <img
                   src="/logo.png"
                   alt="Al-Haram Travel Logo"
-                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg object-cover shadow-sm"
+                  className="w-9 h-9 sm:w-10 sm:h-10 lg:w-9 lg:h-9 rounded-lg object-cover shadow-sm"
                 />
               )}
             </div>
             <div className="overflow-hidden min-w-0">
-              <h2 className="font-extrabold text-sm text-white truncate tracking-tight">
+              <h2 className="font-extrabold text-xs sm:text-sm text-white truncate tracking-tight">
                 {agency?.name || (isLoading ? 'لوڈ ہو رہا ہے...' : 'Al-Haram Travel')}
               </h2>
-              <span className="block text-[11px] text-slate-400 font-medium truncate">
+              <span className="block text-[10px] sm:text-[11px] text-slate-400 font-medium truncate">
                 لائسنس: {agency?.license_no || 'DTS Reg. Verified'}
               </span>
             </div>
@@ -108,18 +108,18 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
 
         {/* Super Admin Portal Button */}
         {isSuper && (
-          <div className="pt-3">
+          <div className="pt-2.5">
             <Link
               href="/super-admin"
               onClick={onCloseMobile}
-              className="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-purple-600/40 transition flex items-center justify-between group border border-purple-400/20"
+              className="w-full px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white text-[11px] font-bold shadow-lg shadow-purple-600/40 transition flex items-center justify-between group border border-purple-400/20"
               style={{ transform: 'none' }}
             >
               <div className="flex items-center gap-2">
-                <span className="text-base">🛡️</span>
+                <span className="text-sm">🛡️</span>
                 <span>سپر ایڈمن پورٹل</span>
               </div>
-              <ChevronRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition" />
+              <ChevronRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-0.5 transition" />
             </Link>
           </div>
         )}
@@ -130,7 +130,7 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
             <Link
               href="/dashboard/owner/profit"
               onClick={onCloseMobile}
-              className={`w-full px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-between border ${
+              className={`w-full px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between border ${
                 pathname === '/dashboard/owner/profit'
                   ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-md'
                   : 'bg-emerald-950/40 border-emerald-800/40 text-emerald-400 hover:bg-emerald-900/50 hover:text-emerald-300'
@@ -139,17 +139,17 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
             >
               <div className="flex items-center justify-between w-full" dir="rtl" style={{ transform: 'none' }}>
                 <div className="flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="font-urdu text-[13px] text-emerald-300">خفیہ منافع</span>
+                  <Lock className="w-3 h-3 text-emerald-400 shrink-0" />
+                  <span className="font-urdu text-[12px] lg:text-[11px] text-emerald-300">خفیہ منافع</span>
                 </div>
-                <span className="font-sans text-[10px] text-emerald-400/80 font-mono" dir="ltr">(Secret Profit)</span>
+                <span className="font-sans text-[9px] text-emerald-400/80 font-mono" dir="ltr">(Secret Profit)</span>
               </div>
             </Link>
           </div>
         )}
 
         {/* Navigation Links */}
-        <nav className="mt-4 space-y-1 transform-none" style={{ transform: 'none' }}>
+        <nav className="mt-3 lg:mt-2.5 space-y-0.5 lg:space-y-0.5 transform-none" style={{ transform: 'none' }}>
           {navItems.map((item) => {
             const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             const Icon = item.icon;
@@ -158,25 +158,25 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                 key={item.href}
                 href={item.href}
                 onClick={onCloseMobile}
-                className={`flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all transform-none ${
+                className={`flex items-center justify-between w-full px-3.5 py-2.5 lg:py-2 xl:py-2.5 rounded-xl transition-all transform-none ${
                   active
                     ? 'bg-white/10 backdrop-blur-xl border-l-4 border-emerald-400 text-white shadow-lg'
                     : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
                 style={{ transform: 'none' }}
               >
-                <div className="flex items-center gap-3 transform-none" style={{ transform: 'none' }}>
+                <div className="flex items-center gap-2.5 lg:gap-2 transform-none" style={{ transform: 'none' }}>
                   <Icon
-                    className={`w-5 h-5 flex-shrink-0 ${
+                    className={`w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0 ${
                       active ? 'text-emerald-400' : 'text-slate-400'
                     }`}
                   />
-                  <span className="font-english text-[11px] text-gray-400 tracking-wider transform-none uppercase" style={{ transform: 'none' }}>
+                  <span className="font-english text-[10px] lg:text-[9px] xl:text-[10px] text-gray-400 tracking-wider transform-none uppercase" style={{ transform: 'none' }}>
                     ({item.eng})
                   </span>
                 </div>
                 <span
-                  className="font-urdu text-[16px] text-white transform-none rotate-0 not-italic"
+                  className="font-urdu text-[14px] md:text-[15px] lg:text-[13px] xl:text-[14px] leading-[1.5] text-white transform-none rotate-0 not-italic"
                   dir="rtl"
                   style={{ transform: 'none', fontStyle: 'normal' }}
                 >
