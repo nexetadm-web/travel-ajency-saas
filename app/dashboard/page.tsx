@@ -168,7 +168,7 @@ export default function DashboardOverviewPage() {
           <span className="font-urdu text-xs text-gray-400 not-italic transform-none">ریئل ٹائم ڈیٹا</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" dir="ltr">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 auto-rows-fr" dir="ltr">
           <PremiumCard
             title="کل حجاج و زائرین (TOTAL HUJJAJ)"
             value={totalPilgrims}
@@ -203,7 +203,7 @@ export default function DashboardOverviewPage() {
       </div>
 
       {/* SECOND ROW METRICS (Departing, Receivable, Payable, Net Profit) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 auto-rows-fr">
         <PremiumCard
           title="روانگی اس ہفتے (Departing Week)"
           value={departingThisWeek > 0 ? departingThisWeek : totalGroups}

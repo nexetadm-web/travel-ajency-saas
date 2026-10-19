@@ -83,13 +83,14 @@ export default function PremiumCard({
   const content = (
     <div
       style={{ transform: 'none', rotate: '0deg' }}
-      className={`w-full relative overflow-hidden rounded-2xl p-5 min-h-[140px] text-white bg-gradient-to-br ${config.bg} shadow-lg ${config.shadow} border border-white/10 flex flex-col justify-between ${className}`}
+      className={`w-full h-full min-h-[165px] md:min-h-[175px] relative overflow-hidden rounded-2xl p-5 text-white bg-gradient-to-br ${config.bg} shadow-lg ${config.shadow} border border-white/10 flex flex-col justify-between ${className}`}
     >
-      <div className="relative z-10 transform-none" style={{ transform: 'none' }}>
+      <div className="h-full flex flex-col justify-between transform-none" style={{ transform: 'none' }}>
+        {/* TOP CONTENT: TITLE + ICON */}
         <div className="flex justify-between items-start gap-3 transform-none" style={{ transform: 'none' }}>
           <div className="transform-none min-w-0" style={{ transform: 'none' }}>
             <p
-              className="font-urdu text-[18px] leading-[1.8] transform-none rotate-0 not-italic text-white"
+              className="font-urdu text-[17px] leading-[1.6] transform-none rotate-0 not-italic text-white"
               dir="rtl"
               style={{ transform: 'none', fontStyle: 'normal' }}
             >
@@ -104,14 +105,6 @@ export default function PremiumCard({
                 ({engPart})
               </p>
             )}
-            <p className="font-english text-3xl font-bold mt-3 transform-none text-white block" dir="ltr" style={{ transform: 'none' }}>
-              {value}
-            </p>
-            {subtitle && (
-              <p className="font-urdu text-white/80 text-xs mt-1 transform-none not-italic leading-relaxed" dir="rtl" style={{ transform: 'none' }}>
-                {subtitle}
-              </p>
-            )}
           </div>
           <div
             className="bg-white/20 p-2.5 rounded-xl transform-none flex items-center justify-center text-white shrink-0"
@@ -124,31 +117,51 @@ export default function PremiumCard({
             ) : null}
           </div>
         </div>
-      </div>
 
-      {trend && (
-        <div
-          className="relative z-10 pt-2.5 mt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-white/85"
-          dir="auto"
-          style={{ transform: 'none' }}
-        >
-          <span className="flex items-center gap-1.5 font-medium leading-normal">
-            {trendUp ? (
-              <ArrowUpRight className="w-3.5 h-3.5 text-white shrink-0" />
-            ) : (
-              <ArrowDownRight className="w-3.5 h-3.5 text-white/80 shrink-0" />
-            )}
-            {trend}
-          </span>
-          <ArrowUpRight className="w-3.5 h-3.5 opacity-70 shrink-0" />
+        {/* BOTTOM CONTENT: NUMBER + SUBTITLE + TREND */}
+        <div className="mt-auto pt-2 transform-none" style={{ transform: 'none' }}>
+          <p
+            className="font-english text-[26px] font-bold mt-2 transform-none text-white block leading-tight tracking-tight"
+            dir="ltr"
+            style={{ transform: 'none' }}
+          >
+            {value}
+          </p>
+          {subtitle && (
+            <p
+              className="font-urdu text-white/80 text-xs mt-1 transform-none not-italic leading-relaxed"
+              dir="rtl"
+              style={{ transform: 'none' }}
+            >
+              {subtitle}
+            </p>
+          )}
+
+          {trend && (
+            <div
+              className="relative z-10 pt-2 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/85"
+              dir="auto"
+              style={{ transform: 'none' }}
+            >
+              <span className="flex items-center gap-1.5 font-medium leading-normal">
+                {trendUp ? (
+                  <ArrowUpRight className="w-3.5 h-3.5 text-white shrink-0" />
+                ) : (
+                  <ArrowDownRight className="w-3.5 h-3.5 text-white/80 shrink-0" />
+                )}
+                {trend}
+              </span>
+              <ArrowUpRight className="w-3.5 h-3.5 opacity-70 shrink-0" />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 
   if (href) {
     return (
-      <Link href={href} className="block" style={{ transform: 'none' }}>
+      <Link href={href} className="block h-full" style={{ transform: 'none' }}>
         {content}
       </Link>
     );
