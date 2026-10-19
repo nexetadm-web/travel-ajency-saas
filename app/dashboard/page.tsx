@@ -85,9 +85,9 @@ export default function DashboardOverviewPage() {
   const notifications = notifData?.notifications || [];
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden space-y-6 sm:space-y-8 max-w-7xl mx-auto px-2 sm:px-4">
+    <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-[1440px] space-y-6 sm:space-y-8">
       {/* TOP AGENCY HEADER CARD (Shell/PSO Light Theme) */}
-      <div className="bg-white rounded-[20px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-hidden">
+      <div className="bg-white rounded-[20px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-5 md:p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 overflow-hidden">
         <div className="flex items-center gap-3 min-w-0">
           {agency?.logo_url ? (
             <img
@@ -102,12 +102,12 @@ export default function DashboardOverviewPage() {
               className="w-12 h-12 rounded-xl object-cover border border-emerald-200 shadow-sm shrink-0"
             />
           )}
-          <div className="min-w-0">
+          <div className="min-w-0" dir="rtl">
             <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2 flex-wrap">
               <span className="truncate">{agency?.name || 'Pyary Travels & Tours'}</span>
               <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0">لائیو پورٹل</span>
             </h1>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs text-gray-500">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs text-gray-500" dir="ltr">
               <span className="flex items-center gap-1">👤 {agency?.owner_name || 'Haji Abdul Rehman'}</span>
               <span className="w-1 h-1 bg-gray-300 rounded-full hidden sm:inline-block"></span>
               <span className="flex items-center gap-1">📞 {agency?.phone || '+92 300 5556677'}</span>
@@ -118,17 +118,17 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* Right CTA Buttons */}
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2.5 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Link
             href="/dashboard/pilgrims/new"
-            className="bg-emerald-500 text-white rounded-full px-4 sm:px-5 py-2.5 shadow-md shadow-emerald-200 hover:bg-emerald-600 text-xs font-bold transition flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-5 py-2.5 shadow-md shadow-emerald-200 text-xs font-bold transition flex items-center justify-center gap-1.5"
           >
             <Plus className="w-4 h-4 shrink-0" />
             <span className="truncate">+ نیا حاجی</span>
           </Link>
           <Link
             href="/dashboard/groups"
-            className="bg-white border border-gray-200 rounded-full px-4 sm:px-5 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto bg-white border border-gray-200 hover:bg-gray-50 rounded-full px-5 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition flex items-center justify-center gap-1.5"
           >
             <Users className="w-4 h-4 text-emerald-600 shrink-0" />
             <span className="truncate">نیا گروپ</span>
@@ -138,7 +138,7 @@ export default function DashboardOverviewPage() {
 
       {/* AI ALERTS BANNER (If notifications present) */}
       {notifications.length > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-900 text-xs shadow-sm">
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-900 text-xs shadow-sm" dir="rtl">
           <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <span className="font-bold block text-amber-800">خودکار AI الرٹس (System Alerts):</span>
@@ -150,58 +150,61 @@ export default function DashboardOverviewPage() {
         </div>
       )}
 
-      {/* PHASE 1: 4 ULTRA PREMIUM GRADIENT STAT CARDS WITH DOT PATTERN OVERLAY */}
-      <div>
+      {/* PHASE 1: 3 PRIMARY EXECUTIVE METRICS CARDS */}
+      <div dir="rtl">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500 flex items-center gap-2">
+          <h2 className="urdu-text text-sm sm:text-base font-bold uppercase tracking-wider text-gray-700 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-emerald-600" />
-            کلیدی اشاریے (Primary Executive Metrics)
+            کلیدی اشاریے (PRIMARY EXECUTIVE METRICS)
           </h2>
-          <span className="text-xs text-gray-400">ریئل ٹائم ڈیٹا</span>
+          <span className="urdu-text text-xs text-gray-400">ریئل ٹائم ڈیٹا</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" dir="ltr">
           <PremiumCard
-            title="کل حجاج و زائرین (Total Hujjaj)"
+            title="کل حجاج و زائرین (TOTAL HUJJAJ)"
             value={totalPilgrims}
             subtitle="رجسٹرڈ عازمین حج و عمرہ"
             icon={Users}
             gradient="violet"
             trend="+12% اس ماہ"
             href="/dashboard/pilgrims"
+            className="col-span-1"
           />
           <PremiumCard
-            title="کل آمدن و ریکوری (Total Revenue)"
+            title="کل آمدن و ریکوری (TOTAL REVENUE)"
             value={formatCurrency(totalRevenue)}
             subtitle="مجموعی وصولیاں و بکنگز"
             icon={DollarSign}
             gradient="emerald"
             trend="وصولی شرح 89%"
             href="/dashboard/ledger"
+            className="col-span-1"
           />
           <PremiumCard
-            title="زیر التواء ویزے (Pending Visa)"
+            title="زیر التواء ویزے (PENDING VISA)"
             value={visaPending}
             subtitle="سفارت خانے میں زیر کارروائی"
             icon={FileCheck2}
             gradient="amber"
             trend="فوری فالو اپ درکار"
             href="/dashboard/visas"
-          />
-          <PremiumCard
-            title="روانگی اس ہفتے (Departing Week)"
-            value={departingThisWeek > 0 ? departingThisWeek : totalGroups}
-            subtitle="روانہ ہونے والے گروپس"
-            icon={Plane}
-            gradient="rose"
-            trend="اگلے 7 دن میں پرواز"
-            href="/dashboard/groups"
+            className="col-span-1"
           />
         </div>
       </div>
 
-      {/* SECOND ROW CARDS (Receivable, Payable, Net Profit, Today Profit) - ALL COLORFUL */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* SECOND ROW METRICS (Departing, Receivable, Payable, Net Profit) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <PremiumCard
+          title="روانگی اس ہفتے (Departing Week)"
+          value={departingThisWeek > 0 ? departingThisWeek : totalGroups}
+          subtitle="روانہ ہونے والے گروپس"
+          icon={Plane}
+          gradient="rose"
+          trend="اگلے 7 دن میں پرواز"
+          href="/dashboard/groups"
+        />
         <PremiumCard
           title="کل واجب الوصول (Receivable)"
           value={formatCurrency(receivable)}
@@ -227,14 +230,6 @@ export default function DashboardOverviewPage() {
           icon={TrendingUp}
           gradient="green"
           trend="منافع مارجن 18.5%"
-        />
-        <PremiumCard
-          title="آج کا منافع (Today Profit)"
-          value={formatCurrency(todayProfit)}
-          subtitle="آج کی بکنگز اور ٹکٹس"
-          icon={DollarSign}
-          gradient="purple"
-          trend="ریئل ٹائم بکنگ کاؤنٹر"
         />
       </div>
 

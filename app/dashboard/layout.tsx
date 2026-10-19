@@ -16,14 +16,14 @@ export default function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFF] text-slate-800 flex flex-col md:flex-row antialiased">
+    <div className="min-h-screen bg-[#F8FAFF] text-slate-800 flex flex-col lg:flex-row antialiased">
       {/* DESKTOP SIDEBAR */}
-      <div className="hidden md:block sticky top-0 h-screen flex-shrink-0 z-30">
+      <div className="hidden lg:block sticky top-0 h-screen flex-shrink-0 z-30">
         <Sidebar />
       </div>
 
       {/* MOBILE NAVBAR */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 shadow-sm">
+      <nav className="lg:hidden flex items-center justify-between px-4 py-3 bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-bold flex items-center justify-center text-sm shadow-md shadow-emerald-500/20 shrink-0">
             {agency?.name ? agency.name.charAt(0).toUpperCase() : 'P'}
@@ -38,18 +38,20 @@ export default function DashboardLayout({
             </div>
           </div>
         </div>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-xl bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200 transition shadow-sm"
-          aria-label="Toggle navigation menu"
-        >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </div>
+        <div className="flex lg:hidden">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 rounded-xl bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200 transition shadow-sm"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </nav>
 
       {/* MOBILE DROPDOWN DRAWER */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 overflow-hidden">
+        <div className="lg:hidden fixed inset-0 z-50 overflow-hidden">
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
@@ -63,7 +65,7 @@ export default function DashboardLayout({
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 bg-[#F8FAFF] overflow-x-hidden overflow-y-auto w-full max-w-full">
         {/* Desktop Top Header bar (hidden on mobile to prevent clutter) */}
-        <header className="hidden md:flex px-6 py-3.5 border-b border-gray-100 bg-white/80 backdrop-blur items-center justify-between text-xs sticky top-0 z-20">
+        <header className="hidden lg:flex px-6 py-3.5 border-b border-gray-100 bg-white/80 backdrop-blur items-center justify-between text-xs sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="text-gray-500">

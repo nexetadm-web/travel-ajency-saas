@@ -7,6 +7,13 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    screens: {
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+    },
     extend: {
       colors: {
         background: "var(--background)",
@@ -26,7 +33,12 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        urdu: ['Noto Nastaliq Urdu', 'Urdu Typesetting', 'serif'],
+        urdu: ['Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'serif'],
+      },
+      lineHeight: {
+        'urdu-loose': '2.2',
+        'urdu-heading': '2.5',
+        'urdu-hero': '2.8',
       },
     },
   },
