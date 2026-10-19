@@ -241,9 +241,11 @@ export default function VisasPage() {
     <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
-        <div>
+        <div dir="rtl" className="text-right" style={{ transform: 'none' }}>
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="font-urdu text-[20px] sm:text-[26px] md:text-[32px] font-bold leading-[1.4] break-words text-gray-900">عمرہ ویزہ ٹریکنگ کنبان</h1>
+            <h1 className="font-urdu text-[24px] md:text-[28px] font-bold leading-[1.8] break-words text-gray-900" style={{ transform: 'none' }}>
+              عمرہ ویزہ ٹریکنگ کنبان
+            </h1>
             <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200 shrink-0">
               ڈریگ اینڈ ڈراپ فعال
             </span>

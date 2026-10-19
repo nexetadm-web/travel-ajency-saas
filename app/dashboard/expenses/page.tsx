@@ -81,7 +81,7 @@ export default function ExpensesPage() {
 
         <button
           onClick={() => setShowModal(true)}
-          className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-1.5 active:scale-95"
+          className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-1.5"
         >
           <Plus className="w-4 h-4 shrink-0" />
           + نیا خرچہ درج کریں (Add Expense)

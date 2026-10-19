@@ -167,11 +167,17 @@ export default function VisaConsultancyPage() {
     <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="font-urdu text-[20px] sm:text-[26px] md:text-[32px] font-bold leading-[1.4] break-words text-gray-900">
-              🌍 ویزہ کنسلٹنسی پورٹل (Study, Visit & Work Visas)
-            </h1>
+        <div dir="rtl" className="text-right" style={{ transform: 'none' }}>
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-2xl shrink-0">🌍</span>
+            <div>
+              <h1 className="font-urdu text-[24px] md:text-[28px] font-bold leading-[1.8] text-gray-900" style={{ transform: 'none' }}>
+                ویزہ کنسلٹنسی پورٹل
+              </h1>
+              <span className="font-sans text-[11px] font-bold uppercase tracking-wider text-indigo-600 block mt-0.5" dir="ltr">
+                Study, Visit & Work Visas
+              </span>
+            </div>
             <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200 shrink-0">
               کنسلٹنٹس فرسٹ چوائس
             </span>
@@ -183,10 +189,11 @@ export default function VisaConsultancyPage() {
 
         <button
           onClick={() => setShowNewModal(true)}
-          className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2 active:scale-95"
+          className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2"
+          style={{ transform: 'none' }}
         >
           <Plus className="w-4 h-4 shrink-0" />
-          + نیا ویزہ کیس بنائیں (New Case)
+          <span>+ نیا ویزہ کیس بنائیں</span>
         </button>
       </div>
 

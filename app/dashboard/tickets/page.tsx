@@ -122,7 +122,7 @@ export default function TicketsPage() {
 
         <button
           onClick={() => setShowModal(true)}
-          className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2 active:scale-95"
+          className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4 shrink-0" />
           + نئی ٹکٹ (New Ticket)

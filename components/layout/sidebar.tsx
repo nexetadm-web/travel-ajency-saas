@@ -41,22 +41,22 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   const isOwner = (agency?.role as string) === 'agency' || (agency?.role as string) === 'owner' || isSuper;
 
   const navItems = [
-    { name: 'ڈیش بورڈ (Dashboard)', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'عمرہ و حج گروپس (Groups)', href: '/dashboard/groups', icon: Users },
-    { name: 'حاجی و زائرین (Hujjaj)', href: '/dashboard/pilgrims', icon: UserCheck },
-    { name: 'ٹکٹنگ اور PNR (Tickets)', href: '/dashboard/tickets', icon: Plane },
-    { name: '✈️ PNR لائیو چیک (PNR Check)', href: '/dashboard/flights/pnr-check', icon: Search },
-    { name: 'عمرہ ویزہ ٹریکنگ (Visas)', href: '/dashboard/visas', icon: FileCheck2 },
-    { name: '🌍 ویزہ کنسلٹنسی (Consultancy)', href: '/dashboard/visa-consultancy', icon: Globe2 },
-    { name: '✈️ ٹور پیکجز (Tours)', href: '/dashboard/tours', icon: Compass },
-    { name: 'ہوٹل و ٹرانسپورٹ (Hotels)', href: '/dashboard/hotels', icon: Building2 },
-    { name: 'مکمل کھاتہ (Ledger)', href: '/dashboard/ledger', icon: BookOpen },
-    { name: '💰 کیش بک (Cash Book)', href: '/dashboard/cashbook', icon: Wallet },
-    { name: '👥 سب ایجنٹس (Sub-Agents)', href: '/dashboard/sub-agents', icon: UserPlus },
-    { name: '🧳 کٹ انوینٹری (Inventory)', href: '/dashboard/inventory', icon: Luggage },
-    { name: 'دفتر کے اخراجات (Expenses)', href: '/dashboard/expenses', icon: Receipt },
-    { name: '📊 اسمارٹ رپورٹس (Reports)', href: '/dashboard/reports', icon: BarChart3 },
-    { name: 'ایجنسی سیٹنگز (Settings)', href: '/dashboard/settings', icon: Settings },
+    { urdu: 'ڈیش بورڈ', eng: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { urdu: 'عمرہ و حج گروپس', eng: 'Groups', href: '/dashboard/groups', icon: Users },
+    { urdu: 'حاجی و زائرین', eng: 'Hujjaj', href: '/dashboard/pilgrims', icon: UserCheck },
+    { urdu: 'ٹکٹنگ اور PNR', eng: 'Tickets', href: '/dashboard/tickets', icon: Plane },
+    { urdu: '✈️ PNR لائیو چیک', eng: 'PNR Check', href: '/dashboard/flights/pnr-check', icon: Search },
+    { urdu: 'عمرہ ویزہ ٹریکنگ', eng: 'Visas', href: '/dashboard/visas', icon: FileCheck2 },
+    { urdu: '🌍 ویزہ کنسلٹنسی', eng: 'Consultancy', href: '/dashboard/visa-consultancy', icon: Globe2 },
+    { urdu: '✈️ ٹور پیکجز', eng: 'Tours', href: '/dashboard/tours', icon: Compass },
+    { urdu: 'ہوٹل و ٹرانسپورٹ', eng: 'Hotels', href: '/dashboard/hotels', icon: Building2 },
+    { urdu: 'مکمل کھاتہ', eng: 'Ledger', href: '/dashboard/ledger', icon: BookOpen },
+    { urdu: '💰 کیش بک', eng: 'Cash Book', href: '/dashboard/cashbook', icon: Wallet },
+    { urdu: '👥 سب ایجنٹس', eng: 'Sub-Agents', href: '/dashboard/sub-agents', icon: UserPlus },
+    { urdu: '🧳 کٹ انوینٹری', eng: 'Inventory', href: '/dashboard/inventory', icon: Luggage },
+    { urdu: 'دفتر کے اخراجات', eng: 'Expenses', href: '/dashboard/expenses', icon: Receipt },
+    { urdu: '📊 اسمارٹ رپورٹس', eng: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+    { urdu: 'ایجنسی سیٹنگز', eng: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
   const handleLogout = async () => {
@@ -66,7 +66,7 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   };
 
   return (
-    <aside className="w-full md:w-72 max-w-[320px] bg-[#0f172a] bg-gradient-to-b from-slate-900 to-slate-950 text-white shadow-2xl border-r border-slate-800/80 p-4 sm:p-5 flex flex-col justify-between h-full select-none overflow-y-auto">
+    <aside className="w-full md:w-72 max-w-[320px] bg-[#0f172a] bg-gradient-to-b from-slate-900 to-slate-950 text-white shadow-2xl border-r border-slate-800/80 p-4 sm:p-5 flex flex-col justify-between h-full select-none overflow-y-auto" style={{ transform: 'none' }}>
       <div>
         {/* Dynamic Agency Branding Header */}
         <div className="flex items-center justify-between pb-4 sm:pb-5 border-b border-white/10 gap-2">
@@ -112,7 +112,8 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
             <Link
               href="/super-admin"
               onClick={onCloseMobile}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-purple-600/40 transition flex items-center justify-between group border border-purple-400/20"
+              className="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-purple-600/40 transition flex items-center justify-between group border border-purple-400/20"
+              style={{ transform: 'none' }}
             >
               <div className="flex items-center gap-2">
                 <span className="text-base">🛡️</span>
@@ -129,17 +130,20 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
             <Link
               href="/dashboard/owner/profit"
               onClick={onCloseMobile}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-between border ${
+              className={`w-full px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-between border ${
                 pathname === '/dashboard/owner/profit'
                   ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-md'
                   : 'bg-emerald-950/40 border-emerald-800/40 text-emerald-400 hover:bg-emerald-900/50 hover:text-emerald-300'
               }`}
+              style={{ transform: 'none' }}
             >
-              <div className="flex items-center gap-2">
-                <Lock className="w-3.5 h-3.5 text-emerald-400" />
-                <span>🔒 خفیہ منافع (Secret Profit)</span>
+              <div className="flex items-center justify-between w-full" dir="rtl" style={{ transform: 'none' }}>
+                <div className="flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="font-urdu text-[13px] text-emerald-300">خفیہ منافع</span>
+                </div>
+                <span className="font-sans text-[10px] text-emerald-400/80 font-mono" dir="ltr">(Secret Profit)</span>
               </div>
-              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono">مالک</span>
             </Link>
           </div>
         )}
@@ -154,18 +158,26 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                 key={item.href}
                 href={item.href}
                 onClick={onCloseMobile}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl mx-2 text-xs transition duration-150 ${
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-[14px] font-normal transition duration-150 ${
                   active
-                    ? 'bg-white/10 backdrop-blur-xl border-l-4 border-emerald-400 text-white shadow-lg font-bold'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5 font-medium'
+                    ? 'bg-white/10 backdrop-blur-xl border-l-4 border-emerald-400 text-white shadow-lg font-semibold'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
                 }`}
+                style={{ transform: 'none' }}
               >
                 <Icon
                   className={`w-4 h-4 flex-shrink-0 ${
                     active ? 'text-emerald-400' : 'text-slate-400'
                   }`}
                 />
-                <span className="truncate">{item.name}</span>
+                <div className="flex items-center gap-2 min-w-0 flex-1 justify-between" dir="rtl" style={{ transform: 'none' }}>
+                  <span className="font-urdu text-[14px] font-normal text-white truncate" style={{ transform: 'none' }}>
+                    {item.urdu}
+                  </span>
+                  <span className="font-sans text-[11px] uppercase tracking-wider text-slate-400 opacity-70 shrink-0" dir="ltr" style={{ transform: 'none' }}>
+                    ({item.eng})
+                  </span>
+                </div>
               </Link>
             );
           })}

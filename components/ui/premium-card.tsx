@@ -74,25 +74,42 @@ export default function PremiumCard({
 }: PremiumCardProps) {
   const config = gradientClasses[gradient] || gradientClasses.violet;
 
+  // Split title if it contains parenthesized English text e.g. "کل حجاج و زائرین (TOTAL HUJJAJ)"
+  const titleMatch = typeof title === 'string' ? title.match(/^(.*?)\s*\((.*?)\)$/) : null;
+  const urduPart = titleMatch ? titleMatch[1].trim() : title;
+  const engPart = titleMatch ? titleMatch[2].trim() : null;
+  const hasUrdu = /[\u0600-\u06FF]/.test(urduPart);
+
   const content = (
     <div
-      className={`w-full relative overflow-hidden rounded-xl sm:rounded-2xl p-3.5 sm:p-4 min-h-[120px] text-white bg-gradient-to-br ${config.bg} shadow-lg ${config.shadow} border border-white/10 group hover:scale-[1.02] transition-all duration-200 flex flex-col justify-between ${className}`}
+      style={{ transform: 'none', rotate: '0deg' }}
+      className={`w-full relative overflow-hidden rounded-2xl p-5 min-h-[140px] text-white bg-gradient-to-br ${config.bg} shadow-lg ${config.shadow} border border-white/10 flex flex-col justify-between ${className}`}
     >
-      {/* 10% Opacity Dot Pattern Overlay */}
-      <div
-        className="absolute inset-0 opacity-10 pointer-events-none rounded-xl sm:rounded-2xl"
-        style={{
-          backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px)',
-          backgroundSize: '12px 12px',
-        }}
-      />
-
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-white/95 tracking-normal leading-relaxed truncate max-w-[80%]" dir="auto">
-            {title}
-          </span>
-          <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner flex-shrink-0">
+        <div className="flex items-start justify-between gap-3 mb-2" style={{ transform: 'none' }}>
+          <div
+            className={`flex flex-col min-w-0 ${hasUrdu ? 'text-right' : 'text-left'}`}
+            dir={hasUrdu ? 'rtl' : 'ltr'}
+            style={{ transform: 'none' }}
+          >
+            <span
+              className={`${hasUrdu ? 'font-urdu text-[15px]' : 'font-sans text-sm font-bold'} font-medium leading-[1.8] text-white tracking-normal break-words`}
+            >
+              {urduPart}
+            </span>
+            {engPart && (
+              <span
+                className="font-sans text-[11px] font-semibold uppercase tracking-wider text-white/70 mt-0.5"
+                dir="ltr"
+              >
+                ({engPart})
+              </span>
+            )}
+          </div>
+          <div
+            className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner flex-shrink-0"
+            style={{ transform: 'none' }}
+          >
             {React.isValidElement(Icon) ? (
               Icon
             ) : Icon ? (
@@ -101,12 +118,12 @@ export default function PremiumCard({
           </div>
         </div>
 
-        <div>
-          <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-white block">
+        <div className="mt-2 text-left" dir="ltr" style={{ transform: 'none' }}>
+          <span className="text-2xl font-bold tracking-tight text-white block">
             {value}
           </span>
           {subtitle && (
-            <p className="text-white/85 text-[11px] sm:text-xs mt-0.5 font-medium leading-relaxed truncate" dir="auto">
+            <p className="text-white/80 text-[11px] sm:text-xs mt-1 font-medium leading-relaxed" dir="auto">
               {subtitle}
             </p>
           )}
@@ -114,8 +131,12 @@ export default function PremiumCard({
       </div>
 
       {trend && (
-        <div className="relative z-10 pt-2 mt-2 border-t border-white/10 flex items-center justify-between text-[10px] sm:text-[11px] text-white/85" dir="auto">
-          <span className="flex items-center gap-1 font-medium leading-normal">
+        <div
+          className="relative z-10 pt-2.5 mt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-white/85"
+          dir="auto"
+          style={{ transform: 'none' }}
+        >
+          <span className="flex items-center gap-1.5 font-medium leading-normal">
             {trendUp ? (
               <ArrowUpRight className="w-3.5 h-3.5 text-white shrink-0" />
             ) : (
@@ -123,7 +144,7 @@ export default function PremiumCard({
             )}
             {trend}
           </span>
-          <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition shrink-0" />
+          <ArrowUpRight className="w-3.5 h-3.5 opacity-70 shrink-0" />
         </div>
       )}
     </div>
@@ -131,7 +152,7 @@ export default function PremiumCard({
 
   if (href) {
     return (
-      <Link href={href} className="block">
+      <Link href={href} className="block" style={{ transform: 'none' }}>
         {content}
       </Link>
     );
@@ -139,3 +160,4 @@ export default function PremiumCard({
 
   return content;
 }
+

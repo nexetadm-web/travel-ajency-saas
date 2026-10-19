@@ -158,7 +158,7 @@ export default function LedgerPage() {
           {activeTab === 'customers' ? (
             <button
               onClick={() => setShowAddCustModal(true)}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-1.5 active:scale-95"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-1.5"
             >
               <Plus className="w-4 h-4 shrink-0" />
               + نیا گاہک کھاتہ
@@ -166,7 +166,7 @@ export default function LedgerPage() {
           ) : (
             <button
               onClick={() => setShowAddSuppModal(true)}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs shadow-lg shadow-purple-200 transition flex items-center justify-center gap-1.5 active:scale-95"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs shadow-lg shadow-purple-200 transition flex items-center justify-center gap-1.5"
             >
               <Plus className="w-4 h-4 shrink-0" />
               + نیا سپلائر کھاتہ

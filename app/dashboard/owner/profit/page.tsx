@@ -85,7 +85,7 @@ export default function OwnerSecretProfitPage() {
         {/* Button "Numbers Chupayen" */}
         <button
           onClick={() => setBlurred(!blurred)}
-          className={`w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg active:scale-95 ${
+          className={`w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg ${
             blurred
               ? 'bg-emerald-500 text-white shadow-emerald-500/20 hover:bg-emerald-600'
               : 'bg-white/10 hover:bg-white/20 text-white border border-white/15'

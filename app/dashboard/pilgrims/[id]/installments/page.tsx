@@ -155,7 +155,7 @@ export default function PilgrimInstallmentsPage() {
               }
               setShowNewPlanModal(true);
             }}
-            className="px-6 py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center gap-2 active:scale-95"
+            className="px-6 py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             + نیا قسط پلان بنائیں

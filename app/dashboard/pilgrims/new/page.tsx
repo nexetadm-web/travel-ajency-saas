@@ -183,7 +183,7 @@ export default function NewPilgrimPage() {
         <button
           type="button"
           onClick={() => setScanModalOpen(true)}
-          className="px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 hover:from-emerald-600 hover:to-teal-700 flex items-center gap-2 active:scale-95 transition"
+          className="px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 hover:from-emerald-600 hover:to-teal-700 flex items-center gap-2 transition"
         >
           <Camera className="w-4 h-4" />
           🛂 Passport Scan - Photo se Data Auto

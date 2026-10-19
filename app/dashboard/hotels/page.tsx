@@ -221,8 +221,10 @@ export default function HotelsAndTransportPage() {
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-xl shadow-md shrink-0">
               🏨
             </div>
-            <div>
-              <h1 className="font-urdu text-[20px] sm:text-[26px] md:text-[32px] font-bold leading-[1.4] break-words text-gray-900">ہوٹل اور ٹرانسپورٹیشن مینجمنٹ</h1>
+            <div dir="rtl" className="text-right" style={{ transform: 'none' }}>
+              <h1 className="font-urdu text-[24px] md:text-[28px] font-bold leading-[1.8] break-words text-gray-900" style={{ transform: 'none' }}>
+                ہوٹل اور ٹرانسپورٹیشن مینجمنٹ
+              </h1>
               <p className="text-xs text-gray-500 mt-0.5 break-words leading-relaxed">
                 مکہ و مدینہ ہوٹل بکنگز، روم و بیڈ الاٹمنٹ، بسیں اور روٹس
               </p>

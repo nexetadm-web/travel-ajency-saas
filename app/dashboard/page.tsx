@@ -244,8 +244,9 @@ export default function DashboardOverviewPage() {
           <Link
             href="/dashboard/groups"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-emerald-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            style={{ transform: 'none' }}
           >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-emerald-500/20">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20" style={{ transform: 'none' }}>
               <Users className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">گروپس اوکیوپینسی</span>
@@ -256,8 +257,9 @@ export default function DashboardOverviewPage() {
           <Link
             href="/dashboard/flights/pnr-check"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-sky-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            style={{ transform: 'none' }}
           >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-sky-500/20">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-sky-500/20" style={{ transform: 'none' }}>
               <Plane className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">PNR لائیو چیک</span>
@@ -268,8 +270,9 @@ export default function DashboardOverviewPage() {
           <Link
             href="/dashboard/visas"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-purple-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            style={{ transform: 'none' }}
           >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-purple-500/20">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 text-white flex items-center justify-center shadow-md shadow-purple-500/20" style={{ transform: 'none' }}>
               <FileCheck2 className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">ویزہ کنبان بورڈ</span>
@@ -280,8 +283,9 @@ export default function DashboardOverviewPage() {
           <Link
             href="/dashboard/sub-agents"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-indigo-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            style={{ transform: 'none' }}
           >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-indigo-500/20">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20" style={{ transform: 'none' }}>
               <Globe2 className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">سب ایجنٹس کمیشن</span>
@@ -292,8 +296,9 @@ export default function DashboardOverviewPage() {
           <Link
             href="/dashboard/tours"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-teal-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            style={{ transform: 'none' }}
           >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-teal-500/20">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center shadow-md shadow-teal-500/20" style={{ transform: 'none' }}>
               <Compass className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">ٹور پیکجز</span>
@@ -304,8 +309,9 @@ export default function DashboardOverviewPage() {
           <Link
             href="/dashboard/cashbook"
             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-amber-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            style={{ transform: 'none' }}
           >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md shadow-amber-500/20">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center shadow-md shadow-amber-500/20" style={{ transform: 'none' }}>
               <Wallet className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-900">روزمرہ کیش بک</span>

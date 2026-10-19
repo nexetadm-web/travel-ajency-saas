@@ -32,13 +32,20 @@ img, svg, video, canvas, audio, iframe, embed, object {
   max-width: 100%;
 }
 
-/* CRITICAL: Urdu Typography Classes - High line-height to prevent Nastaliq overlap */
-.urdu-text,
+/* CRITICAL: Dashboard global transform & rotate removal */
+.dashboard,
+.dashboard * {
+  transform: none !important;
+  rotate: 0deg !important;
+}
+
+/* Urdu Typography Classes - Straight, un-rotated, proper line-height */
 .font-urdu,
+.urdu-text,
 [class*="font-urdu"],
 [class*="urdu-text"] {
-  font-family: var(--font-noto-nastaliq-urdu), 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', serif !important;
-  line-height: 2.2 !important; /* CRITICAL - Nastaliq needs high line-height */
+  font-family: 'Noto Nastaliq Urdu', -apple-system, sans-serif !important;
+  line-height: 1.8 !important;
   word-spacing: normal !important;
   letter-spacing: 0 !important;
   text-align: right;
@@ -46,41 +53,43 @@ img, svg, video, canvas, audio, iframe, embed, object {
   overflow-wrap: break-word !important;
   word-break: normal !important;
   white-space: normal !important;
-  padding-top: 4px;
-  padding-bottom: 4px;
   transform: none !important;
+  rotate: 0deg !important;
   font-style: normal !important;
 }
 
-/* Headings with Nastaliq font need even higher line-height (2.5 to 2.8) */
-h1.urdu-text,
-h1.font-urdu,
-h2.urdu-text,
-h2.font-urdu,
-.urdu-h1,
-.urdu-heading {
-  line-height: 2.5 !important;
-  padding-top: 10px !important;
-  padding-bottom: 10px !important;
-  min-height: 100px;
+/* Dashboard Page Headers: clean, straight, not oversized or rotated */
+.dashboard h1 {
+  font-family: 'Noto Nastaliq Urdu', -apple-system, sans-serif !important;
+  font-size: 24px !important;
+  line-height: 1.8 !important;
+  font-weight: 700 !important;
+  direction: rtl !important;
+  text-align: right !important;
+  transform: none !important;
+  rotate: 0deg !important;
 }
 
 @media (min-width: 768px) {
-  h1.urdu-text,
-  h1.font-urdu,
-  .urdu-h1,
-  .urdu-heading {
-    line-height: 2.8 !important;
-    min-height: 120px;
+  .dashboard h1 {
+    font-size: 28px !important;
   }
+}
+
+h2.urdu-text,
+h2.font-urdu,
+.urdu-h2 {
+  line-height: 1.8 !important;
+  transform: none !important;
+  rotate: 0deg !important;
 }
 
 h3.urdu-text,
 h3.font-urdu,
 .urdu-h3 {
-  line-height: 2.2 !important;
-  padding-top: 6px !important;
-  padding-bottom: 6px !important;
+  line-height: 1.8 !important;
+  transform: none !important;
+  rotate: 0deg !important;
 }
 
 /* Custom scrollbars */
