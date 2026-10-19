@@ -166,34 +166,25 @@ export default function VisaConsultancyPage() {
   return (
     <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
-        <div dir="rtl" className="text-right" style={{ transform: 'none' }}>
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-2xl shrink-0">🌍</span>
-            <div>
-              <h1 className="font-urdu text-[24px] md:text-[28px] font-bold leading-[1.8] text-gray-900" style={{ transform: 'none' }}>
-                ویزہ کنسلٹنسی پورٹل
-              </h1>
-              <span className="font-sans text-[11px] font-bold uppercase tracking-wider text-indigo-600 block mt-0.5" dir="ltr">
-                Study, Visit & Work Visas
-              </span>
-            </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200 shrink-0">
-              کنسلٹنٹس فرسٹ چوائس
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden transform-none" style={{ transform: 'none' }}>
+        <div dir="rtl" className="text-right transform-none" style={{ transform: 'none' }}>
+          <h1 className="font-urdu text-[28px] md:text-[32px] font-bold text-right leading-[2.2] transform-none rotate-0 not-italic" dir="rtl" style={{ transform: 'none', fontStyle: 'normal' }}>
+            ویزہ کنسلٹنسی پورٹل
+          </h1>
+          <p className="font-urdu text-sm text-gray-600 text-right transform-none" dir="rtl">
+            کل کیسز: {stats.totalCases} <span className="font-english text-xs text-indigo-600 font-semibold">(Study, Visit & Work Visas)</span>
+          </p>
+          <p className="text-xs text-gray-500 mt-1 break-words leading-relaxed transform-none">
             برطانیہ، کینیڈا، شینگن، دبئی، آسٹریلیا اور امریکہ ویزا فائلنگ، ایمبیسی چیک لسٹ اور کنبان ٹریکر
           </p>
         </div>
 
         <button
           onClick={() => setShowNewModal(true)}
-          className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2"
+          className="font-urdu bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-full flex items-center gap-2 transform-none shadow-md transition"
           style={{ transform: 'none' }}
         >
-          <Plus className="w-4 h-4 shrink-0" />
-          <span>+ نیا ویزہ کیس بنائیں</span>
+          <span>+</span> <span>نیا ویزہ کیس</span> <span className="font-english text-xs">(New Case)</span>
         </button>
       </div>
 

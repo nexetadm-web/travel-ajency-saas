@@ -118,46 +118,54 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* Right CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto transform-none" style={{ transform: 'none' }}>
           <Link
             href="/dashboard/pilgrims/new"
-            className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-5 py-2.5 shadow-md shadow-emerald-200 text-xs font-bold transition flex items-center justify-center gap-1.5"
+            className="font-urdu bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-full flex items-center justify-center gap-2 transform-none shadow-md text-xs font-bold transition"
+            style={{ transform: 'none' }}
           >
-            <Plus className="w-4 h-4 shrink-0" />
-            <span className="truncate">+ نیا حاجی</span>
+            <span>+</span> <span>نیا حاجی</span> <span className="font-english text-xs">(New Pilgrim)</span>
           </Link>
           <Link
             href="/dashboard/groups"
-            className="w-full sm:w-auto bg-white border border-gray-200 hover:bg-gray-50 rounded-full px-5 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition flex items-center justify-center gap-1.5"
+            className="font-urdu bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded-full flex items-center justify-center gap-2 transform-none shadow-sm text-xs font-bold transition"
+            style={{ transform: 'none' }}
           >
             <Users className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span className="truncate">نیا گروپ</span>
+            <span>نیا گروپ</span> <span className="font-english text-xs">(New Group)</span>
           </Link>
         </div>
       </div>
 
       {/* AI ALERTS BANNER (If notifications present) */}
       {notifications.length > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-900 text-xs shadow-sm" dir="rtl">
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-900 text-xs shadow-sm transform-none" dir="rtl" style={{ transform: 'none' }}>
           <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <span className="font-bold block text-amber-800">خودکار AI الرٹس (System Alerts):</span>
-            <p className="mt-0.5 text-amber-700">{notifications[0].message}</p>
+          <div className="flex-1 transform-none">
+            <span className="font-urdu font-bold block text-amber-800 not-italic">
+              خودکار AI الرٹس <span className="font-english text-[11px]">(System Alerts)</span>:
+            </span>
+            <p className="mt-0.5 text-amber-700 font-urdu not-italic">{notifications[0].message}</p>
           </div>
-          <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
+          <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300 font-urdu shrink-0 not-italic">
             {notifications.length} الرٹس
           </span>
         </div>
       )}
 
       {/* PHASE 1: 3 PRIMARY EXECUTIVE METRICS CARDS */}
-      <div dir="rtl">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="urdu-text text-sm sm:text-base font-bold uppercase tracking-wider text-gray-700 flex items-center gap-2">
+      <div dir="rtl" className="transform-none" style={{ transform: 'none' }}>
+        <div className="flex items-center justify-between mb-4 transform-none" style={{ transform: 'none' }}>
+          <div className="flex items-center gap-2 transform-none">
             <Sparkles className="w-4 h-4 text-emerald-600" />
-            کلیدی اشاریے (PRIMARY EXECUTIVE METRICS)
-          </h2>
-          <span className="urdu-text text-xs text-gray-400">ریئل ٹائم ڈیٹا</span>
+            <span className="font-urdu text-sm sm:text-base font-bold text-gray-700 not-italic transform-none">
+              کلیدی اشاریے
+            </span>
+            <span className="font-english text-[11px] font-bold text-gray-400 uppercase tracking-wider transform-none" dir="ltr">
+              (PRIMARY EXECUTIVE METRICS)
+            </span>
+          </div>
+          <span className="font-urdu text-xs text-gray-400 not-italic transform-none">ریئل ٹائم ڈیٹا</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" dir="ltr">

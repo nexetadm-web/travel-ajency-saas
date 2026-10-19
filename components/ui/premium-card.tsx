@@ -85,48 +85,44 @@ export default function PremiumCard({
       style={{ transform: 'none', rotate: '0deg' }}
       className={`w-full relative overflow-hidden rounded-2xl p-5 min-h-[140px] text-white bg-gradient-to-br ${config.bg} shadow-lg ${config.shadow} border border-white/10 flex flex-col justify-between ${className}`}
     >
-      <div className="relative z-10">
-        <div className="flex items-start justify-between gap-3 mb-2" style={{ transform: 'none' }}>
-          <div
-            className={`flex flex-col min-w-0 ${hasUrdu ? 'text-right' : 'text-left'}`}
-            dir={hasUrdu ? 'rtl' : 'ltr'}
-            style={{ transform: 'none' }}
-          >
-            <span
-              className={`${hasUrdu ? 'font-urdu text-[15px]' : 'font-sans text-sm font-bold'} font-medium leading-[1.8] text-white tracking-normal break-words`}
+      <div className="relative z-10 transform-none" style={{ transform: 'none' }}>
+        <div className="flex justify-between items-start gap-3 transform-none" style={{ transform: 'none' }}>
+          <div className="transform-none min-w-0" style={{ transform: 'none' }}>
+            <p
+              className="font-urdu text-[18px] leading-[1.8] transform-none rotate-0 not-italic text-white"
+              dir="rtl"
+              style={{ transform: 'none', fontStyle: 'normal' }}
             >
               {urduPart}
-            </span>
+            </p>
             {engPart && (
-              <span
-                className="font-sans text-[11px] font-semibold uppercase tracking-wider text-white/70 mt-0.5"
+              <p
+                className="font-english text-[11px] opacity-80 tracking-wide transform-none uppercase text-white/80"
                 dir="ltr"
+                style={{ transform: 'none' }}
               >
                 ({engPart})
-              </span>
+              </p>
+            )}
+            <p className="font-english text-3xl font-bold mt-3 transform-none text-white block" dir="ltr" style={{ transform: 'none' }}>
+              {value}
+            </p>
+            {subtitle && (
+              <p className="font-urdu text-white/80 text-xs mt-1 transform-none not-italic leading-relaxed" dir="rtl" style={{ transform: 'none' }}>
+                {subtitle}
+              </p>
             )}
           </div>
           <div
-            className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white shadow-inner flex-shrink-0"
+            className="bg-white/20 p-2.5 rounded-xl transform-none flex items-center justify-center text-white shrink-0"
             style={{ transform: 'none' }}
           >
             {React.isValidElement(Icon) ? (
               Icon
             ) : Icon ? (
-              <Icon className="w-4 h-4 text-white" />
+              <Icon className="w-5 h-5 text-white" />
             ) : null}
           </div>
-        </div>
-
-        <div className="mt-2 text-left" dir="ltr" style={{ transform: 'none' }}>
-          <span className="text-2xl font-bold tracking-tight text-white block">
-            {value}
-          </span>
-          {subtitle && (
-            <p className="text-white/80 text-[11px] sm:text-xs mt-1 font-medium leading-relaxed" dir="auto">
-              {subtitle}
-            </p>
-          )}
         </div>
       </div>
 

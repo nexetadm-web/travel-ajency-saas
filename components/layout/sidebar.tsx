@@ -149,7 +149,7 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
         )}
 
         {/* Navigation Links */}
-        <nav className="mt-4 space-y-1">
+        <nav className="mt-4 space-y-1 transform-none" style={{ transform: 'none' }}>
           {navItems.map((item) => {
             const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             const Icon = item.icon;
@@ -158,26 +158,30 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                 key={item.href}
                 href={item.href}
                 onClick={onCloseMobile}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-[14px] font-normal transition duration-150 ${
+                className={`flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all transform-none ${
                   active
-                    ? 'bg-white/10 backdrop-blur-xl border-l-4 border-emerald-400 text-white shadow-lg font-semibold'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-white/10 backdrop-blur-xl border-l-4 border-emerald-400 text-white shadow-lg'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
                 style={{ transform: 'none' }}
               >
-                <Icon
-                  className={`w-4 h-4 flex-shrink-0 ${
-                    active ? 'text-emerald-400' : 'text-slate-400'
-                  }`}
-                />
-                <div className="flex items-center gap-2 min-w-0 flex-1 justify-between" dir="rtl" style={{ transform: 'none' }}>
-                  <span className="font-urdu text-[14px] font-normal text-white truncate" style={{ transform: 'none' }}>
-                    {item.urdu}
-                  </span>
-                  <span className="font-sans text-[11px] uppercase tracking-wider text-slate-400 opacity-70 shrink-0" dir="ltr" style={{ transform: 'none' }}>
+                <div className="flex items-center gap-3 transform-none" style={{ transform: 'none' }}>
+                  <Icon
+                    className={`w-5 h-5 flex-shrink-0 ${
+                      active ? 'text-emerald-400' : 'text-slate-400'
+                    }`}
+                  />
+                  <span className="font-english text-[11px] text-gray-400 tracking-wider transform-none uppercase" style={{ transform: 'none' }}>
                     ({item.eng})
                   </span>
                 </div>
+                <span
+                  className="font-urdu text-[16px] text-white transform-none rotate-0 not-italic"
+                  dir="rtl"
+                  style={{ transform: 'none', fontStyle: 'normal' }}
+                >
+                  {item.urdu}
+                </span>
               </Link>
             );
           })}
