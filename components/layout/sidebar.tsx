@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAgency } from '@/hooks/useAgency';
@@ -39,6 +40,35 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
 
   // Owner check for Secret Profit dashboard
   const isOwner = (agency?.role as string) === 'agency' || (agency?.role as string) === 'owner' || isSuper;
+
+  useEffect(() => {
+    const mainRoutes = [
+      '/dashboard',
+      '/dashboard/groups',
+      '/dashboard/pilgrims',
+      '/dashboard/tickets',
+      '/dashboard/flights/pnr-check',
+      '/dashboard/visas',
+      '/dashboard/visa-consultancy',
+      '/dashboard/tours',
+      '/dashboard/hotels',
+      '/dashboard/ledger',
+      '/dashboard/cashbook',
+      '/dashboard/sub-agents',
+      '/dashboard/inventory',
+      '/dashboard/expenses',
+      '/dashboard/reports',
+      '/dashboard/settings',
+      '/dashboard/owner/profit',
+    ];
+    mainRoutes.forEach((route) => {
+      try {
+        router.prefetch(route);
+      } catch (e) {
+        // ignore
+      }
+    });
+  }, [router]);
 
   const navItems = [
     { urdu: 'ڈیش بورڈ', eng: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -111,8 +141,9 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
           <div className="pt-2.5">
             <Link
               href="/super-admin"
+              prefetch={true}
               onClick={onCloseMobile}
-              className="w-full px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white text-[11px] font-bold shadow-lg shadow-purple-600/40 transition flex items-center justify-between group border border-purple-400/20"
+              className="w-full px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white text-[11px] font-bold shadow-lg shadow-purple-600/40 transition-all duration-150 active:scale-[0.98] flex items-center justify-between group border border-purple-400/20"
               style={{ transform: 'none' }}
             >
               <div className="flex items-center gap-2">
@@ -129,8 +160,9 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
           <div className="pt-2">
             <Link
               href="/dashboard/owner/profit"
+              prefetch={true}
               onClick={onCloseMobile}
-              className={`w-full px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between border ${
+              className={`w-full px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-150 active:scale-[0.98] flex items-center justify-between border ${
                 pathname === '/dashboard/owner/profit'
                   ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-md'
                   : 'bg-emerald-950/40 border-emerald-800/40 text-emerald-400 hover:bg-emerald-900/50 hover:text-emerald-300'
@@ -157,8 +189,9 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 onClick={onCloseMobile}
-                className={`flex items-center justify-between w-full px-3.5 py-2.5 lg:py-2 xl:py-2.5 rounded-xl transition-all transform-none ${
+                className={`flex items-center justify-between w-full px-3.5 py-2.5 lg:py-2 xl:py-2.5 rounded-xl transition-all duration-150 active:scale-[0.98] transform-none ${
                   active
                     ? 'bg-white/10 backdrop-blur-xl border-l-4 border-emerald-400 text-white shadow-lg'
                     : 'text-slate-300 hover:text-white hover:bg-white/10'

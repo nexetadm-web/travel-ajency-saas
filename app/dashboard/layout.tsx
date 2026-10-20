@@ -76,6 +76,7 @@ export default function DashboardLayout({
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard/settings/whatsapp"
+              prefetch={true}
               className="text-[11px] text-emerald-600 hover:text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5 transition"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -83,6 +84,7 @@ export default function DashboardLayout({
             </Link>
             <Link
               href="/dashboard/settings"
+              prefetch={true}
               className="text-gray-400 hover:text-gray-700 transition p-1.5 rounded-lg hover:bg-gray-100"
               title="سیٹنگز"
             >

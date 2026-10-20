@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import {
   Plane,
@@ -16,31 +16,74 @@ import {
   Calendar,
   History,
   Sparkles,
+  ChevronDown,
+  Check,
 } from 'lucide-react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+const AIRLINES = [
+  { code: "SV", name: "Saudia Airlines", urdu: "سعودیہ ائیر لائن" },
+  { code: "PK", name: "PIA - Pakistan International", urdu: "پی آئی اے" },
+  { code: "EK", name: "Emirates", urdu: "ایمریٹس" },
+  { code: "EY", name: "Etihad Airways", urdu: "اتحاد ائیرویز" },
+  { code: "QR", name: "Qatar Airways", urdu: "قطر ائیرویز" },
+  { code: "FZ", name: "flydubai", urdu: "فلائی دبئی" },
+  { code: "XY", name: "Flynas", urdu: "فلائی ناس" },
+  { code: "9P", name: "Fly Jinnah", urdu: "فلائی جناح" },
+  { code: "PA", name: "Airblue", urdu: "ائیر بلیو" },
+  { code: "ER", name: "Serene Air", urdu: "سیرین ائیر" },
+  { code: "GF", name: "Gulf Air", urdu: "گلف ائیر" },
+  { code: "WY", name: "Oman Air", urdu: "عمان ائیر" },
+  { code: "TK", name: "Turkish Airlines", urdu: "ترکش ائیر لائن" },
+  { code: "KU", name: "Kuwait Airways", urdu: "کویت ائیرویز" },
+  { code: "OV", name: "SalamAir", urdu: "سلام ائیر" },
+  { code: "G9", name: "Air Arabia", urdu: "ائیر عربیہ" },
+  { code: "J9", name: "Jazeera Airways", urdu: "جزیرہ ائیرویز" },
+  { code: "RJ", name: "Royal Jordanian", urdu: "رائل جارڈینین" },
+  { code: "UL", name: "SriLankan Airlines", urdu: "سری لنکن" },
+  { code: "ET", name: "Ethiopian Airlines", urdu: "ایتھوپین" },
+  { code: "MS", name: "EgyptAir", urdu: "ایجیپٹ ائیر" },
+  { code: "6S", name: "Saudi Gulf / Ajet", urdu: "سعودی گلف" },
+  { code: "OTHER", name: "Custom / Other - کسٹم ائیر لائن", urdu: "دیگر" }
+];
 
 export default function PnrCheckPage() {
   const { data: historyData, mutate: mutateHistory } = useSWR('/api/flights/check-pnr', fetcher);
   const historyList = historyData?.history || [];
 
   const [pnr, setPnr] = useState('');
-  const [airline, setAirline] = useState('Saudia Airlines');
+  const [selectedAirline, setSelectedAirline] = useState('SV');
+  const [customAirline, setCustomAirline] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const airlines = [
-    'Saudia Airlines',
-    'Pakistan International Airlines (PIA)',
-    'Emirates',
-    'Airblue',
-    'Fly Jinnah',
-    'Serene Air',
-    'Qatar Airways',
-    'Flynas',
-    'Gulf Air',
-  ];
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const activeAirlineObj = AIRLINES.find((a) => a.code === selectedAirline) || AIRLINES[0];
+
+  const filteredAirlines = AIRLINES.filter((a) => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      a.code.toLowerCase().includes(q) ||
+      a.name.toLowerCase().includes(q) ||
+      a.urdu.includes(q)
+    );
+  });
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +91,10 @@ export default function PnrCheckPage() {
       setErrorMsg('براہ کرم PNR کوڈ درج کریں');
       return;
     }
+
+    const finalAirline = selectedAirline === 'OTHER'
+      ? (customAirline.trim() || 'Custom Airline')
+      : `${activeAirlineObj.code} - ${activeAirlineObj.name} (${activeAirlineObj.urdu})`;
 
     setSearching(true);
     setErrorMsg('');
@@ -57,7 +104,7 @@ export default function PnrCheckPage() {
       const res = await fetch('/api/flights/check-pnr', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pnr: pnr.trim(), airline }),
+        body: JSON.stringify({ pnr: pnr.trim(), airline: finalAirline }),
       });
 
       const resData = await res.json();
@@ -87,7 +134,7 @@ export default function PnrCheckPage() {
       </div>
 
       {/* PNR Search Card */}
-      <div className="w-full bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-6 overflow-hidden">
+      <div className="w-full bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-6 overflow-visible">
         <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
           {/* PNR Input */}
           <div className="sm:col-span-1">
@@ -104,22 +151,70 @@ export default function PnrCheckPage() {
             />
           </div>
 
-          {/* Airline Dropdown */}
-          <div className="sm:col-span-1">
+          {/* Searchable Airline Select */}
+          <div className="sm:col-span-1 relative" ref={dropdownRef}>
             <label className="block text-xs font-bold text-gray-700 mb-1.5">
               ایئرلائن منتخب کریں
             </label>
-            <select
-              value={airline}
-              onChange={(e) => setAirline(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-900 focus:outline-none focus:border-sky-500"
+            <button
+              type="button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-900 focus:outline-none focus:border-sky-500 flex items-center justify-between text-left"
             >
-              {airlines.map((a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
-              ))}
-            </select>
+              <span className="truncate">
+                {activeAirlineObj.code === 'OTHER'
+                  ? 'Custom / Other - کسٹم ائیر لائن'
+                  : `${activeAirlineObj.code} - ${activeAirlineObj.name} (${activeAirlineObj.urdu})`}
+              </span>
+              <ChevronDown className="w-4 h-4 text-gray-400 shrink-0 ml-1" />
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden">
+                <div className="p-2 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+                  <Search className="w-3.5 h-3.5 text-gray-400 shrink-0 ml-1" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="ائیر لائن تلاش کریں / Search..."
+                    className="w-full bg-transparent text-xs text-gray-800 placeholder-gray-400 focus:outline-none"
+                    autoFocus
+                  />
+                </div>
+                <div className="max-h-56 overflow-y-auto divide-y divide-gray-50">
+                  {filteredAirlines.length === 0 ? (
+                    <div className="p-3 text-xs text-gray-400 text-center">کوئی ائیر لائن نہیں ملی</div>
+                  ) : (
+                    filteredAirlines.map((a) => {
+                      const isSelected = a.code === selectedAirline;
+                      return (
+                        <button
+                          key={a.code}
+                          type="button"
+                          onClick={() => {
+                            setSelectedAirline(a.code);
+                            setDropdownOpen(false);
+                            setSearchQuery('');
+                          }}
+                          className={`w-full px-3.5 py-2.5 text-left text-xs flex items-center justify-between transition hover:bg-sky-50 ${
+                            isSelected ? 'bg-sky-50/70 font-bold text-sky-900' : 'text-gray-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 truncate">
+                            <span className="font-mono font-bold text-sky-600 shrink-0">{a.code}</span>
+                            <span className="text-gray-300">-</span>
+                            <span className="truncate">{a.name}</span>
+                            <span className="text-[11px] text-gray-400 shrink-0">({a.urdu})</span>
+                          </div>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-sky-600 shrink-0 ml-2" />}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Search Button */}
@@ -142,6 +237,24 @@ export default function PnrCheckPage() {
               )}
             </button>
           </div>
+
+          {/* Custom Airline Input (Shown if OTHER is selected) */}
+          {selectedAirline === 'OTHER' && (
+            <div className="mt-3 sm:col-span-3">
+              <label className="font-urdu text-sm block font-bold text-gray-700">
+                کسٹم ائیر لائن کا نام لکھیں
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. AirSial, Vision Air..."
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 font-english bg-gray-50 text-sm focus:outline-none focus:border-sky-500 text-gray-900"
+                id="customAirline"
+                value={customAirline}
+                onChange={(e) => setCustomAirline(e.target.value)}
+                required
+              />
+            </div>
+          )}
         </form>
 
         {errorMsg && (

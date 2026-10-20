@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, cache } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import { useAgency } from '@/hooks/useAgency';
 import {
@@ -28,23 +30,64 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import PremiumCard from '@/components/ui/premium-card';
+import DashboardHeader from '@/components/DashboardHeader';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+// Dynamic import for heavy card component
+const PremiumCard = dynamic(() => import('@/components/ui/premium-card'), {
+  loading: () => (
+    <div className="w-full min-h-[165px] md:min-h-[175px] rounded-2xl bg-gray-100 animate-pulse border border-gray-200" />
+  ),
+  ssr: true,
+});
+
+// Cached fetcher with 60-second revalidation
+const cachedFetcher = cache(async (url: string) => {
+  const res = await fetch(url, { next: { revalidate: 60 } });
+  return res.json();
+});
+
+const swrOptions = {
+  revalidateOnFocus: false,
+  dedupingInterval: 60000,
+  keepPreviousData: true,
+};
 
 export default function DashboardOverviewPage() {
   const { agency } = useAgency();
+  const router = useRouter();
 
-  // Parallel SWR data fetching
-  const { data: groupsData } = useSWR('/api/groups', fetcher, { revalidateOnFocus: false });
-  const { data: pilgrimsData } = useSWR('/api/pilgrims', fetcher, { revalidateOnFocus: false });
-  const { data: ticketsData } = useSWR('/api/tickets', fetcher, { revalidateOnFocus: false });
-  const { data: visasData } = useSWR('/api/visas', fetcher, { revalidateOnFocus: false });
-  const { data: ledgerCustData } = useSWR('/api/ledger/customers', fetcher, { revalidateOnFocus: false });
-  const { data: ledgerSuppData } = useSWR('/api/ledger/suppliers', fetcher, { revalidateOnFocus: false });
-  const { data: expensesData } = useSWR('/api/expenses', fetcher, { revalidateOnFocus: false });
-  const { data: notifData } = useSWR('/api/notifications', fetcher, { revalidateOnFocus: false });
-  const { data: cashbookData } = useSWR('/api/cashbook', fetcher, { revalidateOnFocus: false });
+  // Instant navigation prefetching
+  useEffect(() => {
+    const prefetchRoutes = [
+      '/dashboard/groups',
+      '/dashboard/pilgrims',
+      '/dashboard/pilgrims/new',
+      '/dashboard/flights/pnr-check',
+      '/dashboard/visas',
+      '/dashboard/ledger',
+      '/dashboard/cashbook',
+      '/dashboard/sub-agents',
+      '/dashboard/tours',
+    ];
+    prefetchRoutes.forEach((route) => {
+      try {
+        router.prefetch(route);
+      } catch (e) {
+        // ignore
+      }
+    });
+  }, [router]);
+
+  // Parallel cached SWR data fetching
+  const { data: groupsData } = useSWR('/api/groups', cachedFetcher, swrOptions);
+  const { data: pilgrimsData } = useSWR('/api/pilgrims', cachedFetcher, swrOptions);
+  const { data: ticketsData } = useSWR('/api/tickets', cachedFetcher, swrOptions);
+  const { data: visasData } = useSWR('/api/visas', cachedFetcher, swrOptions);
+  const { data: ledgerCustData } = useSWR('/api/ledger/customers', cachedFetcher, swrOptions);
+  const { data: ledgerSuppData } = useSWR('/api/ledger/suppliers', cachedFetcher, swrOptions);
+  const { data: expensesData } = useSWR('/api/expenses', cachedFetcher, swrOptions);
+  const { data: notifData } = useSWR('/api/notifications', cachedFetcher, swrOptions);
+  const { data: cashbookData } = useSWR('/api/cashbook', cachedFetcher, swrOptions);
 
   const totalGroups = groupsData?.groups?.length || 0;
   const totalPilgrims = pilgrimsData?.pilgrims?.length || 0;
@@ -86,56 +129,8 @@ export default function DashboardOverviewPage() {
 
   return (
     <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-[1440px] space-y-6 sm:space-y-8">
-      {/* TOP AGENCY HEADER CARD (Shell/PSO Light Theme) */}
-      <div className="bg-white rounded-[20px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-5 md:p-6 lg:p-4 xl:p-5 lg:min-h-[90px] xl:min-h-[100px] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 overflow-hidden">
-        <div className="flex items-center gap-3 min-w-0">
-          {agency?.logo_url ? (
-            <img
-              src={agency.logo_url}
-              alt={agency?.name || 'Pyary Travels & Tours'}
-              className="w-12 h-12 lg:w-10 lg:h-10 rounded-xl object-cover border border-emerald-200 shadow-sm shrink-0"
-            />
-          ) : (
-            <img
-              src="/logo.png"
-              alt="Pyary Logo"
-              className="w-12 h-12 lg:w-10 lg:h-10 rounded-xl object-cover border border-emerald-200 shadow-sm shrink-0"
-            />
-          )}
-          <div className="min-w-0" dir="rtl">
-            <h1 className="text-lg sm:text-xl lg:text-lg font-bold text-gray-900 flex items-center gap-2 flex-wrap">
-              <span className="truncate">{agency?.name || 'Pyary Travels & Tours'}</span>
-              <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0">لائیو پورٹل</span>
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs text-gray-500" dir="ltr">
-              <span className="flex items-center gap-1">👤 {agency?.owner_name || 'Haji Abdul Rehman'}</span>
-              <span className="w-1 h-1 bg-gray-300 rounded-full hidden sm:inline-block"></span>
-              <span className="flex items-center gap-1">📞 {agency?.phone || '+92 300 5556677'}</span>
-              <span className="w-1 h-1 bg-gray-300 rounded-full hidden sm:inline-block"></span>
-              <span className="flex items-center gap-1">🪪 {agency?.license_no || 'DTS-LHR-2026'}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 w-full sm:w-auto transform-none" style={{ transform: 'none' }}>
-          <Link
-            href="/dashboard/pilgrims/new"
-            className="font-urdu bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full flex items-center justify-center gap-1.5 transform-none shadow-md font-bold transition shrink-0"
-            style={{ transform: 'none' }}
-          >
-            <span>+</span> <span>نیا حاجی</span> <span className="font-english text-[11px]">(New Pilgrim)</span>
-          </Link>
-          <Link
-            href="/dashboard/groups"
-            className="font-urdu bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-[13px] lg:text-[12px] px-4 py-2 lg:px-3.5 lg:py-2 rounded-full flex items-center justify-center gap-1.5 transform-none shadow-sm font-bold transition shrink-0"
-            style={{ transform: 'none' }}
-          >
-            <Users className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>نیا گروپ</span> <span className="font-english text-[11px]">(New Group)</span>
-          </Link>
-        </div>
-      </div>
+      {/* PROFESSIONAL COMPACT OWNER HEADER */}
+      <DashboardHeader />
 
       {/* AI ALERTS BANNER (If notifications present) */}
       {notifications.length > 0 && (
@@ -251,7 +246,8 @@ export default function DashboardOverviewPage() {
           {/* Action 1: Groups */}
           <Link
             href="/dashboard/groups"
-            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-emerald-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            prefetch={true}
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-emerald-300 hover:shadow-md transition-all duration-150 active:scale-[0.98] flex flex-col items-center justify-center gap-2.5 group"
             style={{ transform: 'none' }}
           >
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20" style={{ transform: 'none' }}>
@@ -264,7 +260,8 @@ export default function DashboardOverviewPage() {
           {/* Action 2: Tickets & PNR Check */}
           <Link
             href="/dashboard/flights/pnr-check"
-            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-sky-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            prefetch={true}
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-sky-300 hover:shadow-md transition-all duration-150 active:scale-[0.98] flex flex-col items-center justify-center gap-2.5 group"
             style={{ transform: 'none' }}
           >
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-sky-500/20" style={{ transform: 'none' }}>
@@ -277,7 +274,8 @@ export default function DashboardOverviewPage() {
           {/* Action 3: Visa Tracking */}
           <Link
             href="/dashboard/visas"
-            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-purple-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            prefetch={true}
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-purple-300 hover:shadow-md transition-all duration-150 active:scale-[0.98] flex flex-col items-center justify-center gap-2.5 group"
             style={{ transform: 'none' }}
           >
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 text-white flex items-center justify-center shadow-md shadow-purple-500/20" style={{ transform: 'none' }}>
@@ -290,7 +288,8 @@ export default function DashboardOverviewPage() {
           {/* Action 4: Sub-Agents */}
           <Link
             href="/dashboard/sub-agents"
-            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-indigo-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            prefetch={true}
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-indigo-300 hover:shadow-md transition-all duration-150 active:scale-[0.98] flex flex-col items-center justify-center gap-2.5 group"
             style={{ transform: 'none' }}
           >
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20" style={{ transform: 'none' }}>
@@ -303,7 +302,8 @@ export default function DashboardOverviewPage() {
           {/* Action 5: Tour Packages */}
           <Link
             href="/dashboard/tours"
-            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-teal-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            prefetch={true}
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-teal-300 hover:shadow-md transition-all duration-150 active:scale-[0.98] flex flex-col items-center justify-center gap-2.5 group"
             style={{ transform: 'none' }}
           >
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center shadow-md shadow-teal-500/20" style={{ transform: 'none' }}>
@@ -316,7 +316,8 @@ export default function DashboardOverviewPage() {
           {/* Action 6: Cash Book */}
           <Link
             href="/dashboard/cashbook"
-            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-amber-300 hover:shadow-md transition flex flex-col items-center justify-center gap-2.5 group"
+            prefetch={true}
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center hover:border-amber-300 hover:shadow-md transition-all duration-150 active:scale-[0.98] flex flex-col items-center justify-center gap-2.5 group"
             style={{ transform: 'none' }}
           >
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center shadow-md shadow-amber-500/20" style={{ transform: 'none' }}>
