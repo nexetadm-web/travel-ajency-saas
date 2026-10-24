@@ -15,77 +15,8 @@ export interface PassportExtractionResult {
   raw_text?: string;
 }
 
-/**
- * Fetch list of models from Gemini API and order them by priority:
- * 1. gemini-2.0-flash
- * 2. gemini-1.5-flash-latest
- * 3. gemini-1.5-flash
- * 4. Any other model supporting generateContent
- */
-async function getAvailableModels(apiKey: string): Promise<string[]> {
-  const preferredPriority = [
-    'gemini-2.0-flash',
-    'gemini-1.5-flash-latest',
-    'gemini-1.5-flash',
-    'gemini-2.5-flash',
-    'gemini-1.5-pro',
-    'gemini-1.5-pro-latest',
-  ];
-
-  try {
-    // First call ListModels API with v1
-    let res = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`);
-    if (!res.ok) {
-      // Fallback to v1beta for model listing if v1 returns non-200
-      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-    }
-
-    if (res.ok) {
-      const data = await res.json();
-      const modelsList: Array<{ name: string; supportedGenerationMethods?: string[] }> = data?.models || [];
-
-      const contentModels = modelsList
-        .filter((m) => m.supportedGenerationMethods?.includes('generateContent'))
-        .map((m) => m.name.replace(/^models\//, ''));
-
-      if (contentModels.length > 0) {
-        const prioritized: string[] = [];
-
-        // 1. Add matching preferred models in order
-        for (const preferred of preferredPriority) {
-          const match = contentModels.find(
-            (m) => m.toLowerCase() === preferred.toLowerCase()
-          );
-          if (match && !prioritized.includes(match)) {
-            prioritized.push(match);
-          }
-        }
-
-        // 2. Add other flash models
-        for (const m of contentModels) {
-          if (m.toLowerCase().includes('flash') && !prioritized.includes(m)) {
-            prioritized.push(m);
-          }
-        }
-
-        // 3. Add any other models supporting generateContent
-        for (const m of contentModels) {
-          if (!prioritized.includes(m)) {
-            prioritized.push(m);
-          }
-        }
-
-        if (prioritized.length > 0) {
-          return prioritized;
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('ListModels call warning, using default priority list:', err);
-  }
-
-  return preferredPriority;
-}
+// Use ONLY stable models in v1 API (no preview, pro-preview, or deep-research models)
+const STABLE_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash-latest'];
 
 export async function extractPassportFromImage(imageInput: string): Promise<PassportExtractionResult> {
   if (!imageInput || typeof imageInput !== 'string') {
@@ -152,9 +83,6 @@ Rules:
 - NEVER return demo, mock, or hallucinated person names.
 - Return raw JSON only, no markdown backticks, no explanatory text.`;
 
-  // Get auto-detected and prioritized models
-  const candidateModels = await getAvailableModels(apiKey);
-
   let candidateText = '';
   let lastErrorMsg = '';
 
@@ -178,48 +106,39 @@ Rules:
     },
   };
 
-  // Try models with automatic fallback
-  for (const modelName of candidateModels) {
-    // Primary attempt: API version v1
-    const apiVersions = ['v1', 'v1beta'];
+  // Try gemini-2.0-flash first; if it fails, fallback to gemini-1.5-flash-latest
+  for (const modelName of STABLE_MODELS) {
+    const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
 
-    for (const apiVer of apiVersions) {
-      const url = `https://generativelanguage.googleapis.com/${apiVer}/models/${modelName}:generateContent?key=${apiKey}`;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestPayload),
+      });
 
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestPayload),
-        });
-
-        if (response.ok) {
-          const resJson = await response.json();
-          const text = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (text) {
-            candidateText = text;
-            break;
-          }
-        } else {
-          const errText = await response.text();
-          lastErrorMsg = `Model ${modelName} (${apiVer}): ${response.status} - ${errText}`;
-          console.warn(`Gemini attempt failed for ${modelName} (${apiVer}):`, errText);
+      if (response.ok) {
+        const resJson = await response.json();
+        const text = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          candidateText = text;
+          break;
         }
-      } catch (reqErr: any) {
-        lastErrorMsg = `Model ${modelName} (${apiVer}): ${reqErr?.message || reqErr}`;
-        console.warn(`Fetch error for ${modelName} (${apiVer}):`, reqErr);
+      } else {
+        const errText = await response.text();
+        lastErrorMsg = `Model ${modelName} (v1): ${response.status} - ${errText}`;
+        console.warn(`Gemini attempt failed for ${modelName} (v1):`, errText);
       }
-    }
-
-    if (candidateText) {
-      break;
+    } catch (reqErr: any) {
+      lastErrorMsg = `Model ${modelName} (v1): ${reqErr?.message || reqErr}`;
+      console.warn(`Fetch error for ${modelName} (v1):`, reqErr);
     }
   }
 
   if (!candidateText) {
-    throw new Error(`تصویر سے کوئی ڈیٹا حاصل نہیں ہو سکا (Extraction failed across available models: ${lastErrorMsg})`);
+    throw new Error(`تصویر سے کوئی ڈیٹا حاصل نہیں ہو سکا (Extraction failed: ${lastErrorMsg})`);
   }
 
   let parsed: any = {};
