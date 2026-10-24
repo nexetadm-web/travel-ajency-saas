@@ -15,6 +15,78 @@ export interface PassportExtractionResult {
   raw_text?: string;
 }
 
+/**
+ * Fetch list of models from Gemini API and order them by priority:
+ * 1. gemini-2.0-flash
+ * 2. gemini-1.5-flash-latest
+ * 3. gemini-1.5-flash
+ * 4. Any other model supporting generateContent
+ */
+async function getAvailableModels(apiKey: string): Promise<string[]> {
+  const preferredPriority = [
+    'gemini-2.0-flash',
+    'gemini-1.5-flash-latest',
+    'gemini-1.5-flash',
+    'gemini-2.5-flash',
+    'gemini-1.5-pro',
+    'gemini-1.5-pro-latest',
+  ];
+
+  try {
+    // First call ListModels API with v1
+    let res = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`);
+    if (!res.ok) {
+      // Fallback to v1beta for model listing if v1 returns non-200
+      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    }
+
+    if (res.ok) {
+      const data = await res.json();
+      const modelsList: Array<{ name: string; supportedGenerationMethods?: string[] }> = data?.models || [];
+
+      const contentModels = modelsList
+        .filter((m) => m.supportedGenerationMethods?.includes('generateContent'))
+        .map((m) => m.name.replace(/^models\//, ''));
+
+      if (contentModels.length > 0) {
+        const prioritized: string[] = [];
+
+        // 1. Add matching preferred models in order
+        for (const preferred of preferredPriority) {
+          const match = contentModels.find(
+            (m) => m.toLowerCase() === preferred.toLowerCase()
+          );
+          if (match && !prioritized.includes(match)) {
+            prioritized.push(match);
+          }
+        }
+
+        // 2. Add other flash models
+        for (const m of contentModels) {
+          if (m.toLowerCase().includes('flash') && !prioritized.includes(m)) {
+            prioritized.push(m);
+          }
+        }
+
+        // 3. Add any other models supporting generateContent
+        for (const m of contentModels) {
+          if (!prioritized.includes(m)) {
+            prioritized.push(m);
+          }
+        }
+
+        if (prioritized.length > 0) {
+          return prioritized;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('ListModels call warning, using default priority list:', err);
+  }
+
+  return preferredPriority;
+}
+
 export async function extractPassportFromImage(imageInput: string): Promise<PassportExtractionResult> {
   if (!imageInput || typeof imageInput !== 'string') {
     throw new Error('پاسپورٹ کی تصویر موصول نہیں ہوئی (Image not provided)');
@@ -80,58 +152,79 @@ Rules:
 - NEVER return demo, mock, or hallucinated person names.
 - Return raw JSON only, no markdown backticks, no explanatory text.`;
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
+  // Get auto-detected and prioritized models
+  const candidateModels = await getAvailableModels(apiKey);
+
+  let candidateText = '';
+  let lastErrorMsg = '';
+
+  const requestPayload = {
+    contents: [
+      {
+        parts: [
+          { text: prompt },
           {
-            parts: [
-              { text: prompt },
-              {
-                inline_data: {
-                  mime_type: mimeType,
-                  data: cleanBase64,
-                },
-              },
-            ],
+            inline_data: {
+              mime_type: mimeType,
+              data: cleanBase64,
+            },
           },
         ],
-        generationConfig: {
-          temperature: 0.1,
-          responseMimeType: 'application/json',
-        },
-      }),
-    }
-  );
+      },
+    ],
+    generationConfig: {
+      temperature: 0.1,
+      responseMimeType: 'application/json',
+    },
+  };
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('Gemini Vision API error response:', errorText);
-    let errMsg = `Gemini API returned status ${response.status}`;
-    try {
-      const errObj = JSON.parse(errorText);
-      if (errObj.error?.message) {
-        errMsg = errObj.error.message;
+  // Try models with automatic fallback
+  for (const modelName of candidateModels) {
+    // Primary attempt: API version v1
+    const apiVersions = ['v1', 'v1beta'];
+
+    for (const apiVer of apiVersions) {
+      const url = `https://generativelanguage.googleapis.com/${apiVer}/models/${modelName}:generateContent?key=${apiKey}`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestPayload),
+        });
+
+        if (response.ok) {
+          const resJson = await response.json();
+          const text = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) {
+            candidateText = text;
+            break;
+          }
+        } else {
+          const errText = await response.text();
+          lastErrorMsg = `Model ${modelName} (${apiVer}): ${response.status} - ${errText}`;
+          console.warn(`Gemini attempt failed for ${modelName} (${apiVer}):`, errText);
+        }
+      } catch (reqErr: any) {
+        lastErrorMsg = `Model ${modelName} (${apiVer}): ${reqErr?.message || reqErr}`;
+        console.warn(`Fetch error for ${modelName} (${apiVer}):`, reqErr);
       }
-    } catch {}
-    throw new Error(`AI اسکین میں خرابی: ${errMsg}`);
+    }
+
+    if (candidateText) {
+      break;
+    }
   }
 
-  const resJson = await response.json();
-  const candidateText = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
-
   if (!candidateText) {
-    throw new Error('تصویر سے کوئی ڈیٹا حاصل نہیں ہو سکا (No text extracted from image)');
+    throw new Error(`تصویر سے کوئی ڈیٹا حاصل نہیں ہو سکا (Extraction failed across available models: ${lastErrorMsg})`);
   }
 
   let parsed: any = {};
   try {
-    const cleanJson = candidateText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const cleanJson = candidateText.replace(/```json/gi, '').replace(/```/gi, '').trim();
     parsed = JSON.parse(cleanJson);
   } catch (parseErr) {
     const jsonMatch = candidateText.match(/\{[\s\S]*\}/);
