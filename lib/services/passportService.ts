@@ -15,8 +15,8 @@ export interface PassportExtractionResult {
   raw_text?: string;
 }
 
-// Use ONLY stable models in v1 API (no preview, pro-preview, or deep-research models)
-const STABLE_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash-latest'];
+// Exactly gemini-2.0-flash with fallback to gemini-1.5-flash in v1beta (no -latest suffix, no v1, no preview/deep-research)
+const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
 
 export async function extractPassportFromImage(imageInput: string): Promise<PassportExtractionResult> {
   if (!imageInput || typeof imageInput !== 'string') {
@@ -106,9 +106,9 @@ Rules:
     },
   };
 
-  // Try gemini-2.0-flash first; if it fails, fallback to gemini-1.5-flash-latest
-  for (const modelName of STABLE_MODELS) {
-    const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
+  // Try gemini-2.0-flash first; if it fails, fallback to gemini-1.5-flash in v1beta
+  for (const modelName of MODELS) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
     try {
       const response = await fetch(url, {
@@ -128,12 +128,12 @@ Rules:
         }
       } else {
         const errText = await response.text();
-        lastErrorMsg = `Model ${modelName} (v1): ${response.status} - ${errText}`;
-        console.warn(`Gemini attempt failed for ${modelName} (v1):`, errText);
+        lastErrorMsg = `Model ${modelName} (v1beta): ${response.status} - ${errText}`;
+        console.warn(`Gemini attempt failed for ${modelName} (v1beta):`, errText);
       }
     } catch (reqErr: any) {
-      lastErrorMsg = `Model ${modelName} (v1): ${reqErr?.message || reqErr}`;
-      console.warn(`Fetch error for ${modelName} (v1):`, reqErr);
+      lastErrorMsg = `Model ${modelName} (v1beta): ${reqErr?.message || reqErr}`;
+      console.warn(`Fetch error for ${modelName} (v1beta):`, reqErr);
     }
   }
 
