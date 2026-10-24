@@ -1,3 +1,6 @@
+import Tesseract from 'tesseract.js';
+import { parse as parseMRZ } from 'mrz';
+
 export interface PassportExtractionResult {
   full_name: string;
   name: string;
@@ -15,162 +18,128 @@ export interface PassportExtractionResult {
   raw_text?: string;
 }
 
-// Exactly gemini-2.0-flash with fallback to gemini-1.5-flash in v1beta (no -latest suffix, no v1, no preview/deep-research)
-const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
-
-export async function extractPassportFromImage(imageInput: string): Promise<PassportExtractionResult> {
-  if (!imageInput || typeof imageInput !== 'string') {
-    throw new Error('پاسپورٹ کی تصویر موصول نہیں ہوئی (Image not provided)');
-  }
-
-  // Detect MIME type and clean Base64 data
-  let mimeType = 'image/jpeg';
-  const mimeMatch = imageInput.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,/);
-  if (mimeMatch) {
-    mimeType = mimeMatch[1];
-  }
-  const cleanBase64 = imageInput.replace(/^data:[^;]+;base64,/, '').trim();
-
-  if (!cleanBase64) {
-    throw new Error('تصویر کا ڈیٹا درست نہیں ہے (Invalid image base64 data)');
-  }
-
-  const apiKey =
-    process.env.GEMINI_API_KEY ||
-    process.env.GOOGLE_API_KEY ||
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('Gemini API key is not configured (GEMINI_API_KEY env var missing)');
-  }
-
-  const prompt = `You are a high-accuracy Passport OCR and MRZ (Machine Readable Zone) extraction engine.
-Analyze the provided passport image carefully.
-Extract the following details from both visual inspection and the 2-line or 3-line MRZ at the bottom:
-1. full_name: Full name as printed on passport (Surname / Given names).
-2. passport_no: Passport number (e.g. PK1234567 or alphanumeric).
-3. dob: Date of birth in DD-MM-YYYY format.
-4. issue_date: Date of issue in DD-MM-YYYY format.
-5. expiry: Date of expiry in DD-MM-YYYY format.
-6. nationality: Country/Nationality (e.g. PAK, PAKISTAN, SAU, etc.).
-7. gender: Gender (M or F).
-8. father_name: Father or Spouse name if visible.
-9. cnic: National ID number / CNIC if visible.
-10. place_of_birth: City/Place of birth if visible.
-11. mrz: The exact MRZ text lines if visible.
-
-Return ONLY a valid JSON object with this exact structure:
-{
-  "full_name": "string",
-  "name": "string",
-  "passport_no": "string",
-  "dob": "string",
-  "issue_date": "string",
-  "expiry": "string",
-  "passport_expiry": "string",
-  "nationality": "string",
-  "gender": "string",
-  "father_name": "string",
-  "cnic": "string",
-  "place_of_birth": "string",
-  "mrz": "string"
+export function formatMRZDate(yymmdd: string | null | undefined, isExpiry: boolean = false): string {
+  if (!yymmdd || yymmdd.length < 6) return '';
+  const yy = parseInt(yymmdd.slice(0, 2), 10);
+  const mm = yymmdd.slice(2, 4);
+  const dd = yymmdd.slice(4, 6);
+  if (isNaN(yy)) return '';
+  const fullYear = isExpiry
+    ? (2000 + yy).toString()
+    : (yy > 40 ? 1900 + yy : 2000 + yy).toString();
+  return `${dd}-${mm}-${fullYear}`;
 }
 
-Rules:
-- Ensure 'name' is identical to 'full_name'.
-- Ensure 'passport_expiry' is identical to 'expiry'.
-- If a field is not visible or cannot be determined, set it to an empty string "".
-- NEVER return demo, mock, or hallucinated person names.
-- Return raw JSON only, no markdown backticks, no explanatory text.`;
+export function parseMRZFromLines(rawLines: string[]): Partial<PassportExtractionResult> {
+  const candidateLines = rawLines
+    .map((l) => l.replace(/\s+/g, '').toUpperCase().replace(/[«‹]/g, '<'))
+    .filter((l) => l.includes('<'));
 
-  let candidateText = '';
-  let lastErrorMsg = '';
-
-  const requestPayload = {
-    contents: [
-      {
-        parts: [
-          { text: prompt },
-          {
-            inline_data: {
-              mime_type: mimeType,
-              data: cleanBase64,
-            },
-          },
-        ],
-      },
-    ],
-    generationConfig: {
-      temperature: 0.1,
-      responseMimeType: 'application/json',
-    },
-  };
-
-  // Try gemini-2.0-flash first; if it fails, fallback to gemini-1.5-flash in v1beta
-  for (const modelName of MODELS) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestPayload),
-      });
-
-      if (response.ok) {
-        const resJson = await response.json();
-        const text = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) {
-          candidateText = text;
-          break;
-        }
-      } else {
-        const errText = await response.text();
-        lastErrorMsg = `Model ${modelName} (v1beta): ${response.status} - ${errText}`;
-        console.warn(`Gemini attempt failed for ${modelName} (v1beta):`, errText);
-      }
-    } catch (reqErr: any) {
-      lastErrorMsg = `Model ${modelName} (v1beta): ${reqErr?.message || reqErr}`;
-      console.warn(`Fetch error for ${modelName} (v1beta):`, reqErr);
-    }
+  let mrzLines: string[] = [];
+  const pIndex = candidateLines.findIndex((l) => l.includes('P<'));
+  if (pIndex !== -1 && candidateLines.length > pIndex + 1) {
+    let line1 = candidateLines[pIndex];
+    let line2 = candidateLines[pIndex + 1];
+    const pSub = line1.indexOf('P<');
+    if (pSub > 0) line1 = line1.slice(pSub);
+    mrzLines = [line1, line2];
+  } else {
+    mrzLines = candidateLines.slice(-2);
   }
 
-  if (!candidateText) {
-    throw new Error(`تصویر سے کوئی ڈیٹا حاصل نہیں ہو سکا (Extraction failed: ${lastErrorMsg})`);
+  if (mrzLines.length < 2) {
+    throw new Error('تصویر میں MRZ کوڈ (P<) نہیں ملا');
   }
 
-  let parsed: any = {};
+  // Normalize lines to 44 characters for TD3
+  const normalized = mrzLines.map((l) => {
+    if (l.length < 44) return l.padEnd(44, '<');
+    if (l.length > 44) return l.slice(0, 44);
+    return l;
+  });
+
+  let parsedFields: any = null;
   try {
-    const cleanJson = candidateText.replace(/```json/gi, '').replace(/```/gi, '').trim();
-    parsed = JSON.parse(cleanJson);
-  } catch (parseErr) {
-    const jsonMatch = candidateText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      parsed = JSON.parse(jsonMatch[0]);
-    } else {
-      throw new Error('پاسپورٹ ڈیٹا فارمیٹ درست نہیں تھا');
-    }
+    const parseResult = parseMRZ(normalized);
+    parsedFields = parseResult?.fields;
+  } catch (err) {
+    console.warn('MRZ parse error, using fallback regex:', err);
   }
 
-  const fullName = (parsed.full_name || parsed.name || '').trim().toUpperCase();
-  const expiry = (parsed.expiry || parsed.passport_expiry || '').trim();
+  let passportNo = '';
+  let firstName = '';
+  let lastName = '';
+  let birthDate = '';
+  let expiryDate = '';
+  let nationality = '';
+  let sex = '';
+
+  if (parsedFields) {
+    passportNo = (parsedFields.documentNumber || '').replace(/</g, '').trim().toUpperCase();
+    firstName = (parsedFields.firstName || '').replace(/</g, ' ').trim().toUpperCase();
+    lastName = (parsedFields.lastName || '').replace(/</g, ' ').trim().toUpperCase();
+    birthDate = formatMRZDate(parsedFields.birthDate, false);
+    expiryDate = formatMRZDate(parsedFields.expirationDate || parsedFields.expiryDate, true);
+    nationality = (parsedFields.nationality || parsedFields.issuingState || '').replace(/</g, '').trim().toUpperCase();
+    sex = (parsedFields.sex || '').toUpperCase();
+  } else {
+    const line1 = normalized[0];
+    const line2 = normalized[1];
+    const namePart = line1.slice(5);
+    const [lastPart, firstPart] = namePart.split('<<');
+    lastName = (lastPart || '').replace(/</g, ' ').trim().toUpperCase();
+    firstName = (firstPart || '').replace(/</g, ' ').trim().toUpperCase();
+    passportNo = line2.slice(0, 9).replace(/</g, '').trim().toUpperCase();
+    nationality = line2.slice(10, 13).replace(/</g, '').trim().toUpperCase();
+    birthDate = formatMRZDate(line2.slice(13, 19), false);
+    sex = line2.charAt(20).toUpperCase();
+    expiryDate = formatMRZDate(line2.slice(21, 27), true);
+  }
+
+  const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
 
   return {
     full_name: fullName,
     name: fullName,
-    passport_no: (parsed.passport_no || '').trim().toUpperCase(),
-    dob: (parsed.dob || parsed.date_of_birth || '').trim(),
-    issue_date: (parsed.issue_date || '').trim(),
-    expiry: expiry,
-    passport_expiry: expiry,
-    nationality: (parsed.nationality || '').trim().toUpperCase(),
-    gender: (parsed.gender || parsed.sex || '').trim().toUpperCase(),
-    father_name: (parsed.father_name || '').trim().toUpperCase(),
-    cnic: (parsed.cnic || '').trim(),
-    place_of_birth: (parsed.place_of_birth || '').trim().toUpperCase(),
-    mrz: (parsed.mrz || '').trim(),
-    raw_text: candidateText,
+    passport_no: passportNo,
+    dob: birthDate,
+    expiry: expiryDate,
+    passport_expiry: expiryDate,
+    nationality,
+    gender: sex,
+    father_name: '',
+    cnic: '',
+    place_of_birth: '',
+    mrz: normalized.join('\n'),
+  };
+}
+
+export async function extractPassportFromImage(imageInput: string | Buffer): Promise<PassportExtractionResult> {
+  let imageSource: any = imageInput;
+
+  if (typeof imageInput === 'string' && imageInput.startsWith('data:')) {
+    const base64Data = imageInput.replace(/^data:[^;]+;base64,/, '').trim();
+    imageSource = Buffer.from(base64Data, 'base64');
+  }
+
+  const { data: { text } } = await Tesseract.recognize(imageSource, 'eng');
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const mrzData = parseMRZFromLines(lines);
+
+  return {
+    full_name: mrzData.full_name || '',
+    name: mrzData.name || '',
+    passport_no: mrzData.passport_no || '',
+    dob: mrzData.dob || '',
+    issue_date: '',
+    expiry: mrzData.expiry || '',
+    passport_expiry: mrzData.passport_expiry || '',
+    nationality: mrzData.nationality || '',
+    gender: mrzData.gender || '',
+    father_name: mrzData.father_name || '',
+    cnic: '',
+    place_of_birth: '',
+    mrz: mrzData.mrz || '',
+    raw_text: text,
   };
 }

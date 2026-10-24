@@ -21,6 +21,18 @@ import {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+function formatMRZDate(yymmdd: string | null | undefined, isExpiry: boolean = false): string {
+  if (!yymmdd || yymmdd.length < 6) return '';
+  const yy = parseInt(yymmdd.slice(0, 2), 10);
+  const mm = yymmdd.slice(2, 4);
+  const dd = yymmdd.slice(4, 6);
+  if (isNaN(yy)) return '';
+  const fullYear = isExpiry
+    ? (2000 + yy).toString()
+    : (yy > 40 ? 1900 + yy : 2000 + yy).toString();
+  return `${dd}-${mm}-${fullYear}`;
+}
+
 export default function NewPilgrimPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,6 +69,7 @@ export default function NewPilgrimPage() {
   const [scanModalOpen, setScanModalOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
   const [pulseGlow, setPulseGlow] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -68,6 +81,7 @@ export default function NewPilgrimPage() {
     father_name: '',
     passport_no: '',
     passport_expiry: '',
+    dob: '',
     cnic: '',
     phone: '',
     pnr: '',
@@ -79,47 +93,129 @@ export default function NewPilgrimPage() {
     payment_paid: '50000',
   });
 
-  const handlePassportUpload = async (file: File) => {
+  // Client-side MRZ Scanner (No AI, No API Key)
+  const scanPassportMRZ = async (file: File) => {
     if (!file) return;
 
     setScanning(true);
     setScanSuccess(false);
+    setSuccessMsg('');
     setErrorMsg('');
 
     try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result as string;
-        const res = await fetch('/api/passport/scan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: base64, fileName: file.name }),
-        });
+      // Dynamic import to keep initial bundle ultra-fast
+      const Tesseract = (await import('tesseract.js')).default;
+      const { parse } = await import('mrz');
 
-        const data = await res.json();
-        if (res.ok && data.data) {
-          // Auto-fill form fields with optimistic UI
-          setForm((prev) => ({
-            ...prev,
-            full_name: data.data.name || prev.full_name,
-            father_name: data.data.father_name || prev.father_name,
-            passport_no: data.data.passport_no || prev.passport_no,
-            passport_expiry: data.data.expiry || prev.passport_expiry,
-            cnic: data.data.cnic || prev.cnic,
-            passport_scan_data: data.data,
-          }));
-          setScanSuccess(true);
-          setPulseGlow(true);
-          setTimeout(() => setPulseGlow(false), 4000);
-          setScanModalOpen(false);
-        } else {
-          setErrorMsg(data.error || 'پاسپورٹ اسکین نہیں ہو سکا');
-        }
-        setScanning(false);
-      };
-      reader.readAsDataURL(file);
+      // Use Tesseract.js to read image: Tesseract.recognize(file, 'eng')
+      const { data: { text } } = await Tesseract.recognize(file, 'eng');
+
+      // Find last 2 lines containing P< and <
+      const rawLines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+      const candidateLines = rawLines
+        .map((l) => l.replace(/\s+/g, '').toUpperCase().replace(/[«‹]/g, '<'))
+        .filter((l) => l.includes('<'));
+
+      let mrzLines: string[] = [];
+      const pIndex = candidateLines.findIndex((l) => l.includes('P<'));
+      if (pIndex !== -1 && candidateLines.length > pIndex + 1) {
+        let line1 = candidateLines[pIndex];
+        let line2 = candidateLines[pIndex + 1];
+        const pSub = line1.indexOf('P<');
+        if (pSub > 0) line1 = line1.slice(pSub);
+        mrzLines = [line1, line2];
+      } else {
+        mrzLines = candidateLines.slice(-2);
+      }
+
+      if (mrzLines.length < 2) {
+        throw new Error('تصویر میں MRZ کوڈ (P<) نہیں ملا۔ آپ ڈیٹا دستی طور پر درج کر سکتے ہیں۔');
+      }
+
+      // Normalize lines to 44 characters for TD3
+      const normalized = mrzLines.map((l) => {
+        if (l.length < 44) return l.padEnd(44, '<');
+        if (l.length > 44) return l.slice(0, 44);
+        return l;
+      });
+
+      // Parse using mrz library: parse(mrzLines)
+      let parsedFields: any = null;
+      try {
+        const parsed = parse(normalized);
+        parsedFields = parsed?.fields;
+      } catch (parseErr) {
+        console.warn('mrz parse warning, using fallback parser:', parseErr);
+      }
+
+      let documentNumber = '';
+      let firstName = '';
+      let lastName = '';
+      let birthDate = '';
+      let expiryDate = '';
+      let nationality = '';
+      let sex = '';
+
+      if (parsedFields) {
+        documentNumber = (parsedFields.documentNumber || '').replace(/</g, '').trim().toUpperCase();
+        firstName = (parsedFields.firstName || '').replace(/</g, ' ').trim().toUpperCase();
+        lastName = (parsedFields.lastName || '').replace(/</g, ' ').trim().toUpperCase();
+        birthDate = formatMRZDate(parsedFields.birthDate, false);
+        expiryDate = formatMRZDate(parsedFields.expirationDate || parsedFields.expiryDate, true);
+        nationality = (parsedFields.nationality || parsedFields.issuingState || '').replace(/</g, '').trim().toUpperCase();
+        sex = (parsedFields.sex || '').toUpperCase();
+      } else {
+        // Fallback line slicing
+        const line1 = normalized[0];
+        const line2 = normalized[1];
+        const namePart = line1.slice(5);
+        const [lastPart, firstPart] = namePart.split('<<');
+        lastName = (lastPart || '').replace(/</g, ' ').trim().toUpperCase();
+        firstName = (firstPart || '').replace(/</g, ' ').trim().toUpperCase();
+        documentNumber = line2.slice(0, 9).replace(/</g, '').trim().toUpperCase();
+        nationality = line2.slice(10, 13).replace(/</g, '').trim().toUpperCase();
+        birthDate = formatMRZDate(line2.slice(13, 19), false);
+        sex = line2.charAt(20).toUpperCase();
+        expiryDate = formatMRZDate(line2.slice(21, 27), true);
+      }
+
+      const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
+
+      if (!documentNumber && !fullName) {
+        throw new Error('MRZ ڈیٹا درست طریقے سے نہیں پڑھا جا سکا۔ آپ دستی طور پر اندراج کر سکتے ہیں۔');
+      }
+
+      // Auto-fill form fields: passport number, full name, DOB, expiry, father name.
+      setForm((prev) => ({
+        ...prev,
+        passport_no: documentNumber || prev.passport_no,
+        full_name: fullName || prev.full_name,
+        dob: birthDate || prev.dob,
+        passport_expiry: expiryDate || prev.passport_expiry,
+        father_name: prev.father_name,
+        passport_scan_data: {
+          documentNumber,
+          firstName,
+          lastName,
+          birthDate,
+          expiryDate,
+          nationality,
+          sex,
+          mrz: normalized.join('\n'),
+        },
+      }));
+
+      // Show message: "MRZ se data mil gaya" on success.
+      setSuccessMsg('MRZ se data mil gaya');
+      setScanSuccess(true);
+      setPulseGlow(true);
+      setTimeout(() => setPulseGlow(false), 4000);
+      setScanModalOpen(false);
     } catch (err: any) {
-      setErrorMsg(err.message || 'فائل اپلوڈ میں خرابی');
+      console.error('MRZ OCR error:', err);
+      // Keep manual input if OCR fails.
+      setErrorMsg(err.message || 'MRZ اسکین نہیں ہو سکا۔ آپ معلومات خود ہاتھ سے (Manually) درج کر سکتے ہیں۔');
+    } finally {
       setScanning(false);
     }
   };
@@ -127,7 +223,7 @@ export default function NewPilgrimPage() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (file) handlePassportUpload(file);
+    if (file) scanPassportMRZ(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -175,18 +271,18 @@ export default function NewPilgrimPage() {
           </Link>
           <div>
             <h1 className="font-urdu text-[18px] sm:text-[22px] md:text-[26px] font-bold leading-[1.4] break-words text-gray-900">نیا حاجی / زائر رجسٹر کریں (New Haji)</h1>
-            <p className="text-xs text-gray-500 break-words">پاسپورٹ AI خودکار اسکین یا دستی اندراج</p>
+            <p className="text-xs text-gray-500 break-words">پاسپورٹ MRZ خودکار اسکین یا دستی اندراج</p>
           </div>
         </div>
 
-        {/* Top Button requested in Phase 3 */}
+        {/* Top Button */}
         <button
           type="button"
           onClick={() => setScanModalOpen(true)}
           className="px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 hover:from-emerald-600 hover:to-teal-700 flex items-center gap-2 transition"
         >
           <Camera className="w-4 h-4" />
-          🛂 Passport Scan - Photo se Data Auto
+          🛂 Passport MRZ Scan - Photo se Data Auto
         </button>
       </div>
 
@@ -199,7 +295,7 @@ export default function NewPilgrimPage() {
                 <span className="p-2 rounded-xl bg-emerald-100 text-emerald-600">
                   <Sparkles className="w-5 h-5" />
                 </span>
-                <h3 className="font-bold text-base text-gray-900">پاسپورٹ AI اسکین</h3>
+                <h3 className="font-bold text-base text-gray-900">پاسپورٹ MRZ اسکینر</h3>
               </div>
               <button
                 onClick={() => setScanModalOpen(false)}
@@ -220,7 +316,7 @@ export default function NewPilgrimPage() {
                 ref={fileInputRef}
                 onChange={(e) => {
                   const f = e.target.files?.[0];
-                  if (f) handlePassportUpload(f);
+                  if (f) scanPassportMRZ(f);
                 }}
                 accept="image/*"
                 className="hidden"
@@ -234,19 +330,19 @@ export default function NewPilgrimPage() {
               </div>
               <div>
                 <p className="font-bold text-gray-800 text-sm">
-                  {scanning ? 'Passport parh raha hai...' : 'Passport photo yahan daalein'}
+                  {scanning ? 'MRZ پڑھا جا رہا ہے...' : 'Passport photo yahan daalein'}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {scanning ? 'براہ کرم انتظار فرمائیں، AI تصویر سے ڈیٹا پڑھ رہا ہے...' : 'یا کلک کر کے اپنے کمپیوٹر / موبائل سے تصویر منتخب کریں'}
+                  {scanning ? 'براہ کرم انتظار فرمائیں، Tesseract OCR سے پاسپورٹ پڑھا جا رہا ہے...' : 'یا کلک کر کے اپنے کمپیوٹر / موبائل سے تصویر منتخب کریں'}
                 </p>
               </div>
               <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
-                95% درستگی اور فوری آٹو فِل
+                100% لوکل MRZ ریکگنیشن
               </span>
             </div>
 
             <div className="text-xs text-gray-500 text-center">
-              نام، والد کا نام، پاسپورٹ نمبر، ایکسپائری، اور شناختی کارڈ خودکار طور پر درج ہو جائے گا۔
+              پاسپورٹ نمبر، نام، تاریخ پیدائش، اور ایکسپائری خودکار طور پر درج ہو جائے گی۔
             </div>
           </div>
         </div>
@@ -258,12 +354,12 @@ export default function NewPilgrimPage() {
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
             <div>
-              <span className="font-bold block">پاسپورٹ کامیابی سے اسکین ہو گیا!</span>
-              <span className="text-[11px] text-emerald-700">فارم کے خانے خودکار طور پر بھر دیے گئے ہیں۔</span>
+              <span className="font-bold block">{successMsg || 'MRZ se data mil gaya'}</span>
+              <span className="text-[11px] text-emerald-700">فارم کے خانے خودکار طور پر بھر دیے گئے ہیں۔ (MRZ se data mil gaya)</span>
             </div>
           </div>
           <span className="px-3 py-1 rounded-full bg-emerald-600 text-white font-bold text-xs shadow-sm">
-            95% accurate - edit if needed
+            MRZ Success
           </span>
         </div>
       )}
@@ -275,7 +371,7 @@ export default function NewPilgrimPage() {
         </div>
       )}
 
-      {/* REGISTRATION FORM */}
+      {/* REGISTRATION FORM (Manual Input Always Available) */}
       <form
         onSubmit={handleSubmit}
         className={`bg-white rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-6 space-y-6 transition-all duration-500 ${
@@ -392,6 +488,22 @@ export default function NewPilgrimPage() {
               onChange={(e) => setForm({ ...form, passport_no: e.target.value })}
               placeholder="e.g. AB1234567"
               className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono font-bold ${
+                pulseGlow ? 'bg-emerald-50/70 border-emerald-400' : ''
+              }`}
+            />
+          </div>
+
+          {/* Date of Birth (DOB) */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1.5">
+              تاریخ پیدائش (DOB DD-MM-YYYY)
+            </label>
+            <input
+              type="text"
+              value={form.dob}
+              onChange={(e) => setForm({ ...form, dob: e.target.value })}
+              placeholder="DD-MM-YYYY"
+              className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 ${
                 pulseGlow ? 'bg-emerald-50/70 border-emerald-400' : ''
               }`}
             />

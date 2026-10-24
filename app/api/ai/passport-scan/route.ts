@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Extract real data using Gemini 1.5 Flash Vision
+    // Extract real data using MRZ OCR
     const extractedData = await extractPassportFromImage(base64Image);
 
     // Save scan to passport_scans table

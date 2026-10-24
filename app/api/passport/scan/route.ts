@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: extractedData,
-      message: 'Passport scanned successfully via Gemini Vision AI',
+      message: 'Passport scanned successfully via MRZ OCR',
     });
   } catch (error: any) {
     console.error('Passport scan API error:', error);
