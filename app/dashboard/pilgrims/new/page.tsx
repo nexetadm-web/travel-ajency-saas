@@ -233,9 +233,11 @@ export default function NewPilgrimPage() {
                 )}
               </div>
               <div>
-                <p className="font-bold text-gray-800 text-sm">Passport photo yahan daalein</p>
+                <p className="font-bold text-gray-800 text-sm">
+                  {scanning ? 'Passport parh raha hai...' : 'Passport photo yahan daalein'}
+                </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  یا کلک کر کے اپنے کمپیوٹر / موبائل سے تصویر منتخب کریں
+                  {scanning ? 'براہ کرم انتظار فرمائیں، AI تصویر سے ڈیٹا پڑھ رہا ہے...' : 'یا کلک کر کے اپنے کمپیوٹر / موبائل سے تصویر منتخب کریں'}
                 </p>
               </div>
               <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">

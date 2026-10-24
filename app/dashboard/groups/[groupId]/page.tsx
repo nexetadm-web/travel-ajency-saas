@@ -977,7 +977,7 @@ export default function GroupDetailsPage() {
                 className="px-3.5 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow transition flex items-center gap-1.5"
               >
                 {scanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
-                اسکین AI
+                {scanning ? 'Passport parh raha hai...' : 'اسکین AI'}
               </button>
             </div>
 
