@@ -31,40 +31,97 @@ export function formatMRZDate(yymmdd: string | null | undefined, isExpiry: boole
 }
 
 export function parseMRZFromLines(rawLines: string[]): Partial<PassportExtractionResult> {
-  const candidateLines = rawLines
-    .map((l) => l.replace(/\s+/g, '').toUpperCase().replace(/[«‹]/g, '<'))
-    .filter((l) => l.includes('<'));
+  const cleanedLines = rawLines.map((l) =>
+    l.replace(/\s+/g, '').toUpperCase().replace(/[«‹]/g, '<')
+  );
 
-  let mrzLines: string[] = [];
-  const pIndex = candidateLines.findIndex((l) => l.includes('P<'));
-  if (pIndex !== -1 && candidateLines.length > pIndex + 1) {
-    let line1 = candidateLines[pIndex];
-    let line2 = candidateLines[pIndex + 1];
-    const pSub = line1.indexOf('P<');
-    if (pSub > 0) line1 = line1.slice(pSub);
-    mrzLines = [line1, line2];
-  } else {
-    mrzLines = candidateLines.slice(-2);
+  // Reject any line like TBLFT or PASSPORT
+  const filteredLines = cleanedLines.filter((l) => {
+    if (l.includes('TBLFT') || l.includes('PASSPORT')) return false;
+    if (!l.includes('<')) return false;
+    return true;
+  });
+
+  // From OCR text, find ONLY lines that are 44 characters long and contain P<PAK or PK.
+  // If not found, find lines that have << and length > 30.
+  let line1Candidates = filteredLines.filter(
+    (l) => (l.includes('P<PAK') || l.includes('P<PK') || l.includes('P<')) && l.length === 44
+  );
+  if (line1Candidates.length === 0) {
+    line1Candidates = filteredLines.filter(
+      (l) => (l.includes('P<PAK') || l.includes('P<PK') || l.includes('P<')) && l.length > 30
+    );
+  }
+  if (line1Candidates.length === 0) {
+    line1Candidates = filteredLines.filter((l) => l.includes('<<') && l.length > 30);
   }
 
-  if (mrzLines.length < 2) {
+  if (line1Candidates.length === 0) {
+    throw new Error('تصویر میں پاسپورٹ MRZ لائن نہیں مل سکی');
+  }
+
+  const normalize44 = (str: string) => {
+    let s = str.trim().toUpperCase();
+    const pIndex = s.indexOf('P<');
+    if (pIndex > 0) s = s.slice(pIndex);
+    if (s.length < 44) return s.padEnd(44, '<');
+    return s.slice(0, 44);
+  };
+
+  const candidatePairs: string[][] = [];
+  for (const l1 of line1Candidates) {
+    const idx = filteredLines.indexOf(l1);
+    if (idx !== -1 && idx + 1 < filteredLines.length) {
+      candidatePairs.push([normalize44(l1), normalize44(filteredLines[idx + 1])]);
+    }
+    for (const l2 of filteredLines) {
+      if (l2 !== l1 && l2.length > 30 && !l2.startsWith('P<')) {
+        candidatePairs.push([normalize44(l1), normalize44(l2)]);
+      }
+    }
+  }
+
+  if (candidatePairs.length === 0) {
+    if (filteredLines.length >= 2) {
+      candidatePairs.push([
+        normalize44(filteredLines[filteredLines.length - 2]),
+        normalize44(filteredLines[filteredLines.length - 1]),
+      ]);
+    }
+  }
+
+  if (candidatePairs.length === 0) {
     throw new Error('تصویر میں MRZ کوڈ (P<) نہیں ملا');
   }
 
-  // Normalize lines to 44 characters for TD3
-  const normalized = mrzLines.map((l) => {
-    if (l.length < 44) return l.padEnd(44, '<');
-    if (l.length > 44) return l.slice(0, 44);
-    return l;
-  });
+  let bestResult: any = null;
+  let bestPair: string[] = [];
+  let secondBestResult: any = null;
+  let secondBestPair: string[] = [];
 
-  let parsedFields: any = null;
-  try {
-    const parseResult = parseMRZ(normalized);
-    parsedFields = parseResult?.fields;
-  } catch (err) {
-    console.warn('MRZ parse error, using fallback regex:', err);
+  for (const pair of candidatePairs) {
+    try {
+      const parsed = parseMRZ(pair);
+      if (parsed?.valid) {
+        bestResult = parsed;
+        bestPair = pair;
+        break;
+      } else if (!secondBestResult && parsed?.fields) {
+        secondBestResult = parsed;
+        secondBestPair = pair;
+      }
+    } catch (err) {
+      // Continue if format error
+    }
   }
+
+  const chosenResult = bestResult || secondBestResult;
+  const chosenPair =
+    bestPair.length > 0
+      ? bestPair
+      : secondBestPair.length > 0
+      ? secondBestPair
+      : candidatePairs[0];
 
   let passportNo = '';
   let firstName = '';
@@ -74,17 +131,18 @@ export function parseMRZFromLines(rawLines: string[]): Partial<PassportExtractio
   let nationality = '';
   let sex = '';
 
-  if (parsedFields) {
-    passportNo = (parsedFields.documentNumber || '').replace(/</g, '').trim().toUpperCase();
-    firstName = (parsedFields.firstName || '').replace(/</g, ' ').trim().toUpperCase();
-    lastName = (parsedFields.lastName || '').replace(/</g, ' ').trim().toUpperCase();
-    birthDate = formatMRZDate(parsedFields.birthDate, false);
-    expiryDate = formatMRZDate(parsedFields.expirationDate || parsedFields.expiryDate, true);
-    nationality = (parsedFields.nationality || parsedFields.issuingState || '').replace(/</g, '').trim().toUpperCase();
-    sex = (parsedFields.sex || '').toUpperCase();
+  if (chosenResult?.fields) {
+    const f = chosenResult.fields;
+    passportNo = (f.documentNumber || '').replace(/</g, '').trim().toUpperCase();
+    firstName = (f.firstName || '').replace(/</g, ' ').trim().toUpperCase();
+    lastName = (f.lastName || '').replace(/</g, ' ').trim().toUpperCase();
+    birthDate = formatMRZDate(f.birthDate, false);
+    expiryDate = formatMRZDate(f.expirationDate || f.expiryDate, true);
+    nationality = (f.nationality || f.issuingState || '').replace(/</g, '').trim().toUpperCase();
+    sex = (f.sex || '').toUpperCase();
   } else {
-    const line1 = normalized[0];
-    const line2 = normalized[1];
+    const line1 = chosenPair[0];
+    const line2 = chosenPair[1];
     const namePart = line1.slice(5);
     const [lastPart, firstPart] = namePart.split('<<');
     lastName = (lastPart || '').replace(/</g, ' ').trim().toUpperCase();
@@ -110,7 +168,7 @@ export function parseMRZFromLines(rawLines: string[]): Partial<PassportExtractio
     father_name: '',
     cnic: '',
     place_of_birth: '',
-    mrz: normalized.join('\n'),
+    mrz: chosenPair.join('\n'),
   };
 }
 
@@ -122,7 +180,12 @@ export async function extractPassportFromImage(imageInput: string | Buffer): Pro
     imageSource = Buffer.from(base64Data, 'base64');
   }
 
-  const { data: { text } } = await Tesseract.recognize(imageSource, 'eng');
+  const { data: { text } } = await Tesseract.recognize(imageSource, 'eng', {
+    // @ts-ignore
+    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',
+    // @ts-ignore
+    psm: 6,
+  });
   const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   const mrzData = parseMRZFromLines(lines);
 

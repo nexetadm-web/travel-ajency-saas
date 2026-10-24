@@ -70,6 +70,7 @@ export default function NewPilgrimPage() {
   const [scanning, setScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [detectedMRZLines, setDetectedMRZLines] = useState<string[]>([]);
   const [pulseGlow, setPulseGlow] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -93,6 +94,83 @@ export default function NewPilgrimPage() {
     payment_paid: '50000',
   });
 
+  // IMAGE PREPROCESS (Zaroori):
+  // Take image, create canvas. Crop ONLY bottom 35% of passport (where MRZ is).
+  // Convert to grayscale, increase contrast by 2x, upscale image to 2x size.
+  const preprocessPassportImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const originalWidth = img.naturalWidth || img.width;
+            const originalHeight = img.naturalHeight || img.height;
+
+            // Crop ONLY bottom 35% of passport (where MRZ is)
+            const cropHeight = originalHeight * 0.35;
+            const cropStartY = originalHeight * 0.65;
+
+            // Upscale image to 2x size
+            const targetWidth = Math.floor(originalWidth * 2);
+            const targetHeight = Math.floor(cropHeight * 2);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            if (!ctx) {
+              return resolve(img.src);
+            }
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            // Draw cropped bottom 35% upscaled 2x
+            ctx.drawImage(
+              img,
+              0,
+              cropStartY,
+              originalWidth,
+              cropHeight,
+              0,
+              0,
+              targetWidth,
+              targetHeight
+            );
+
+            // Convert to grayscale, increase contrast by 2x
+            const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              // Luminance grayscale
+              const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+              // Increase contrast by 2x
+              const contrasted = (gray - 128) * 2 + 128;
+              const finalVal = Math.min(255, Math.max(0, contrasted));
+
+              data[i] = finalVal;
+              data[i + 1] = finalVal;
+              data[i + 2] = finalVal;
+            }
+            ctx.putImageData(imageData, 0, 0);
+
+            resolve(canvas.toDataURL('image/png'));
+          } catch (err) {
+            reject(err);
+          }
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   // Client-side MRZ Scanner (No AI, No API Key)
   const scanPassportMRZ = async (file: File) => {
     if (!file) return;
@@ -101,52 +179,123 @@ export default function NewPilgrimPage() {
     setScanSuccess(false);
     setSuccessMsg('');
     setErrorMsg('');
+    setDetectedMRZLines([]);
 
     try {
-      // Dynamic import to keep initial bundle ultra-fast
+      // 1. IMAGE PREPROCESS (Zaroori)
+      const croppedImage = await preprocessPassportImage(file);
+
+      // 2. TESSERACT CONFIG
       const Tesseract = (await import('tesseract.js')).default;
       const { parse } = await import('mrz');
 
-      // Use Tesseract.js to read image: Tesseract.recognize(file, 'eng')
-      const { data: { text } } = await Tesseract.recognize(file, 'eng');
-
-      // Find last 2 lines containing P< and <
-      const rawLines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-      const candidateLines = rawLines
-        .map((l) => l.replace(/\s+/g, '').toUpperCase().replace(/[«‹]/g, '<'))
-        .filter((l) => l.includes('<'));
-
-      let mrzLines: string[] = [];
-      const pIndex = candidateLines.findIndex((l) => l.includes('P<'));
-      if (pIndex !== -1 && candidateLines.length > pIndex + 1) {
-        let line1 = candidateLines[pIndex];
-        let line2 = candidateLines[pIndex + 1];
-        const pSub = line1.indexOf('P<');
-        if (pSub > 0) line1 = line1.slice(pSub);
-        mrzLines = [line1, line2];
-      } else {
-        mrzLines = candidateLines.slice(-2);
-      }
-
-      if (mrzLines.length < 2) {
-        throw new Error('تصویر میں MRZ کوڈ (P<) نہیں ملا۔ آپ ڈیٹا دستی طور پر درج کر سکتے ہیں۔');
-      }
-
-      // Normalize lines to 44 characters for TD3
-      const normalized = mrzLines.map((l) => {
-        if (l.length < 44) return l.padEnd(44, '<');
-        if (l.length > 44) return l.slice(0, 44);
-        return l;
+      // Use this exact config:
+      const { data: { text } } = await Tesseract.recognize(croppedImage, 'eng', {
+        // @ts-ignore
+        tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',
+        // @ts-ignore
+        psm: 6,
       });
 
-      // Parse using mrz library: parse(mrzLines)
-      let parsedFields: any = null;
-      try {
-        const parsed = parse(normalized);
-        parsedFields = parsed?.fields;
-      } catch (parseErr) {
-        console.warn('mrz parse warning, using fallback parser:', parseErr);
+      // 3. MRZ FILTER
+      const rawLines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+      const cleanedLines = rawLines.map((l) =>
+        l.replace(/\s+/g, '').toUpperCase().replace(/[«‹]/g, '<')
+      );
+
+      // Reject any line like TBLFT or PASSPORT
+      const filteredLines = cleanedLines.filter((l) => {
+        if (l.includes('TBLFT') || l.includes('PASSPORT')) return false;
+        if (!l.includes('<')) return false;
+        return true;
+      });
+
+      // From OCR text, find ONLY lines that are 44 characters long and contain P<PAK or PK.
+      // If not found, find lines that have << and length > 30.
+      let line1Candidates = filteredLines.filter(
+        (l) => (l.includes('P<PAK') || l.includes('P<PK') || l.includes('P<')) && l.length === 44
+      );
+      if (line1Candidates.length === 0) {
+        line1Candidates = filteredLines.filter(
+          (l) => (l.includes('P<PAK') || l.includes('P<PK') || l.includes('P<')) && l.length > 30
+        );
       }
+      if (line1Candidates.length === 0) {
+        line1Candidates = filteredLines.filter((l) => l.includes('<<') && l.length > 30);
+      }
+
+      if (line1Candidates.length === 0) {
+        throw new Error('تصویر کے نچلے حصے میں پاسپورٹ MRZ لائن نہیں مل سکی۔ آپ معلومات ہاتھ سے درج کر سکتے ہیں۔');
+      }
+
+      const normalize44 = (str: string) => {
+        let s = str.trim().toUpperCase();
+        const pIndex = s.indexOf('P<');
+        if (pIndex > 0) s = s.slice(pIndex);
+        if (s.length < 44) return s.padEnd(44, '<');
+        return s.slice(0, 44);
+      };
+
+      // Form candidate pairs
+      const candidatePairs: string[][] = [];
+      for (const l1 of line1Candidates) {
+        const idx = filteredLines.indexOf(l1);
+        if (idx !== -1 && idx + 1 < filteredLines.length) {
+          candidatePairs.push([normalize44(l1), normalize44(filteredLines[idx + 1])]);
+        }
+        for (const l2 of filteredLines) {
+          if (l2 !== l1 && l2.length > 30 && !l2.startsWith('P<')) {
+            candidatePairs.push([normalize44(l1), normalize44(l2)]);
+          }
+        }
+      }
+
+      if (candidatePairs.length === 0) {
+        if (filteredLines.length >= 2) {
+          candidatePairs.push([
+            normalize44(filteredLines[filteredLines.length - 2]),
+            normalize44(filteredLines[filteredLines.length - 1]),
+          ]);
+        }
+      }
+
+      if (candidatePairs.length === 0) {
+        throw new Error('MRZ کی دوسری لائن نہیں مل سکی۔ آپ معلومات دستی طور پر درج کر سکتے ہیں۔');
+      }
+
+      // Parse ONLY those 2 MRZ lines with mrz library.
+      // Validate checksum, if checksum fails, try second best OCR result.
+      let bestResult: any = null;
+      let bestPair: string[] = [];
+      let secondBestResult: any = null;
+      let secondBestPair: string[] = [];
+
+      for (const pair of candidatePairs) {
+        try {
+          const parsed = parse(pair);
+          if (parsed?.valid) {
+            bestResult = parsed;
+            bestPair = pair;
+            break;
+          } else if (!secondBestResult && parsed?.fields) {
+            secondBestResult = parsed;
+            secondBestPair = pair;
+          }
+        } catch (err) {
+          // Continue if format error
+        }
+      }
+
+      const chosenResult = bestResult || secondBestResult;
+      const chosenPair =
+        bestPair.length > 0
+          ? bestPair
+          : secondBestPair.length > 0
+          ? secondBestPair
+          : candidatePairs[0];
+
+      // SHOW MRZ LINES: In UI, show the 2 detected MRZ lines in a small box so user can verify
+      setDetectedMRZLines(chosenPair);
 
       let documentNumber = '';
       let firstName = '';
@@ -156,18 +305,19 @@ export default function NewPilgrimPage() {
       let nationality = '';
       let sex = '';
 
-      if (parsedFields) {
-        documentNumber = (parsedFields.documentNumber || '').replace(/</g, '').trim().toUpperCase();
-        firstName = (parsedFields.firstName || '').replace(/</g, ' ').trim().toUpperCase();
-        lastName = (parsedFields.lastName || '').replace(/</g, ' ').trim().toUpperCase();
-        birthDate = formatMRZDate(parsedFields.birthDate, false);
-        expiryDate = formatMRZDate(parsedFields.expirationDate || parsedFields.expiryDate, true);
-        nationality = (parsedFields.nationality || parsedFields.issuingState || '').replace(/</g, '').trim().toUpperCase();
-        sex = (parsedFields.sex || '').toUpperCase();
+      if (chosenResult?.fields) {
+        const f = chosenResult.fields;
+        documentNumber = (f.documentNumber || '').replace(/</g, '').trim().toUpperCase();
+        firstName = (f.firstName || '').replace(/</g, ' ').trim().toUpperCase();
+        lastName = (f.lastName || '').replace(/</g, ' ').trim().toUpperCase();
+        birthDate = formatMRZDate(f.birthDate, false);
+        expiryDate = formatMRZDate(f.expirationDate || f.expiryDate, true);
+        nationality = (f.nationality || f.issuingState || '').replace(/</g, '').trim().toUpperCase();
+        sex = (f.sex || '').toUpperCase();
       } else {
-        // Fallback line slicing
-        const line1 = normalized[0];
-        const line2 = normalized[1];
+        // Fallback line slicing if mrz parse threw
+        const line1 = chosenPair[0];
+        const line2 = chosenPair[1];
         const namePart = line1.slice(5);
         const [lastPart, firstPart] = namePart.split('<<');
         lastName = (lastPart || '').replace(/</g, ' ').trim().toUpperCase();
@@ -182,7 +332,7 @@ export default function NewPilgrimPage() {
       const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
 
       if (!documentNumber && !fullName) {
-        throw new Error('MRZ ڈیٹا درست طریقے سے نہیں پڑھا جا سکا۔ آپ دستی طور پر اندراج کر سکتے ہیں۔');
+        throw new Error('MRZ سے ڈیٹا حاصل نہیں ہو سکا۔ آپ معلومات دستی درج کر سکتے ہیں۔');
       }
 
       // Auto-fill form fields: passport number, full name, DOB, expiry, father name.
@@ -201,7 +351,7 @@ export default function NewPilgrimPage() {
           expiryDate,
           nationality,
           sex,
-          mrz: normalized.join('\n'),
+          mrz: chosenPair.join('\n'),
         },
       }));
 
@@ -295,7 +445,7 @@ export default function NewPilgrimPage() {
                 <span className="p-2 rounded-xl bg-emerald-100 text-emerald-600">
                   <Sparkles className="w-5 h-5" />
                 </span>
-                <h3 className="font-bold text-base text-gray-900">پاسپورٹ MRZ اسکینر</h3>
+                <h3 className="font-bold text-base text-gray-900">پاسپورٹ MRZ اسکینر (Bottom 35%)</h3>
               </div>
               <button
                 onClick={() => setScanModalOpen(false)}
@@ -330,14 +480,14 @@ export default function NewPilgrimPage() {
               </div>
               <div>
                 <p className="font-bold text-gray-800 text-sm">
-                  {scanning ? 'MRZ پڑھا جا رہا ہے...' : 'Passport photo yahan daalein'}
+                  {scanning ? 'MRZ کروپ اور اسکین ہو رہا ہے...' : 'Passport photo yahan daalein'}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {scanning ? 'براہ کرم انتظار فرمائیں، Tesseract OCR سے پاسپورٹ پڑھا جا رہا ہے...' : 'یا کلک کر کے اپنے کمپیوٹر / موبائل سے تصویر منتخب کریں'}
+                  {scanning ? 'نیچے کا 35% حصہ ہائی کنٹراسٹ کر کے MRZ پڑھا جا رہا ہے...' : 'یا کلک کر کے اپنے کمپیوٹر / موبائل سے تصویر منتخب کریں'}
                 </p>
               </div>
               <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
-                100% لوکل MRZ ریکگنیشن
+                آٹو کروپ + 2x کنٹراسٹ + 44 کریکٹر فلٹر
               </span>
             </div>
 
@@ -361,6 +511,27 @@ export default function NewPilgrimPage() {
           <span className="px-3 py-1 rounded-full bg-emerald-600 text-white font-bold text-xs shadow-sm">
             MRZ Success
           </span>
+        </div>
+      )}
+
+      {/* SHOW MRZ LINES: In UI, show the 2 detected MRZ lines in a small box so user can verify */}
+      {detectedMRZLines.length >= 2 && (
+        <div className="p-3.5 bg-slate-900 border border-slate-700 rounded-2xl text-emerald-400 font-mono text-xs shadow-md space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 pb-1 border-b border-slate-800">
+            <span className="flex items-center gap-1.5 font-sans font-bold text-slate-300">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              شناخت شدہ MRZ لائنز (Detected MRZ Lines):
+            </span>
+            <span className="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 text-[10px] border border-emerald-800/60">
+              44 Chars / Line
+            </span>
+          </div>
+          <div className="tracking-widest break-all select-all text-[11px] sm:text-xs text-emerald-300 bg-slate-950/70 p-2 rounded-lg border border-slate-800">
+            {detectedMRZLines[0]}
+          </div>
+          <div className="tracking-widest break-all select-all text-[11px] sm:text-xs text-emerald-300 bg-slate-950/70 p-2 rounded-lg border border-slate-800">
+            {detectedMRZLines[1]}
+          </div>
         </div>
       )}
 
