@@ -351,7 +351,7 @@ export default function VisasPage() {
         /* LIST VIEW */
         <ContentCard>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-700">
+            <table className="w-full min-w-[650px] text-left text-xs text-gray-700">
               <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[11px] border-b border-gray-100">
                 <tr>
                   <th className="p-4">پاسپورٹ نمبر</th>
@@ -385,9 +385,9 @@ export default function VisasPage() {
 
       {/* CREATE VISA MODAL */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white border border-gray-100 rounded-[28px] p-6 sm:p-8 shadow-2xl">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="w-full max-w-lg max-h-[90vh] bg-white border border-gray-100 rounded-[28px] shadow-2xl flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-5 sm:px-8 sm:py-5 border-b border-gray-100 shrink-0">
               <h3 className="text-lg font-bold text-gray-900">+ نیا عمرہ ویزہ ریکارڈ</h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -397,84 +397,90 @@ export default function VisasPage() {
               </button>
             </div>
 
-            {errorMsg && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
-                {errorMsg}
-              </div>
-            )}
+            <form onSubmit={handleCreateVisa} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="p-6 sm:p-8 space-y-4 overflow-y-auto flex-1">
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+                    {errorMsg}
+                  </div>
+                )}
 
-            <form onSubmit={handleCreateVisa} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">پاسپورٹ نمبر *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="AK1234567"
-                  value={formData.passport_no}
-                  onChange={(e) => setFormData({ ...formData, passport_no: e.target.value.toUpperCase() })}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase font-black focus:outline-none focus:border-purple-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">سفارت خانہ (Embassy)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">پاسپورٹ نمبر *</label>
                   <input
                     type="text"
-                    value={formData.embassy}
-                    onChange={(e) => setFormData({ ...formData, embassy: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs"
+                    required
+                    placeholder="AK1234567"
+                    value={formData.passport_no}
+                    onChange={(e) => setFormData({ ...formData, passport_no: e.target.value.toUpperCase() })}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase font-black focus:outline-none focus:border-purple-500 text-left"
+                    dir="ltr"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">ابتدائی سٹیٹس</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs"
-                  >
-                    <option value="document_pending">دستاویزات زیرِ التواء</option>
-                    <option value="in_embassy">سفارت خانے میں (In Embassy)</option>
-                    <option value="printed">ویزہ پرنٹ ہو گیا (Printed)</option>
-                    <option value="returned">پاسپورٹ موصول (Returned)</option>
-                  </select>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">سفارت خانہ (Embassy)</label>
+                    <input
+                      type="text"
+                      value={formData.embassy}
+                      onChange={(e) => setFormData({ ...formData, embassy: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-right"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">ابتدائی سٹیٹس</label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-right font-semibold"
+                    >
+                      <option value="document_pending">دستاویزات زیرِ التواء</option>
+                      <option value="in_embassy">سفارت خانے میں (In Embassy)</option>
+                      <option value="printed">ویزہ پرنٹ ہو گیا (Printed)</option>
+                      <option value="returned">پاسپورٹ موصول (Returned)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">ویزہ نمبر</label>
+                    <input
+                      type="text"
+                      placeholder="V12345678"
+                      value={formData.visa_number}
+                      onChange={(e) => setFormData({ ...formData, visa_number: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">تاریخ تنسیخ (Expiry Date)</label>
+                    <input
+                      type="date"
+                      value={formData.expiry_date}
+                      onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-left"
+                      dir="ltr"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">ویزہ نمبر</label>
-                  <input
-                    type="text"
-                    placeholder="V12345678"
-                    value={formData.visa_number}
-                    onChange={(e) => setFormData({ ...formData, visa_number: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">تاریخ تنسیخ (Expiry Date)</label>
-                  <input
-                    type="date"
-                    value={formData.expiry_date}
-                    onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+              {/* Fixed Footer */}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-white transition"
                 >
                   منسوخ کریں
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50 transition"
                 >
                   {submitting ? 'محفوظ ہو رہا ہے...' : 'ویزہ محفوظ کریں'}
                 </button>

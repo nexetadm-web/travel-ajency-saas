@@ -204,7 +204,7 @@ export default function CashBookPage() {
       {/* ENTRIES TABLE */}
       <ContentCard>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-gray-700">
+          <table className="w-full min-w-[650px] text-left text-xs text-gray-700">
             <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="p-4">تاریخ</th>
@@ -265,10 +265,10 @@ export default function CashBookPage() {
 
       {/* ADD ENTRY MODAL */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white border border-gray-100 rounded-[28px] p-6 sm:p-8 shadow-2xl">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-              <h3 className="text-lg font-bold text-gray-900">+ نیا کیش بک اندراج</h3>
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="w-full max-w-md max-h-[90vh] bg-white border border-gray-100 rounded-[28px] shadow-2xl flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-5 sm:px-8 sm:py-5 border-b border-gray-100 shrink-0">
+              <h3 className="text-lg font-bold text-gray-900 text-right">+ نیا کیش بک اندراج</h3>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 flex items-center justify-center text-sm font-bold"
@@ -277,118 +277,122 @@ export default function CashBookPage() {
               </button>
             </div>
 
-            <form onSubmit={handleAddEntry} className="space-y-4">
-              {/* Type Switcher */}
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, type: 'in' })}
-                  className={`py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                    form.type === 'in'
-                      ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  <ArrowDownRight className="w-4 h-4" />
-                  آمدنی (Cash In)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, type: 'out' })}
-                  className={`py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                    form.type === 'out'
-                      ? 'bg-rose-500 text-white shadow-md shadow-rose-200'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  <ArrowUpRight className="w-4 h-4" />
-                  اخراجات (Cash Out)
-                </button>
+            <form onSubmit={handleAddEntry} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="p-6 sm:p-8 space-y-4 overflow-y-auto flex-1">
+                {/* Type Switcher */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, type: 'in' })}
+                    className={`py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                      form.type === 'in'
+                        ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <ArrowDownRight className="w-4 h-4" />
+                    آمدنی (Cash In)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, type: 'out' })}
+                    className={`py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                      form.type === 'out'
+                        ? 'bg-rose-500 text-white shadow-md shadow-rose-200'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <ArrowUpRight className="w-4 h-4" />
+                    اخراجات (Cash Out)
+                  </button>
+                </div>
+
+                {/* Amount */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">رقم (Amount in PKR)*</label>
+                  <input
+                    type="number"
+                    required
+                    placeholder="e.g. 50000"
+                    value={form.amount}
+                    onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm font-black focus:outline-none focus:border-emerald-500 text-left"
+                    dir="ltr"
+                  />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">کیٹگری (Category)</label>
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 text-right font-semibold"
+                  >
+                    {form.type === 'in' ? (
+                      <>
+                        <option value="زائر ایڈوانس (Pilgrim Advance)">زائر ایڈوانس (Pilgrim Advance)</option>
+                        <option value="ٹکٹ فروخت کیش (Ticket Sale)">ٹکٹ فروخت کیش (Ticket Sale)</option>
+                        <option value="ویزہ کنسلٹنسی فیس (Visa Fee)">ویزہ کنسلٹنسی فیس (Visa Fee)</option>
+                        <option value="ٹور پیکیج بکنگ (Tour Booking)">ٹور پیکیج بکنگ (Tour Booking)</option>
+                        <option value="سب ایجنٹ وصولی (Sub Agent)">سب ایجنٹ وصولی (Sub Agent)</option>
+                        <option value="دیگر آمدن (Other)">دیگر آمدن (Other)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="دفتری کرایہ (Office Rent)">دفتری کرایہ (Office Rent)</option>
+                        <option value="اسٹاف تنخواہ (Staff Salary)">اسٹاف تنخواہ (Staff Salary)</option>
+                        <option value="ہوٹل سپلائر ادائیگی (Hotel Supplier)">ہوٹل سپلائر ادائیگی (Hotel Supplier)</option>
+                        <option value="ایئرلائن ادائیگی (Airline Payment)">ایئرلائن ادائیگی (Airline Payment)</option>
+                        <option value="ٹرانسپورٹ و بس کرایہ (Transport)">ٹرانسپورٹ و بس کرایہ (Transport)</option>
+                        <option value="سفارت خانہ فیس (Embassy Fee)">سفارت خانہ فیس (Embassy Fee)</option>
+                        <option value="دیگر متفرق اخراجات (Other Expense)">دیگر متفرق اخراجات (Other Expense)</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+
+                {/* Method */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">ادائیگی کا طریقہ (Method)</label>
+                  <select
+                    value={form.method}
+                    onChange={(e) => setForm({ ...form, method: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 text-right font-semibold"
+                  >
+                    <option value="cash">کیش (Cash in Hand)</option>
+                    <option value="bank">بینک اکاؤنٹ (Bank Transfer)</option>
+                    <option value="easypaisa">ایزی پیسہ (Easypaisa)</option>
+                    <option value="jazzcash">جاز کیش (Jazzcash)</option>
+                  </select>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">تفصیل / ریمارکس</label>
+                  <input
+                    type="text"
+                    placeholder="کسٹمر یا اخراجات کی تفصیل..."
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 text-right"
+                  />
+                </div>
               </div>
 
-              {/* Amount */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">رقم (Amount in PKR)*</label>
-                <input
-                  type="number"
-                  required
-                  placeholder="e.g. 50000"
-                  value={form.amount}
-                  onChange={(e) => setForm({ ...form, amount: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm font-black focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">کیٹگری (Category)</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                >
-                  {form.type === 'in' ? (
-                    <>
-                      <option value="زائر ایڈوانس (Pilgrim Advance)">زائر ایڈوانس (Pilgrim Advance)</option>
-                      <option value="ٹکٹ فروخت کیش (Ticket Sale)">ٹکٹ فروخت کیش (Ticket Sale)</option>
-                      <option value="ویزہ کنسلٹنسی فیس (Visa Fee)">ویزہ کنسلٹنسی فیس (Visa Fee)</option>
-                      <option value="ٹور پیکیج بکنگ (Tour Booking)">ٹور پیکیج بکنگ (Tour Booking)</option>
-                      <option value="سب ایجنٹ وصولی (Sub Agent)">سب ایجنٹ وصولی (Sub Agent)</option>
-                      <option value="دیگر آمدن (Other)">دیگر آمدن (Other)</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="دفتری کرایہ (Office Rent)">دفتری کرایہ (Office Rent)</option>
-                      <option value="اسٹاف تنخواہ (Staff Salary)">اسٹاف تنخواہ (Staff Salary)</option>
-                      <option value="ہوٹل سپلائر ادائیگی (Hotel Supplier)">ہوٹل سپلائر ادائیگی (Hotel Supplier)</option>
-                      <option value="ایئرلائن ادائیگی (Airline Payment)">ایئرلائن ادائیگی (Airline Payment)</option>
-                      <option value="ٹرانسپورٹ و بس کرایہ (Transport)">ٹرانسپورٹ و بس کرایہ (Transport)</option>
-                      <option value="سفارت خانہ فیس (Embassy Fee)">سفارت خانہ فیس (Embassy Fee)</option>
-                      <option value="دیگر متفرق اخراجات (Other Expense)">دیگر متفرق اخراجات (Other Expense)</option>
-                    </>
-                  )}
-                </select>
-              </div>
-
-              {/* Method */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">ادائیگی کا طریقہ (Method)</label>
-                <select
-                  value={form.method}
-                  onChange={(e) => setForm({ ...form, method: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="cash">کیش (Cash in Hand)</option>
-                  <option value="bank">بینک اکاؤنٹ (Bank Transfer)</option>
-                  <option value="easypaisa">ایزی پیسہ (Easypaisa)</option>
-                  <option value="jazzcash">جاز کیش (Jazzcash)</option>
-                </select>
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">تفصیل / ریمارکس</label>
-                <input
-                  type="text"
-                  placeholder="کسٹمر یا اخراجات کی تفصیل..."
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+              {/* Fixed Footer */}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-white transition"
                 >
                   منسوخ کریں
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50 transition"
                 >
                   {submitting ? 'محفوظ ہو رہا ہے...' : 'محفوظ کریں'}
                 </button>

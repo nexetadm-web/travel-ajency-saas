@@ -348,109 +348,118 @@ export default function TourPackagesPage() {
 
       {/* MODAL 1: NEW TOUR PACKAGE */}
       {showNewPkgModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="w-full max-w-lg bg-white border border-gray-100 rounded-[28px] p-6 sm:p-8 shadow-2xl my-8">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-              <h3 className="text-lg font-bold text-gray-900">+ نیا ٹور پیکیج بنائیں</h3>
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="w-full max-w-lg max-h-[90vh] bg-white border border-gray-100 rounded-[24px] sm:rounded-[28px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Header - Fixed */}
+            <div className="flex items-center justify-between px-6 py-4 sm:px-8 sm:py-5 border-b border-gray-100 shrink-0">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900">+ نیا ٹور پیکیج بنائیں</h3>
               <button
+                type="button"
                 onClick={() => setShowNewPkgModal(false)}
-                className="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 flex items-center justify-center text-sm font-bold"
+                className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center text-sm font-bold transition"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleCreatePackage} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">پیکیج کا نام *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Hunza Autumn 5 Days Tour"
-                  value={newPkg.package_name}
-                  onChange={(e) => setNewPkg({ ...newPkg, package_name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-semibold focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+            {/* Form - Scrollable */}
+            <form onSubmit={handleCreatePackage} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="p-6 sm:p-8 overflow-y-auto space-y-4 flex-1">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">ٹور قسم</label>
-                  <select
-                    value={newPkg.type}
-                    onChange={(e) => setNewPkg({ ...newPkg, type: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500 font-semibold"
-                  >
-                    <option value="domestic">اندرون ملک (Domestic)</option>
-                    <option value="international">بیرون ملک (International)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">منزل (Destination)*</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">پیکیج کا نام *</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. ہنزہ / دبئی"
-                    value={newPkg.destination}
-                    onChange={(e) => setNewPkg({ ...newPkg, destination: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+                    placeholder="e.g. Hunza Autumn 5 Days Tour"
+                    value={newPkg.package_name}
+                    onChange={(e) => setNewPkg({ ...newPkg, package_name: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-semibold focus:outline-none focus:border-emerald-500 text-right"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">ٹور قسم</label>
+                    <select
+                      value={newPkg.type}
+                      onChange={(e) => setNewPkg({ ...newPkg, type: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500 font-semibold text-right"
+                    >
+                      <option value="domestic">اندرون ملک (Domestic)</option>
+                      <option value="international">بیرون ملک (International)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">منزل (Destination)*</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. ہنزہ / دبئی"
+                      value={newPkg.destination}
+                      onChange={(e) => setNewPkg({ ...newPkg, destination: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500 text-right"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">مدت (دن)</label>
+                    <input
+                      type="number"
+                      value={newPkg.duration_days}
+                      onChange={(e) => setNewPkg({ ...newPkg, duration_days: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">قیمت فی فرد</label>
+                    <input
+                      type="number"
+                      value={newPkg.price_per_person}
+                      onChange={(e) => setNewPkg({ ...newPkg, price_per_person: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">کل سیٹیں</label>
+                    <input
+                      type="number"
+                      value={newPkg.max_seats}
+                      onChange={(e) => setNewPkg({ ...newPkg, max_seats: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">شامل خدمات (Includes)</label>
+                  <input
+                    type="text"
+                    value={newPkg.includes}
+                    onChange={(e) => setNewPkg({ ...newPkg, includes: e.target.value })}
+                    placeholder="ہوٹل رہائش، 4x4 جیپ، ناشتہ و ٹور گائیڈ"
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-right"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">مدت (دن)</label>
-                  <input
-                    type="number"
-                    value={newPkg.duration_days}
-                    onChange={(e) => setNewPkg({ ...newPkg, duration_days: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">قیمت فی فرد</label>
-                  <input
-                    type="number"
-                    value={newPkg.price_per_person}
-                    onChange={(e) => setNewPkg({ ...newPkg, price_per_person: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کل سیٹیں</label>
-                  <input
-                    type="number"
-                    value={newPkg.max_seats}
-                    onChange={(e) => setNewPkg({ ...newPkg, max_seats: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">شامل خدمات (Includes)</label>
-                <input
-                  type="text"
-                  value={newPkg.includes}
-                  onChange={(e) => setNewPkg({ ...newPkg, includes: e.target.value })}
-                  placeholder="ہوٹل رہائش، 4x4 جیپ، ناشتہ و ٹور گائیڈ"
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+              {/* Footer - Fixed */}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowNewPkgModal(false)}
-                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-white transition"
                 >
                   منسوخ کریں
                 </button>
                 <button
                   type="submit"
                   disabled={submittingPkg}
-                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50 transition"
                 >
                   {submittingPkg ? 'پیکیج بنایا جا رہا ہے...' : '✓ پیکیج بنائیں'}
                 </button>
@@ -462,9 +471,9 @@ export default function TourPackagesPage() {
 
       {/* MODAL 2: PACKAGE DETAILS & BOOKINGS & PROFIT */}
       {selectedPkgId && detailData?.package && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="w-full max-w-4xl bg-white border border-gray-100 rounded-[28px] p-6 sm:p-8 shadow-2xl my-8 space-y-6">
-            <div className="flex items-start justify-between pb-4 border-b border-gray-100">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="w-full max-w-4xl max-h-[90vh] bg-white border border-gray-100 rounded-[28px] shadow-2xl flex flex-col overflow-hidden">
+            <div className="flex items-start justify-between px-6 py-5 sm:px-8 sm:py-5 border-b border-gray-100 shrink-0">
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-xl font-black text-gray-900">{detailData.package.package_name}</h3>
@@ -494,80 +503,94 @@ export default function TourPackagesPage() {
               </div>
             </div>
 
-            {/* PROFIT FINANCIAL BREAKDOWN CARD */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-5 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 rounded-2xl border border-emerald-200 text-xs">
-              <div>
-                <span className="text-emerald-800 block text-[11px]">کل مسافرین:</span>
-                <strong className="text-base font-black text-emerald-950">{detailData.stats.totalPersons} مسافر</strong>
+            {/* Scrollable Body */}
+            <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1">
+              {/* PROFIT FINANCIAL BREAKDOWN CARD */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-5 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 rounded-2xl border border-emerald-200 text-xs">
+                <div>
+                  <span className="text-emerald-800 block text-[11px]">کل مسافرین:</span>
+                  <strong className="text-base font-black text-emerald-950">{detailData.stats.totalPersons} مسافر</strong>
+                </div>
+                <div>
+                  <span className="text-emerald-800 block text-[11px]">مجموعی ریونیو:</span>
+                  <strong className="text-base font-black text-emerald-700">{formatCurrency(detailData.stats.totalRevenue)}</strong>
+                </div>
+                <div>
+                  <span className="text-emerald-800 block text-[11px]">تخمینی آپریٹنگ لاگت:</span>
+                  <strong className="text-base font-bold text-gray-700">{formatCurrency(detailData.stats.estimatedCost)}</strong>
+                </div>
+                <div>
+                  <span className="text-emerald-800 block text-[11px]">خالص منافع (Net Profit):</span>
+                  <strong className="text-base font-black text-teal-800">{formatCurrency(detailData.stats.netProfit)}</strong>
+                </div>
               </div>
-              <div>
-                <span className="text-emerald-800 block text-[11px]">مجموعی ریونیو:</span>
-                <strong className="text-base font-black text-emerald-700">{formatCurrency(detailData.stats.totalRevenue)}</strong>
-              </div>
-              <div>
-                <span className="text-emerald-800 block text-[11px]">تخمینی آپریٹنگ لاگت:</span>
-                <strong className="text-base font-bold text-gray-700">{formatCurrency(detailData.stats.estimatedCost)}</strong>
-              </div>
-              <div>
-                <span className="text-emerald-800 block text-[11px]">خالص منافع (Net Profit):</span>
-                <strong className="text-base font-black text-teal-800">{formatCurrency(detailData.stats.netProfit)}</strong>
+
+              {/* BOOKINGS TABLE */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700">
+                  بکنگز لسٹ اور تصدیقی واؤچرز (Tour Bookings & Vouchers)
+                </h4>
+
+                <div className="rounded-2xl border border-gray-100 overflow-x-auto shadow-sm">
+                  <table className="w-full min-w-[650px] text-left text-xs text-gray-700">
+                    <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[11px]">
+                      <tr>
+                        <th className="p-3.5">کلائنٹ نام</th>
+                        <th className="p-3.5">فون / رابطہ</th>
+                        <th className="p-3.5">افراد</th>
+                        <th className="p-3.5">کل رقم</th>
+                        <th className="p-3.5">ایڈوانس</th>
+                        <th className="p-3.5">بقایا</th>
+                        <th className="p-3.5 text-center">واؤچر PDF</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {(detailData.bookings || []).length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="p-8 text-center text-gray-400">
+                            اس پیکیج میں ابھی کوئی بکنگ درج نہیں ہوئی۔
+                          </td>
+                        </tr>
+                      ) : (
+                        (detailData.bookings || []).map((b: any) => (
+                          <tr key={b.id} className="hover:bg-gray-50/60 transition">
+                            <td className="p-3.5 font-bold text-gray-900">{b.client_name}</td>
+                            <td className="p-3.5 text-gray-500">{b.phone || '-'}</td>
+                            <td className="p-3.5 font-bold">{b.persons}</td>
+                            <td className="p-3.5 font-bold">{formatCurrency(b.total_amount)}</td>
+                            <td className="p-3.5 text-emerald-600 font-bold">{formatCurrency(b.advance)}</td>
+                            <td className="p-3.5 text-rose-600 font-bold">
+                              {formatCurrency((b.total_amount || 0) - (b.advance || 0))}
+                            </td>
+                            <td className="p-3.5 text-center">
+                              <a
+                                href={`/api/pdf/tour-voucher/${b.id}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 font-bold text-[11px] transition"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                واؤچر PDF
+                              </a>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
-            {/* BOOKINGS TABLE */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700">
-                بکنگز لسٹ اور تصدیقی واؤچرز (Tour Bookings & Vouchers)
-              </h4>
-
-              <div className="rounded-2xl border border-gray-100 overflow-x-auto shadow-sm">
-                <table className="w-full text-left text-xs text-gray-700">
-                  <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[11px]">
-                    <tr>
-                      <th className="p-3.5">کلائنٹ نام</th>
-                      <th className="p-3.5">فون / رابطہ</th>
-                      <th className="p-3.5">افراد</th>
-                      <th className="p-3.5">کل رقم</th>
-                      <th className="p-3.5">ایڈوانس</th>
-                      <th className="p-3.5">بقایا</th>
-                      <th className="p-3.5 text-center">واؤچر PDF</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {(detailData.bookings || []).length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="p-8 text-center text-gray-400">
-                          اس پیکیج میں ابھی کوئی بکنگ درج نہیں ہوئی۔
-                        </td>
-                      </tr>
-                    ) : (
-                      (detailData.bookings || []).map((b: any) => (
-                        <tr key={b.id} className="hover:bg-gray-50/60 transition">
-                          <td className="p-3.5 font-bold text-gray-900">{b.client_name}</td>
-                          <td className="p-3.5 text-gray-500">{b.phone || '-'}</td>
-                          <td className="p-3.5 font-bold">{b.persons}</td>
-                          <td className="p-3.5 font-bold">{formatCurrency(b.total_amount)}</td>
-                          <td className="p-3.5 text-emerald-600 font-bold">{formatCurrency(b.advance)}</td>
-                          <td className="p-3.5 text-rose-600 font-bold">
-                            {formatCurrency((b.total_amount || 0) - (b.advance || 0))}
-                          </td>
-                          <td className="p-3.5 text-center">
-                            <a
-                              href={`/api/pdf/tour-voucher/${b.id}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 font-bold text-[11px] transition"
-                            >
-                              <Download className="w-3.5 h-3.5" />
-                              واؤچر PDF
-                            </a>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+            {/* Footer - Fixed */}
+            <div className="flex items-center justify-end px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
+              <button
+                type="button"
+                onClick={() => setSelectedPkgId(null)}
+                className="px-5 py-2 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-white transition"
+              >
+                بند کریں
+              </button>
             </div>
           </div>
         </div>
@@ -575,9 +598,9 @@ export default function TourPackagesPage() {
 
       {/* MODAL 3: ADD BOOKING TO SELECTED PACKAGE */}
       {showAddBookingModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white border border-gray-100 rounded-[28px] p-6 sm:p-8 shadow-2xl">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="w-full max-w-md max-h-[90vh] bg-white border border-gray-100 rounded-[28px] shadow-2xl flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-5 sm:px-8 sm:py-5 border-b border-gray-100 shrink-0">
               <h3 className="text-lg font-bold text-gray-900">+ نئی ٹور بکنگ درج کریں</h3>
               <button
                 onClick={() => setShowAddBookingModal(false)}
@@ -587,93 +610,101 @@ export default function TourPackagesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleAddBooking} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">لیڈ مسافر کا نام *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. عثمان خان"
-                  value={newBooking.client_name}
-                  onChange={(e) => setNewBooking({ ...newBooking, client_name: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleAddBooking} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="p-6 sm:p-8 space-y-4 overflow-y-auto flex-1">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">فون نمبر (WhatsApp)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">لیڈ مسافر کا نام *</label>
                   <input
                     type="text"
-                    placeholder="03001234567"
-                    value={newBooking.phone}
-                    onChange={(e) => setNewBooking({ ...newBooking, phone: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs"
+                    required
+                    placeholder="e.g. عثمان خان"
+                    value={newBooking.client_name}
+                    onChange={(e) => setNewBooking({ ...newBooking, client_name: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-right"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">شناختی کارڈ (CNIC)</label>
-                  <input
-                    type="text"
-                    placeholder="35202-0000000-0"
-                    value={newBooking.cnic}
-                    onChange={(e) => setNewBooking({ ...newBooking, cnic: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">فون نمبر (WhatsApp)</label>
+                    <input
+                      type="text"
+                      placeholder="03001234567"
+                      value={newBooking.phone}
+                      onChange={(e) => setNewBooking({ ...newBooking, phone: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">شناختی کارڈ (CNIC)</label>
+                    <input
+                      type="text"
+                      placeholder="35202-0000000-0"
+                      value={newBooking.cnic}
+                      onChange={(e) => setNewBooking({ ...newBooking, cnic: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">افراد کی تعداد</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={newBooking.persons}
+                      onChange={(e) => {
+                        const persons = Number(e.target.value) || 1;
+                        const rate = detailData?.package?.price_per_person || 45000;
+                        setNewBooking({
+                          ...newBooking,
+                          persons: String(persons),
+                          total_amount: String(persons * rate),
+                        });
+                      }}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">کل رقم (PKR)</label>
+                    <input
+                      type="number"
+                      value={newBooking.total_amount}
+                      onChange={(e) => setNewBooking({ ...newBooking, total_amount: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">ایڈوانس وصولی</label>
+                    <input
+                      type="number"
+                      value={newBooking.advance}
+                      onChange={(e) => setNewBooking({ ...newBooking, advance: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-emerald-600 text-left"
+                      dir="ltr"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">افراد کی تعداد</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={newBooking.persons}
-                    onChange={(e) => {
-                      const persons = Number(e.target.value) || 1;
-                      const rate = detailData?.package?.price_per_person || 45000;
-                      setNewBooking({
-                        ...newBooking,
-                        persons: String(persons),
-                        total_amount: String(persons * rate),
-                      });
-                    }}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کل رقم (PKR)</label>
-                  <input
-                    type="number"
-                    value={newBooking.total_amount}
-                    onChange={(e) => setNewBooking({ ...newBooking, total_amount: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">ایڈوانس وصولی</label>
-                  <input
-                    type="number"
-                    value={newBooking.advance}
-                    onChange={(e) => setNewBooking({ ...newBooking, advance: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-emerald-600"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+              {/* Footer - Fixed */}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowAddBookingModal(false)}
-                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-white transition"
                 >
                   منسوخ کریں
                 </button>
                 <button
                   type="submit"
                   disabled={submittingBooking}
-                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50 transition"
                 >
                   {submittingBooking ? 'محفوظ ہو رہا ہے...' : '✓ بکنگ درج کریں'}
                 </button>

@@ -129,9 +129,9 @@ export default function PnrCheckPage() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 sm:space-y-8 px-2 sm:px-4">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 sm:space-y-8 max-w-5xl mx-auto px-2 sm:px-4">
       {/* Top Header */}
-      <div className="overflow-hidden transform-none" dir="rtl" style={{ transform: 'none' }}>
+      <div className="overflow-visible transform-none" dir="rtl" style={{ transform: 'none' }}>
         <h1 className="font-urdu text-[22px] md:text-[24px] lg:text-[22px] xl:text-[24px] font-bold text-right leading-[1.6] transform-none rotate-0 not-italic text-gray-900" style={{ transform: 'none', fontStyle: 'normal' }}>
           ایئرلائن <span className="font-english">PNR</span> لائیو چیک و اسٹیٹس
         </h1>
@@ -141,12 +141,12 @@ export default function PnrCheckPage() {
       </div>
 
       {/* Main PNR Form Container */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 overflow-visible relative z-10 space-y-4">
+      <div className={`bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 overflow-visible relative space-y-4 transition-all ${open ? 'z-40' : 'z-20'}`}>
         <form onSubmit={handleSearch}>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
             {/* PNR Input */}
             <div className="w-full">
-              <label className="font-urdu text-[13px] mb-1.5 block font-bold text-gray-700">
+              <label className="font-urdu text-[13px] mb-1.5 block font-bold text-gray-700 text-right" dir="rtl">
                 PNR کوڈ درج کریں *
               </label>
               <input
@@ -155,13 +155,14 @@ export default function PnrCheckPage() {
                 value={pnr}
                 onChange={(e) => setPnr(e.target.value.toUpperCase())}
                 placeholder="e.g. PK782X یا SV9102"
-                className="w-full h-[44px] bg-white border border-gray-200 rounded-xl px-4 text-[13px] font-mono font-bold text-gray-900 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all"
+                className="w-full h-[44px] bg-white border border-gray-200 rounded-xl px-4 text-[13px] font-mono font-bold text-gray-900 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all text-left"
+                dir="ltr"
               />
             </div>
 
             {/* Airline Dropdown Combobox */}
             <div className="relative w-full" ref={dropdownRef}>
-              <label className="font-urdu text-[13px] mb-1.5 block">ایئر لائن منتخب کریں</label>
+              <label className="font-urdu text-[13px] mb-1.5 block text-right" dir="rtl">ایئر لائن منتخب کریں</label>
               <button 
                 type="button"
                 onClick={() => setOpen(!open)}
@@ -174,7 +175,7 @@ export default function PnrCheckPage() {
               </button>
 
               {open && (
-                <div className="absolute top-[100%] left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-[9999] overflow-hidden">
+                <div className="absolute top-[100%] left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[9999] overflow-hidden min-w-full">
                   <div className="p-2 border-b border-gray-100">
                     <input 
                       autoFocus
@@ -240,12 +241,12 @@ export default function PnrCheckPage() {
           {/* Custom Airline Input */}
           {showCustomInput && (
             <div className="mt-3">
-              <label className="font-urdu text-[13px]">کسٹم ائیر لائن کا نام</label>
+              <label className="font-urdu text-[13px] block text-right mb-1" dir="rtl">کسٹم ائیر لائن کا نام</label>
               <input
                 type="text"
                 value={customAirline}
                 onChange={(e) => setCustomAirline(e.target.value)}
-                className="w-full mt-1 h-[44px] border border-gray-200 rounded-xl px-4 text-[13px]"
+                className="w-full h-[44px] border border-gray-200 rounded-xl px-4 text-[13px] text-right"
                 placeholder="e.g. AirSial, Vision Air"
               />
             </div>
@@ -253,7 +254,7 @@ export default function PnrCheckPage() {
         </form>
 
         {errorMsg && (
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2 text-right">
             <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -357,7 +358,7 @@ export default function PnrCheckPage() {
           <p className="text-xs text-gray-400 py-6 text-center">ابھی تک کوئی PNR چیک نہیں کیا گیا۔</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
+            <table className="w-full min-w-[550px] text-xs text-left">
               <thead className="bg-gray-50 text-gray-600 font-bold border-b border-gray-100">
                 <tr>
                   <th className="py-2.5 px-3">PNR</th>

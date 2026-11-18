@@ -123,22 +123,22 @@ export default function SubAgentDetailPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Top Header Card */}
-      <div className="bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-6">
+      <div className="bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 p-4 sm:p-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link
               href="/dashboard/sub-agents"
-              className="w-10 h-10 rounded-2xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition"
+              className="w-10 h-10 rounded-2xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition shrink-0"
               title="واپس جائیں"
             >
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-black text-gray-900">{subAgent.name}</h1>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h1 className="text-xl sm:text-2xl font-black text-gray-900 break-words">{subAgent.name}</h1>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0 whitespace-nowrap">
                   {subAgent.commissionType === 'percent' ||
                   subAgent.commission_type === 'percent' ||
                   subAgent.commission_type === 'percentage'
@@ -149,12 +149,12 @@ export default function SubAgentDetailPage() {
               <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 mt-2">
                 <span className="flex items-center gap-1 font-mono text-gray-700">
                   <Phone className="w-3.5 h-3.5 text-indigo-500" />
-                  {subAgent.phone}
+                  <span>{subAgent.phone}</span>
                 </span>
                 {subAgent.city && (
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-                    {subAgent.city}
+                    <span>{subAgent.city}</span>
                   </span>
                 )}
                 {subAgent.cnic && (
@@ -264,7 +264,7 @@ export default function SubAgentDetailPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-700">
+            <table className="w-full min-w-[700px] text-left text-xs text-gray-700">
               <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="p-4">حاجی کا نام</th>
@@ -338,9 +338,10 @@ export default function SubAgentDetailPage() {
 
       {/* COMMISSION PAYOUT MODAL */}
       {payModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-md w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Header - Fixed */}
+            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 sm:px-8 sm:py-5 shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
                   💰
@@ -351,6 +352,7 @@ export default function SubAgentDetailPage() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setPayModalOpen(false)}
                 className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"
               >
@@ -358,75 +360,81 @@ export default function SubAgentDetailPage() {
               </button>
             </div>
 
-            {errorMsg && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
+            {/* Form - Scrollable */}
+            <form onSubmit={handlePayout} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="p-6 sm:p-8 overflow-y-auto space-y-4 flex-1">
+                {errorMsg && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 text-right">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>{errorMsg}</span>
+                  </div>
+                )}
 
-            <form onSubmit={handlePayout} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  ادائیگی رقم (روپے) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  placeholder="e.g. 25000"
-                  value={payForm.amount}
-                  onChange={(e) => setPayForm({ ...payForm, amount: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-900 focus:outline-none focus:border-emerald-500"
-                />
-                <span className="text-[11px] text-gray-500 mt-1 block">
-                  کل باقی رقم: {formatCurrency(subAgent.remaining || 0)}
-                </span>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+                    ادائیگی رقم (روپے) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    placeholder="e.g. 25000"
+                    value={payForm.amount}
+                    onChange={(e) => setPayForm({ ...payForm, amount: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-900 focus:outline-none focus:border-emerald-500 text-left"
+                    dir="ltr"
+                  />
+                  <span className="text-[11px] text-gray-500 mt-1 block text-right" dir="rtl">
+                    کل باقی رقم: <span dir="ltr">{formatCurrency(subAgent.remaining || 0)}</span>
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+                    ادائیگی کا ذریعہ
+                  </label>
+                  <select
+                    value={payForm.method}
+                    onChange={(e) => setPayForm({ ...payForm, method: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 text-right"
+                  >
+                    <option value="cash">کیش (نقد)</option>
+                    <option value="bank">بینک ٹرانسفر (Online Transfer)</option>
+                    <option value="easypaisa">ایزی پیسہ (EasyPaisa)</option>
+                    <option value="jazzcash">جاز کیش (JazzCash)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">رسید / حوالہ نمبر</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. REC-98765"
+                    value={payForm.receiptNo}
+                    onChange={(e) => setPayForm({ ...payForm, receiptNo: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono text-left"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">تفصیل / ریمارکس</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. رجب عمرہ گروپ کمیشن فائنل"
+                    value={payForm.notes}
+                    onChange={(e) => setPayForm({ ...payForm, notes: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 text-right"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  ادائیگی کا ذریعہ
-                </label>
-                <select
-                  value={payForm.method}
-                  onChange={(e) => setPayForm({ ...payForm, method: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="cash">کیش (نقد)</option>
-                  <option value="bank">بینک ٹرانسفر (Online Transfer)</option>
-                  <option value="easypaisa">ایزی پیسہ (EasyPaisa)</option>
-                  <option value="jazzcash">جاز کیش (JazzCash)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">رسید / حوالہ نمبر</label>
-                <input
-                  type="text"
-                  placeholder="e.g. REC-98765"
-                  value={payForm.receiptNo}
-                  onChange={(e) => setPayForm({ ...payForm, receiptNo: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">تفصیل / ریمارکس</label>
-                <input
-                  type="text"
-                  placeholder="e.g. رجب عمرہ گروپ کمیشن فائنل"
-                  value={payForm.notes}
-                  onChange={(e) => setPayForm({ ...payForm, notes: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3">
+              {/* Footer - Fixed */}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
                 <button
                   type="button"
                   onClick={() => setPayModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50 transition"
+                  className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-white transition"
                 >
                   منسوخ کریں
                 </button>

@@ -222,14 +222,14 @@ export default function VisaConsultancyPage() {
       </div>
 
       {/* FILTERS & SEARCH */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
-          <Filter className="w-4 h-4 text-gray-400" />
+          <Filter className="w-4 h-4 text-gray-400 shrink-0" />
           {/* Country Filter */}
           <select
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value)}
-            className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 shadow-sm font-semibold"
+            className="flex-1 sm:flex-none px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 shadow-sm font-semibold max-w-full"
           >
             <option value="all">تمام ممالک (All Countries)</option>
             <option value="UK">برطانیہ (UK)</option>
@@ -246,7 +246,7 @@ export default function VisaConsultancyPage() {
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 shadow-sm font-semibold"
+            className="flex-1 sm:flex-none px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 shadow-sm font-semibold max-w-full"
           >
             <option value="all">تمام ویزہ اقسام (All Types)</option>
             <option value="study">اسٹڈی ویزہ (Study Visa)</option>
@@ -349,156 +349,166 @@ export default function VisaConsultancyPage() {
 
       {/* MODAL 1: NEW VISA CASE */}
       {showNewModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="w-full max-w-lg bg-white border border-gray-100 rounded-[28px] p-6 sm:p-8 shadow-2xl my-8">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-              <h3 className="text-lg font-bold text-gray-900">+ نیا ویزہ کیس درج کریں</h3>
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="w-full max-w-lg max-h-[90vh] bg-white border border-gray-100 rounded-[24px] sm:rounded-[28px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Header - Fixed */}
+            <div className="flex items-center justify-between px-6 py-4 sm:px-8 sm:py-5 border-b border-gray-100 shrink-0">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900">+ نیا ویزہ کیس درج کریں</h3>
               <button
+                type="button"
                 onClick={() => setShowNewModal(false)}
-                className="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 flex items-center justify-center text-sm font-bold"
+                className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center text-sm font-bold transition"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleCreateCase} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کلائنٹ کا نام *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. احمد حسن"
-                    value={newCase.client_name}
-                    onChange={(e) => setNewCase({ ...newCase, client_name: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500 font-semibold"
-                  />
+            {/* Form - Scrollable */}
+            <form onSubmit={handleCreateCase} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="p-6 sm:p-8 overflow-y-auto space-y-4 flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">کلائنٹ کا نام *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. احمد حسن"
+                      value={newCase.client_name}
+                      onChange={(e) => setNewCase({ ...newCase, client_name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500 font-semibold text-right"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">والد کا نام</label>
+                    <input
+                      type="text"
+                      placeholder="حسن اختر"
+                      value={newCase.father_name}
+                      onChange={(e) => setNewCase({ ...newCase, father_name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500 text-right"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">والد کا نام</label>
-                  <input
-                    type="text"
-                    placeholder="حسن اختر"
-                    value={newCase.father_name}
-                    onChange={(e) => setNewCase({ ...newCase, father_name: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">ملک (Country)</label>
+                    <select
+                      value={newCase.country}
+                      onChange={(e) => setNewCase({ ...newCase, country: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500 font-semibold"
+                    >
+                      <option value="UK">برطانیہ (UK)</option>
+                      <option value="Canada">کینیڈا (Canada)</option>
+                      <option value="Schengen">یورپ شینگن (Schengen)</option>
+                      <option value="USA">امریکہ (USA)</option>
+                      <option value="Dubai">دبئی (Dubai)</option>
+                      <option value="Australia">آسٹریلیا (Australia)</option>
+                      <option value="Turkey">ترکیہ (Turkey)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">ویزہ کیٹیگری</label>
+                    <select
+                      value={newCase.visa_type}
+                      onChange={(e) => setNewCase({ ...newCase, visa_type: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500 font-semibold"
+                    >
+                      <option value="study">اسٹڈی ویزہ (Study)</option>
+                      <option value="visit">وزٹ ویزہ (Visit)</option>
+                      <option value="work">ورک ویزہ (Work)</option>
+                      <option value="tourist">ٹورسٹ ویزہ (Tourist)</option>
+                      <option value="business">بزنس ویزہ (Business)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">پاسپورٹ نمبر</label>
+                    <input
+                      type="text"
+                      placeholder="AK1234567"
+                      value={newCase.passport_no}
+                      onChange={(e) => setNewCase({ ...newCase, passport_no: e.target.value.toUpperCase() })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase focus:outline-none focus:border-indigo-500 text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">فون نمبر (WhatsApp)</label>
+                    <input
+                      type="text"
+                      placeholder="03001234567"
+                      value={newCase.phone}
+                      onChange={(e) => setNewCase({ ...newCase, phone: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500 text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+
+                {newCase.visa_type === 'study' ? (
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">یونیورسٹی / کالج نام</label>
+                    <input
+                      type="text"
+                      placeholder="University of Hertfordshire, UK"
+                      value={newCase.university_name}
+                      onChange={(e) => setNewCase({ ...newCase, university_name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-right"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">کمپنی / ایمپلائر نام (اختیاری)</label>
+                    <input
+                      type="text"
+                      placeholder="Employer / Sponsor Name"
+                      value={newCase.employer_name}
+                      onChange={(e) => setNewCase({ ...newCase, employer_name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-right"
+                    />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">کنسلٹنسی کل فیس (PKR)</label>
+                    <input
+                      type="number"
+                      value={newCase.total_fee}
+                      onChange={(e) => setNewCase({ ...newCase, total_fee: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">وصول شدہ ایڈوانس (PKR)</label>
+                    <input
+                      type="number"
+                      value={newCase.paid}
+                      onChange={(e) => setNewCase({ ...newCase, paid: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-emerald-600 text-left"
+                      dir="ltr"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">ملک (Country)</label>
-                  <select
-                    value={newCase.country}
-                    onChange={(e) => setNewCase({ ...newCase, country: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500 font-semibold"
-                  >
-                    <option value="UK">برطانیہ (UK)</option>
-                    <option value="Canada">کینیڈا (Canada)</option>
-                    <option value="Schengen">یورپ شینگن (Schengen)</option>
-                    <option value="USA">امریکہ (USA)</option>
-                    <option value="Dubai">دبئی (Dubai)</option>
-                    <option value="Australia">آسٹریلیا (Australia)</option>
-                    <option value="Turkey">ترکیہ (Turkey)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">ویزہ کیٹیگری</label>
-                  <select
-                    value={newCase.visa_type}
-                    onChange={(e) => setNewCase({ ...newCase, visa_type: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500 font-semibold"
-                  >
-                    <option value="study">اسٹڈی ویزہ (Study)</option>
-                    <option value="visit">وزٹ ویزہ (Visit)</option>
-                    <option value="work">ورک ویزہ (Work)</option>
-                    <option value="tourist">ٹورسٹ ویزہ (Tourist)</option>
-                    <option value="business">بزنس ویزہ (Business)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">پاسپورٹ نمبر</label>
-                  <input
-                    type="text"
-                    placeholder="AK1234567"
-                    value={newCase.passport_no}
-                    onChange={(e) => setNewCase({ ...newCase, passport_no: e.target.value.toUpperCase() })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase focus:outline-none focus:border-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">فون نمبر (WhatsApp)</label>
-                  <input
-                    type="text"
-                    placeholder="03001234567"
-                    value={newCase.phone}
-                    onChange={(e) => setNewCase({ ...newCase, phone: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-indigo-500"
-                  />
-                </div>
-              </div>
-
-              {newCase.visa_type === 'study' ? (
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">یونیورسٹی / کالج نام</label>
-                  <input
-                    type="text"
-                    placeholder="University of Hertfordshire, UK"
-                    value={newCase.university_name}
-                    onChange={(e) => setNewCase({ ...newCase, university_name: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کمپنی / ایمپلائر نام (اختیاری)</label>
-                  <input
-                    type="text"
-                    placeholder="Employer / Sponsor Name"
-                    value={newCase.employer_name}
-                    onChange={(e) => setNewCase({ ...newCase, employer_name: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs"
-                  />
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کنسلٹنسی کل فیس (PKR)</label>
-                  <input
-                    type="number"
-                    value={newCase.total_fee}
-                    onChange={(e) => setNewCase({ ...newCase, total_fee: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">وصول شدہ ایڈوانس (PKR)</label>
-                  <input
-                    type="number"
-                    value={newCase.paid}
-                    onChange={(e) => setNewCase({ ...newCase, paid: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold text-emerald-600"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+              {/* Footer - Fixed */}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowNewModal(false)}
-                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-white transition"
                 >
                   منسوخ کریں
                 </button>
                 <button
                   type="submit"
                   disabled={creating}
-                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50 transition"
                 >
                   {creating ? 'کیس بنایا جا رہا ہے...' : '✓ کیس درج کریں'}
                 </button>
@@ -510,120 +520,126 @@ export default function VisaConsultancyPage() {
 
       {/* MODAL 2: CASE DETAILS & DOCUMENT CHECKLIST & TIMELINE */}
       {selectedCaseId && detailData?.case && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="w-full max-w-3xl bg-white border border-gray-100 rounded-[28px] p-6 sm:p-8 shadow-2xl my-8 space-y-6">
-            <div className="flex items-start justify-between pb-4 border-b border-gray-100">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="w-full max-w-3xl max-h-[90vh] bg-white border border-gray-100 rounded-[24px] sm:rounded-[28px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Header - Fixed */}
+            <div className="flex items-start justify-between px-6 py-4 sm:px-8 sm:py-5 border-b border-gray-100 shrink-0">
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-xl font-bold text-gray-900">{detailData.case.client_name}</h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">{detailData.case.client_name}</h3>
                   <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs">
                     {detailData.case.country} - {detailData.case.visa_type.toUpperCase()}
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  پاسپورٹ: <strong className="font-mono text-gray-800">{detailData.case.passport_no || 'N/A'}</strong> | فون: {detailData.case.phone || 'N/A'}
+                  پاسپورٹ: <strong className="font-mono text-gray-800">{detailData.case.passport_no || 'N/A'}</strong> | فون: <span className="font-mono">{detailData.case.phone || 'N/A'}</span>
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <a
                   href={`/api/pdf/visa-checklist/${detailData.case.id}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 flex items-center gap-1.5 transition"
+                  className="px-3 sm:px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 flex items-center gap-1.5 transition"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  ایمبیسی چیک لسٹ PDF
+                  <span className="hidden sm:inline">ایمبیسی چیک لسٹ PDF</span>
+                  <span className="sm:hidden">PDF</span>
                 </a>
                 <button
+                  type="button"
                   onClick={() => setSelectedCaseId(null)}
-                  className="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 flex items-center justify-center text-sm font-bold"
+                  className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center text-sm font-bold transition"
                 >
                   ✕
                 </button>
               </div>
             </div>
 
-            {/* Fee summary card */}
-            <div className="grid grid-cols-3 gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-xs">
-              <div>
-                <span className="text-gray-400 block">کل طے شدہ فیس:</span>
-                <strong className="text-sm font-bold text-gray-800">{formatCurrency(detailData.case.total_fee)}</strong>
-              </div>
-              <div>
-                <span className="text-gray-400 block">ادا شدہ فیس:</span>
-                <strong className="text-sm font-bold text-emerald-600">{formatCurrency(detailData.case.paid)}</strong>
-              </div>
-              <div className="flex items-center justify-between">
+            {/* Scrollable Content */}
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 flex-1">
+              {/* Fee summary card */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-xs">
                 <div>
-                  <span className="text-gray-400 block">بقایا واجب الادا:</span>
-                  <strong className="text-sm font-bold text-rose-600">
-                    {formatCurrency((detailData.case.total_fee || 0) - (detailData.case.paid || 0))}
-                  </strong>
+                  <span className="text-gray-400 block">کل طے شدہ فیس:</span>
+                  <strong className="text-sm font-bold text-gray-800" dir="ltr">{formatCurrency(detailData.case.total_fee)}</strong>
                 </div>
-                <button
-                  onClick={() => handleAddPayment(detailData.case.id, detailData.case.paid || 0)}
-                  className="px-3 py-1 rounded-lg bg-emerald-500 text-white text-[10px] font-bold shadow hover:bg-emerald-600"
-                >
-                  + ادائیگی
-                </button>
-              </div>
-            </div>
-
-            {/* Document Checklist with Status Toggles */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
-                <FileCheck2 className="w-4 h-4 text-indigo-600" />
-                ایمبیسی دستاویزات چیک لسٹ (Click to Toggle Status: Pending ➔ Received ➔ Verified)
-              </h4>
-
-              <div className="divide-y divide-gray-100 border border-gray-200 rounded-2xl overflow-hidden">
-                {(detailData.documents || []).map((doc: any) => (
-                  <div
-                    key={doc.id}
-                    onClick={() => handleToggleDocStatus(doc.id, doc.status)}
-                    className="p-3.5 flex items-center justify-between hover:bg-gray-50 transition cursor-pointer"
+                <div>
+                  <span className="text-gray-400 block">ادا شدہ فیس:</span>
+                  <strong className="text-sm font-bold text-emerald-600" dir="ltr">{formatCurrency(detailData.case.paid)}</strong>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-gray-400 block">بقایا واجب الادا:</span>
+                    <strong className="text-sm font-bold text-rose-600" dir="ltr">
+                      {formatCurrency((detailData.case.total_fee || 0) - (detailData.case.paid || 0))}
+                    </strong>
+                  </div>
+                  <button
+                    onClick={() => handleAddPayment(detailData.case.id, detailData.case.paid || 0)}
+                    className="px-3 py-1 rounded-lg bg-emerald-500 text-white text-[10px] font-bold shadow hover:bg-emerald-600 transition"
                   >
-                    <span className="text-xs font-semibold text-gray-800">{doc.doc_name}</span>
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
-                        doc.status === 'verified'
-                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                          : doc.status === 'received'
-                          ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                          : 'bg-amber-100 text-amber-800 border border-amber-300'
-                      }`}
+                    + ادائیگی
+                  </button>
+                </div>
+              </div>
+
+              {/* Document Checklist with Status Toggles */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
+                  <FileCheck2 className="w-4 h-4 text-indigo-600" />
+                  ایمبیسی دستاویزات چیک لسٹ (Click to Toggle Status: Pending ➔ Received ➔ Verified)
+                </h4>
+
+                <div className="divide-y divide-gray-100 border border-gray-200 rounded-2xl overflow-hidden">
+                  {(detailData.documents || []).map((doc: any) => (
+                    <div
+                      key={doc.id}
+                      onClick={() => handleToggleDocStatus(doc.id, doc.status)}
+                      className="p-3.5 flex items-center justify-between hover:bg-gray-50 transition cursor-pointer"
                     >
-                      {doc.status === 'verified' ? '✓ تصدیق شدہ (Verified)' : doc.status === 'received' ? 'موصل (Received)' : 'زیر التواء (Pending)'}
-                    </span>
-                  </div>
-                ))}
+                      <span className="text-xs font-semibold text-gray-800">{doc.doc_name}</span>
+                      <span
+                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
+                          doc.status === 'verified'
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                            : doc.status === 'received'
+                            ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                            : 'bg-amber-100 text-amber-800 border border-amber-300'
+                        }`}
+                      >
+                        {doc.status === 'verified' ? '✓ تصدیق شدہ (Verified)' : doc.status === 'received' ? 'موصل (Received)' : 'زیر التواء (Pending)'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Timeline */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700">
+                  کیس ٹائم لائن اور پیش رفت (Timeline)
+                </h4>
+                <div className="max-h-36 overflow-y-auto space-y-1.5 bg-gray-50 p-3 rounded-2xl border border-gray-100 text-xs">
+                  {(detailData.timeline || []).map((t: any) => (
+                    <div key={t.id} className="flex items-center justify-between text-[11px] text-gray-600">
+                      <span>{t.note || `تبدیلی: ${t.status_to}`}</span>
+                      <span className="text-[10px] text-gray-400 font-mono">{formatDate(t.created_at)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Timeline */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700">
-                کیس ٹائم لائن اور پیش رفت (Timeline)
-              </h4>
-              <div className="max-h-36 overflow-y-auto space-y-1.5 bg-gray-50 p-3 rounded-2xl border border-gray-100 text-xs">
-                {(detailData.timeline || []).map((t: any) => (
-                  <div key={t.id} className="flex items-center justify-between text-[11px] text-gray-600">
-                    <span>{t.note || `تبدیلی: ${t.status_to}`}</span>
-                    <span className="text-[10px] text-gray-400 font-mono">{formatDate(t.created_at)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Action Bar */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+            {/* Footer - Fixed */}
+            <div className="flex items-center justify-between px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500">موجودہ اسٹیٹس:</span>
                 <select
                   value={detailData.case.status}
                   onChange={(e) => handleUpdateStatus(detailData.case.id, e.target.value)}
-                  className="text-xs font-bold px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900"
+                  className="text-xs font-bold px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-gray-900"
                 >
                   <option value="inquiry">انکوائری (Inquiry)</option>
                   <option value="documents_pending">دستاویزات زیر التواء</option>
@@ -635,8 +651,9 @@ export default function VisaConsultancyPage() {
               </div>
 
               <button
+                type="button"
                 onClick={() => setSelectedCaseId(null)}
-                className="px-6 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold"
+                className="px-6 py-2.5 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold transition"
               >
                 بند کریں
               </button>

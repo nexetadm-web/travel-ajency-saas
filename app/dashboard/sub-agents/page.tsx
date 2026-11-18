@@ -168,7 +168,7 @@ export default function SubAgentsPage() {
       ) : (
         <ContentCard>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-700">
+            <table className="w-full min-w-[800px] text-left text-xs text-gray-700">
               <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="p-4">سب ایجنٹ نام</th>
@@ -243,9 +243,10 @@ export default function SubAgentsPage() {
 
       {/* ADD SUB AGENT MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-lg w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Header - Fixed */}
+            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 sm:px-8 sm:py-5 shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
                   👥
@@ -256,6 +257,7 @@ export default function SubAgentsPage() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setModalOpen(false)}
                 className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"
               >
@@ -263,109 +265,116 @@ export default function SubAgentsPage() {
               </button>
             </div>
 
-            {errorMsg && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
+            {/* Form - Scrollable */}
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="p-6 sm:p-8 overflow-y-auto space-y-4 flex-1">
+                {errorMsg && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 text-right">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>{errorMsg}</span>
+                  </div>
+                )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  ایجنٹ کا مکمل نام *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. محمد سلیم (گوجرانوالہ ایجنٹ)"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    موبائل / واٹس ایپ نمبر *
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+                    ایجنٹ کا مکمل نام *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="0300-1234567"
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-mono"
+                    placeholder="e.g. محمد سلیم (گوجرانوالہ ایجنٹ)"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 text-right"
                   />
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+                      موبائل / واٹس ایپ نمبر *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="0300-1234567"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-mono text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+                      شہر / علاقہ
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. لاہور / سیالکوٹ"
+                      value={form.city}
+                      onChange={(e) => setForm({ ...form, city: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 text-right"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    شہر / علاقہ
+                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+                    شناختی کارڈ (CNIC) اختیاری
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. لاہور / سیالکوٹ"
-                    value={form.city}
-                    onChange={(e) => setForm({ ...form, city: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500"
+                    placeholder="35201-xxxxxxx-x"
+                    value={form.cnic}
+                    onChange={(e) => setForm({ ...form, cnic: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-mono text-left"
+                    dir="ltr"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  شناختی کارڈ (CNIC) اختیاری
-                </label>
-                <input
-                  type="text"
-                  placeholder="35201-xxxxxxx-x"
-                  value={form.cnic}
-                  onChange={(e) => setForm({ ...form, cnic: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-mono"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    کمیشن کی قسم
-                  </label>
-                  <select
-                    value={form.commissionType}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        commissionType: e.target.value,
-                        commissionValue: e.target.value === 'percent' ? '5' : '5000',
-                      })
-                    }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500"
-                  >
-                    <option value="per_person">مقررہ رقم فی حاجی (Per Pilgrim)</option>
-                    <option value="percent">فیصد تناسب (Percentage %)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    {form.commissionType === 'percent' ? 'کمیشن فیصد (%)' : 'کمیشن رقم (روپے)'}
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    required
-                    value={form.commissionValue}
-                    onChange={(e) => setForm({ ...form, commissionValue: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-bold"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+                      کمیشن کی قسم
+                    </label>
+                    <select
+                      value={form.commissionType}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          commissionType: e.target.value,
+                          commissionValue: e.target.value === 'percent' ? '5' : '5000',
+                        })
+                      }
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 text-right"
+                    >
+                      <option value="per_person">مقررہ رقم فی حاجی (Per Pilgrim)</option>
+                      <option value="percent">فیصد تناسب (Percentage %)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+                      {form.commissionType === 'percent' ? 'کمیشن فیصد (%)' : 'کمیشن رقم (روپے)'}
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      required
+                      value={form.commissionValue}
+                      onChange={(e) => setForm({ ...form, commissionValue: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-bold text-left"
+                      dir="ltr"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3">
+              {/* Footer - Fixed */}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50 transition"
+                  className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-white transition"
                 >
                   منسوخ کریں
                 </button>
