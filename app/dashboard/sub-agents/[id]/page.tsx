@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAgency } from '@/hooks/useAgency';
+import Modal from '@/components/ui/modal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -337,120 +338,98 @@ export default function SubAgentDetailPage() {
       </div>
 
       {/* COMMISSION PAYOUT MODAL */}
-      {payModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Header - Fixed */}
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 sm:px-8 sm:py-5 shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-                  💰
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-base">کمیشن ادائیگی درج کریں</h3>
-                  <p className="text-[11px] text-gray-500">سب ایجنٹ: {subAgent.name}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setPayModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Form - Scrollable */}
-            <form onSubmit={handlePayout} className="flex flex-col flex-1 min-h-0 overflow-hidden">
-              <div className="p-6 sm:p-8 overflow-y-auto space-y-4 flex-1">
-                {errorMsg && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 text-right">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    <span>{errorMsg}</span>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
-                    ادائیگی رقم (روپے) *
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    placeholder="e.g. 25000"
-                    value={payForm.amount}
-                    onChange={(e) => setPayForm({ ...payForm, amount: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-900 focus:outline-none focus:border-emerald-500 text-left"
-                    dir="ltr"
-                  />
-                  <span className="text-[11px] text-gray-500 mt-1 block text-right" dir="rtl">
-                    کل باقی رقم: <span dir="ltr">{formatCurrency(subAgent.remaining || 0)}</span>
-                  </span>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
-                    ادائیگی کا ذریعہ
-                  </label>
-                  <select
-                    value={payForm.method}
-                    onChange={(e) => setPayForm({ ...payForm, method: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 text-right"
-                  >
-                    <option value="cash">کیش (نقد)</option>
-                    <option value="bank">بینک ٹرانسفر (Online Transfer)</option>
-                    <option value="easypaisa">ایزی پیسہ (EasyPaisa)</option>
-                    <option value="jazzcash">جاز کیش (JazzCash)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">رسید / حوالہ نمبر</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. REC-98765"
-                    value={payForm.receiptNo}
-                    onChange={(e) => setPayForm({ ...payForm, receiptNo: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono text-left"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">تفصیل / ریمارکس</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. رجب عمرہ گروپ کمیشن فائنل"
-                    value={payForm.notes}
-                    onChange={(e) => setPayForm({ ...payForm, notes: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 text-right"
-                  />
-                </div>
-              </div>
-
-              {/* Footer - Fixed */}
-              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setPayModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-white transition"
-                >
-                  منسوخ کریں
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-lg shadow-emerald-200 transition flex items-center gap-2"
-                >
-                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  <span>ادائیگی کنفرم کریں</span>
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={payModalOpen}
+        onClose={() => setPayModalOpen(false)}
+        title="کمیشن ادائیگی درج کریں"
+        subtitle={`سب ایجنٹ: ${subAgent.name}`}
+        onSubmit={handlePayout}
+        maxWidth="500px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setPayModalOpen(false)}
+              className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-white transition"
+            >
+              منسوخ کریں
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-lg shadow-emerald-200 transition flex items-center gap-2"
+            >
+              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              <span>ادائیگی کنفرم کریں</span>
+            </button>
+          </>
+        }
+      >
+        {errorMsg && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 text-right">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{errorMsg}</span>
           </div>
+        )}
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+            ادائیگی رقم (روپے) *
+          </label>
+          <input
+            type="number"
+            required
+            min="1"
+            placeholder="e.g. 25000"
+            value={payForm.amount}
+            onChange={(e) => setPayForm({ ...payForm, amount: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-900 focus:outline-none focus:border-emerald-500 text-left"
+            dir="ltr"
+          />
+          <span className="text-[11px] text-gray-500 mt-1 block text-right" dir="rtl">
+            کل باقی رقم: <span dir="ltr">{formatCurrency(subAgent.remaining || 0)}</span>
+          </span>
         </div>
-      )}
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+            ادائیگی کا ذریعہ
+          </label>
+          <select
+            value={payForm.method}
+            onChange={(e) => setPayForm({ ...payForm, method: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 text-right"
+          >
+            <option value="cash">کیش (نقد)</option>
+            <option value="bank">بینک ٹرانسفر (Online Transfer)</option>
+            <option value="easypaisa">ایزی پیسہ (EasyPaisa)</option>
+            <option value="jazzcash">جاز کیش (JazzCash)</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1 text-right">رسید / حوالہ نمبر</label>
+          <input
+            type="text"
+            placeholder="e.g. REC-98765"
+            value={payForm.receiptNo}
+            onChange={(e) => setPayForm({ ...payForm, receiptNo: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono text-left"
+            dir="ltr"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1 text-right">تفصیل / ریمارکس</label>
+          <input
+            type="text"
+            placeholder="e.g. رجب عمرہ گروپ کمیشن فائنل"
+            value={payForm.notes}
+            onChange={(e) => setPayForm({ ...payForm, notes: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 text-right"
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

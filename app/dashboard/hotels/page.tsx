@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import PremiumCard from '@/components/ui/premium-card';
+import Modal from '@/components/ui/modal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -520,354 +521,327 @@ export default function HotelsAndTransportPage() {
       )}
 
       {/* MODAL 1: ADD HOTEL */}
-      {showHotelModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h3 className="font-black text-gray-900 text-base">🏨 نیا ہوٹل شامل کریں</h3>
-              <button
-                onClick={() => setShowHotelModal(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      <Modal
+        isOpen={showHotelModal}
+        onClose={() => setShowHotelModal(false)}
+        title="🏨 نیا ہوٹل شامل کریں"
+        onSubmit={handleCreateHotel}
+        maxWidth="480px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setShowHotelModal(false)}
+              className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50"
+            >
+              منسوخ
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 flex items-center gap-2"
+            >
+              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              <span>محفوظ کریں</span>
+            </button>
+          </>
+        }
+      >
+        {errorMsg && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
-            {errorMsg && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1">ہوٹل کا نام *</label>
+          <input
+            type="text"
+            required
+            placeholder="e.g. سوئس ہوٹل المبین یا دار التوحید"
+            value={hotelForm.name}
+            onChange={(e) => setHotelForm({ ...hotelForm, name: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+          />
+        </div>
 
-            <form onSubmit={handleCreateHotel} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">ہوٹل کا نام *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. سوئس ہوٹل المبین یا دار التوحید"
-                  value={hotelForm.name}
-                  onChange={(e) => setHotelForm({ ...hotelForm, name: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                />
-              </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">شہر *</label>
+            <select
+              value={hotelForm.city}
+              onChange={(e) => setHotelForm({ ...hotelForm, city: e.target.value })}
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="Makkah">مکہ مکرمہ (Makkah)</option>
+              <option value="Madinah">مدینہ منورہ (Madinah)</option>
+            </select>
+          </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">شہر *</label>
-                  <select
-                    value={hotelForm.city}
-                    onChange={(e) => setHotelForm({ ...hotelForm, city: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="Makkah">مکہ مکرمہ (Makkah)</option>
-                    <option value="Madinah">مدینہ منورہ (Madinah)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">قسم</label>
-                  <select
-                    value={hotelForm.type}
-                    onChange={(e) => setHotelForm({ ...hotelForm, type: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="hotel_directory">ہوٹل ڈائریکٹری</option>
-                    <option value="group_hotel_booking">گروپ بُکنگ</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">کرایہ فی رات (روپے / ریال)</label>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="25000"
-                  value={hotelForm.price_per_night}
-                  onChange={(e) => setHotelForm({ ...hotelForm, price_per_night: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-bold"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">رابطہ کار یا فون نمبر</label>
-                <input
-                  type="text"
-                  placeholder="+966 50 123 4567"
-                  value={hotelForm.contact_person}
-                  onChange={(e) => setHotelForm({ ...hotelForm, contact_person: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowHotelModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50"
-                >
-                  منسوخ
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 flex items-center gap-2"
-                >
-                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  <span>محفوظ کریں</span>
-                </button>
-              </div>
-            </form>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">قسم</label>
+            <select
+              value={hotelForm.type}
+              onChange={(e) => setHotelForm({ ...hotelForm, type: e.target.value })}
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="hotel_directory">ہوٹل ڈائریکٹری</option>
+              <option value="group_hotel_booking">گروپ بُکنگ</option>
+            </select>
           </div>
         </div>
-      )}
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1">کرایہ فی رات (روپے / ریال)</label>
+          <input
+            type="number"
+            min="0"
+            placeholder="25000"
+            value={hotelForm.price_per_night}
+            onChange={(e) => setHotelForm({ ...hotelForm, price_per_night: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-bold"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1">رابطہ کار یا فون نمبر</label>
+          <input
+            type="text"
+            placeholder="+966 50 123 4567"
+            value={hotelForm.contact_person}
+            onChange={(e) => setHotelForm({ ...hotelForm, contact_person: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono"
+          />
+        </div>
+      </Modal>
 
       {/* MODAL 2: ADD HOTEL BOOKING */}
-      {showBookingModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-lg w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h3 className="font-black text-gray-900 text-base">📅 نئی گروپ ہوٹل بکنگ</h3>
-              <button
-                onClick={() => setShowBookingModal(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      <Modal
+        isOpen={showBookingModal}
+        onClose={() => setShowBookingModal(false)}
+        title="📅 نئی گروپ ہوٹل بکنگ"
+        onSubmit={handleCreateBooking}
+        maxWidth="540px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setShowBookingModal(false)}
+              className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50"
+            >
+              منسوخ
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 flex items-center gap-2"
+            >
+              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              <span>بکنگ کنفرم کریں</span>
+            </button>
+          </>
+        }
+      >
+        {errorMsg && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
-            {errorMsg && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">عمرہ / حج گروپ *</label>
+            <select
+              required
+              value={bookingForm.group_id}
+              onChange={(e) => setBookingForm({ ...bookingForm, group_id: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="">گروپ منتخب کریں...</option>
+              {groups.map((g: any) => (
+                <option key={g.id} value={g.id}>{g.group_name}</option>
+              ))}
+            </select>
+          </div>
 
-            <form onSubmit={handleCreateBooking} className="space-y-3.5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">عمرہ / حج گروپ *</label>
-                  <select
-                    required
-                    value={bookingForm.group_id}
-                    onChange={(e) => setBookingForm({ ...bookingForm, group_id: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="">گروپ منتخب کریں...</option>
-                    {groups.map((g: any) => (
-                      <option key={g.id} value={g.id}>{g.group_name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">ہوٹل منتخب کریں *</label>
-                  <select
-                    required
-                    value={bookingForm.hotel_id}
-                    onChange={(e) => setBookingForm({ ...bookingForm, hotel_id: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="">ہوٹل منتخب کریں...</option>
-                    {hotels.map((h: any) => (
-                      <option key={h.id} value={h.id}>{h.name || h.hotel_name} ({h.city})</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">چیک اِن تاریخ</label>
-                  <input
-                    type="date"
-                    value={bookingForm.check_in}
-                    onChange={(e) => setBookingForm({ ...bookingForm, check_in: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">چیک آؤٹ تاریخ</label>
-                  <input
-                    type="date"
-                    value={bookingForm.check_out}
-                    onChange={(e) => setBookingForm({ ...bookingForm, check_out: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کمروں کی تعداد</label>
-                  <input
-                    type="number"
-                    value={bookingForm.total_rooms}
-                    onChange={(e) => setBookingForm({ ...bookingForm, total_rooms: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کل بیڈز</label>
-                  <input
-                    type="number"
-                    value={bookingForm.total_beds}
-                    onChange={(e) => setBookingForm({ ...bookingForm, total_beds: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کل لاگت (روپے)</label>
-                  <input
-                    type="number"
-                    value={bookingForm.total_cost}
-                    onChange={(e) => setBookingForm({ ...bookingForm, total_cost: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">پیشگی ادا شدہ (Advance)</label>
-                  <input
-                    type="number"
-                    value={bookingForm.advance_paid}
-                    onChange={(e) => setBookingForm({ ...bookingForm, advance_paid: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-bold"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowBookingModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50"
-                >
-                  منسوخ
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 flex items-center gap-2"
-                >
-                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  <span>بکنگ کنفرم کریں</span>
-                </button>
-              </div>
-            </form>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">ہوٹل منتخب کریں *</label>
+            <select
+              required
+              value={bookingForm.hotel_id}
+              onChange={(e) => setBookingForm({ ...bookingForm, hotel_id: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="">ہوٹل منتخب کریں...</option>
+              {hotels.map((h: any) => (
+                <option key={h.id} value={h.id}>{h.name || h.hotel_name} ({h.city})</option>
+              ))}
+            </select>
           </div>
         </div>
-      )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">چیک اِن تاریخ</label>
+            <input
+              type="date"
+              value={bookingForm.check_in}
+              onChange={(e) => setBookingForm({ ...bookingForm, check_in: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">چیک آؤٹ تاریخ</label>
+            <input
+              type="date"
+              value={bookingForm.check_out}
+              onChange={(e) => setBookingForm({ ...bookingForm, check_out: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">کمروں کی تعداد</label>
+            <input
+              type="number"
+              value={bookingForm.total_rooms}
+              onChange={(e) => setBookingForm({ ...bookingForm, total_rooms: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">کل بیڈز</label>
+            <input
+              type="number"
+              value={bookingForm.total_beds}
+              onChange={(e) => setBookingForm({ ...bookingForm, total_beds: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">کل لاگت (روپے)</label>
+            <input
+              type="number"
+              value={bookingForm.total_cost}
+              onChange={(e) => setBookingForm({ ...bookingForm, total_cost: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-bold"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">پیشگی ادا شدہ (Advance)</label>
+            <input
+              type="number"
+              value={bookingForm.advance_paid}
+              onChange={(e) => setBookingForm({ ...bookingForm, advance_paid: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-bold"
+            />
+          </div>
+        </div>
+      </Modal>
 
       {/* MODAL 3: ADD TRANSPORT */}
-      {showTransportModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h3 className="font-black text-gray-900 text-base">🚐 نئی ٹرانسپورٹ بکنگ</h3>
-              <button
-                onClick={() => setShowTransportModal(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      <Modal
+        isOpen={showTransportModal}
+        onClose={() => setShowTransportModal(false)}
+        title="🚐 نئی ٹرانسپورٹ بکنگ"
+        onSubmit={handleCreateTransport}
+        maxWidth="480px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setShowTransportModal(false)}
+              className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50"
+            >
+              منسوخ
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 flex items-center gap-2"
+            >
+              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              <span>محفوظ کریں</span>
+            </button>
+          </>
+        }
+      >
+        {errorMsg && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
-            {errorMsg && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1">عمرہ گروپ (اختیاری)</label>
+          <select
+            value={transportForm.group_id}
+            onChange={(e) => setTransportForm({ ...transportForm, group_id: e.target.value })}
+            className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+          >
+            <option value="">شیڈولڈ یا کوئی گروپ نہیں...</option>
+            {groups.map((g: any) => (
+              <option key={g.id} value={g.id}>{g.group_name}</option>
+            ))}
+          </select>
+        </div>
 
-            <form onSubmit={handleCreateTransport} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">عمرہ گروپ (اختیاری)</label>
-                <select
-                  value={transportForm.group_id}
-                  onChange={(e) => setTransportForm({ ...transportForm, group_id: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="">شیڈولڈ یا کوئی گروپ نہیں...</option>
-                  {groups.map((g: any) => (
-                    <option key={g.id} value={g.id}>{g.group_name}</option>
-                  ))}
-                </select>
-              </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">گاڑی کی قسم *</label>
+            <select
+              value={transportForm.type}
+              onChange={(e) => setTransportForm({ ...transportForm, type: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="Bus">بس (Bus 50 Seater)</option>
+              <option value="Coaster">کوسٹر (Coaster)</option>
+              <option value="GMC">جی ایم سی (GMC SUV)</option>
+              <option value="Hiace">ہائی ایس (Hiace)</option>
+              <option value="Train">حرمین ٹرین (Train)</option>
+            </select>
+          </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">گاڑی کی قسم *</label>
-                  <select
-                    value={transportForm.type}
-                    onChange={(e) => setTransportForm({ ...transportForm, type: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="Bus">بس (Bus 50 Seater)</option>
-                    <option value="Coaster">کوسٹر (Coaster)</option>
-                    <option value="GMC">جی ایم سی (GMC SUV)</option>
-                    <option value="Hiace">ہائی ایس (Hiace)</option>
-                    <option value="Train">حرمین ٹرین (Train)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کرایہ / لاگت (روپے)</label>
-                  <input
-                    type="number"
-                    value={transportForm.cost}
-                    onChange={(e) => setTransportForm({ ...transportForm, cost: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-bold"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">روٹ (Route)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. JED-MAK-MAD-JED"
-                  value={transportForm.route}
-                  onChange={(e) => setTransportForm({ ...transportForm, route: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">تاریخ سفر</label>
-                <input
-                  type="date"
-                  value={transportForm.date}
-                  onChange={(e) => setTransportForm({ ...transportForm, date: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowTransportModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50"
-                >
-                  منسوخ
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 flex items-center gap-2"
-                >
-                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  <span>محفوظ کریں</span>
-                </button>
-              </div>
-            </form>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">کرایہ / لاگت (روپے)</label>
+            <input
+              type="number"
+              value={transportForm.cost}
+              onChange={(e) => setTransportForm({ ...transportForm, cost: e.target.value })}
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-bold"
+            />
           </div>
         </div>
-      )}
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1">روٹ (Route)</label>
+          <input
+            type="text"
+            placeholder="e.g. JED-MAK-MAD-JED"
+            value={transportForm.route}
+            onChange={(e) => setTransportForm({ ...transportForm, route: e.target.value })}
+            className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-mono"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1">تاریخ سفر</label>
+          <input
+            type="date"
+            value={transportForm.date}
+            onChange={(e) => setTransportForm({ ...transportForm, date: e.target.value })}
+            className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900"
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -82,80 +82,85 @@ export default function PremiumCard({
 
   const content = (
     <div
-      style={{ transform: 'none', rotate: '0deg' }}
-      className={`w-full h-full min-h-[165px] md:min-h-[175px] relative overflow-hidden rounded-2xl p-5 text-white bg-gradient-to-br ${config.bg} shadow-lg ${config.shadow} border border-white/10 flex flex-col justify-between ${className}`}
+      style={{
+        transform: 'none',
+        rotate: '0deg',
+        display: 'flex',
+        flexDirection: 'column',
+        direction: 'rtl',
+        textAlign: 'right',
+        gap: '8px',
+      }}
+      className={`w-full h-full min-h-[160px] relative overflow-hidden rounded-2xl p-5 text-white bg-gradient-to-br ${config.bg} shadow-lg ${config.shadow} border border-white/10 flex flex-col gap-2 ${className}`}
+      dir="rtl"
     >
-      <div className="h-full flex flex-col justify-between transform-none" style={{ transform: 'none' }}>
-        {/* TOP CONTENT: TITLE + ICON */}
-        <div className="flex justify-between items-start gap-3 transform-none" style={{ transform: 'none' }}>
-          <div className="transform-none min-w-0" style={{ transform: 'none' }}>
-            <p
-              className="font-urdu text-[17px] leading-[1.6] transform-none rotate-0 not-italic text-white"
-              dir="rtl"
-              style={{ transform: 'none', fontStyle: 'normal' }}
-            >
-              {urduPart}
-            </p>
-            {engPart && (
-              <p
-                className="font-english text-[11px] opacity-80 tracking-wide transform-none uppercase text-white/80"
-                dir="ltr"
-                style={{ transform: 'none' }}
-              >
-                ({engPart})
-              </p>
-            )}
-          </div>
-          <div
-            className="bg-white/20 p-2.5 rounded-xl transform-none flex items-center justify-center text-white shrink-0"
-            style={{ transform: 'none' }}
-          >
-            {React.isValidElement(Icon) ? (
-              Icon
-            ) : Icon ? (
-              <Icon className="w-5 h-5 text-white" />
-            ) : null}
-          </div>
-        </div>
-
-        {/* BOTTOM CONTENT: NUMBER + SUBTITLE + TREND */}
-        <div className="mt-auto pt-2 transform-none" style={{ transform: 'none' }}>
+      {/* 1. Title at top: flex row between title and icon */}
+      <div className="flex items-start justify-between gap-3 w-full" dir="rtl">
+        <div className="text-right min-w-0 flex-1">
           <p
-            className="font-english text-[26px] font-bold mt-2 transform-none text-white block leading-tight tracking-tight"
-            dir="ltr"
-            style={{ transform: 'none' }}
+            className="font-urdu text-[16px] sm:text-[17px] font-bold text-white text-right leading-tight not-italic m-0"
+            dir="rtl"
+            style={{ fontStyle: 'normal' }}
           >
-            {value}
+            {urduPart}
           </p>
-          {subtitle && (
+          {engPart && (
             <p
-              className="font-urdu text-white/80 text-xs mt-1 transform-none not-italic leading-relaxed"
-              dir="rtl"
-              style={{ transform: 'none' }}
+              className="font-english text-[10px] text-white/80 font-medium tracking-wide uppercase mt-0.5 text-right"
+              dir="ltr"
             >
-              {subtitle}
+              ({engPart})
             </p>
           )}
-
-          {trend && (
-            <div
-              className="relative z-10 pt-2 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/85"
-              dir="auto"
-              style={{ transform: 'none' }}
-            >
-              <span className="flex items-center gap-1.5 font-medium leading-normal">
-                {trendUp ? (
-                  <ArrowUpRight className="w-3.5 h-3.5 text-white shrink-0" />
-                ) : (
-                  <ArrowDownRight className="w-3.5 h-3.5 text-white/80 shrink-0" />
-                )}
-                {trend}
-              </span>
-              <ArrowUpRight className="w-3.5 h-3.5 opacity-70 shrink-0" />
-            </div>
-          )}
+        </div>
+        <div className="bg-white/20 p-2 rounded-xl flex items-center justify-center text-white shrink-0">
+          {React.isValidElement(Icon) ? (
+            Icon
+          ) : Icon ? (
+            <Icon className="w-5 h-5 text-white" />
+          ) : null}
         </div>
       </div>
+
+      {/* 2. Big number in middle: font-size 28px, not overlapping */}
+      <div className="w-full text-right my-auto py-1">
+        <span
+          className="font-english text-white font-black tracking-tight inline-block text-right leading-none"
+          style={{ fontSize: '28px', lineHeight: '1.2' }}
+          dir="ltr"
+        >
+          {value}
+        </span>
+      </div>
+
+      {/* 3. Subtitle below */}
+      {subtitle && (
+        <p
+          className="font-urdu text-white/80 text-xs text-right leading-normal not-italic m-0"
+          dir="rtl"
+          style={{ fontStyle: 'normal' }}
+        >
+          {subtitle}
+        </p>
+      )}
+
+      {/* 4. Trend / Badge at bottom (inside card, not absolute over text) */}
+      {trend && (
+        <div
+          className="pt-2 mt-auto border-t border-white/10 flex items-center justify-between text-[11px] text-white/90"
+          dir="rtl"
+        >
+          <span className="flex items-center gap-1.5 font-medium">
+            {trendUp ? (
+              <ArrowUpRight className="w-3.5 h-3.5 text-white shrink-0" />
+            ) : (
+              <ArrowDownRight className="w-3.5 h-3.5 text-white/80 shrink-0" />
+            )}
+            {trend}
+          </span>
+          <ArrowUpRight className="w-3 h-3 opacity-70 shrink-0" />
+        </div>
+      )}
     </div>
   );
 

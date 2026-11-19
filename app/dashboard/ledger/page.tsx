@@ -21,6 +21,7 @@ import {
 import { formatCurrency, formatDate } from '@/lib/utils';
 import PremiumCard from '@/components/ui/premium-card';
 import ContentCard from '@/components/ui/content-card';
+import Modal from '@/components/ui/modal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -425,178 +426,185 @@ export default function LedgerPage() {
       )}
 
       {/* RECORD PAYMENT MODAL */}
-      {showPayModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-900 mb-1">رقم وصولی کا اندراج (Receive Payment)</h3>
-            <p className="text-xs text-gray-500 mb-4">گاہک: <strong className="text-gray-800">{selectedCustomer?.customer_name}</strong></p>
-
-            <form onSubmit={handleRecordPayment} className="space-y-3">
-              <div>
-                <label className="block text-xs text-gray-700 font-medium mb-1">وصول شدہ رقم (PKR)*</label>
-                <input
-                  type="number"
-                  required
-                  value={txForm.amount}
-                  onChange={(e) => setTxForm({ ...txForm, amount: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs text-gray-700 font-medium mb-1">طریقہ ادائیگی (Payment Method)</label>
-                <select
-                  value={txForm.method}
-                  onChange={(e) => setTxForm({ ...txForm, method: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="cash">کیش (Cash)</option>
-                  <option value="bank">بینک ٹرانسفر (Bank)</option>
-                  <option value="easypaisa">ایزی پیسہ (Easypaisa)</option>
-                  <option value="jazzcash">جاز کیش (Jazzcash)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs text-gray-700 font-medium mb-1">تفصیل / نوٹ</label>
-                <input
-                  type="text"
-                  value={txForm.note}
-                  onChange={(e) => setTxForm({ ...txForm, note: e.target.value })}
-                  placeholder="عمرہ ایڈوانس قسط نمبر 2"
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div className="pt-3 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowPayModal(false)}
-                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition"
-                >
-                  منسوخ
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 transition"
-                >
-                  {submitting ? 'محفوظ ہو رہا ہے...' : 'رسید جاری کریں'}
-                </button>
-              </div>
-            </form>
-          </div>
+      <Modal
+        isOpen={showPayModal}
+        onClose={() => setShowPayModal(false)}
+        title="رقم وصولی کا اندراج (Receive Payment)"
+        subtitle={selectedCustomer ? `گاہک: ${selectedCustomer.customer_name}` : undefined}
+        onSubmit={handleRecordPayment}
+        maxWidth="480px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setShowPayModal(false)}
+              className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition"
+            >
+              منسوخ
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 transition"
+            >
+              {submitting ? 'محفوظ ہو رہا ہے...' : 'رسید جاری کریں'}
+            </button>
+          </>
+        }
+      >
+        <div>
+          <label className="block text-xs text-gray-700 font-medium mb-1">وصول شدہ رقم (PKR)*</label>
+          <input
+            type="number"
+            required
+            value={txForm.amount}
+            onChange={(e) => setTxForm({ ...txForm, amount: e.target.value })}
+            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold focus:outline-none focus:border-emerald-500"
+          />
         </div>
-      )}
+
+        <div>
+          <label className="block text-xs text-gray-700 font-medium mb-1">طریقہ ادائیگی (Payment Method)</label>
+          <select
+            value={txForm.method}
+            onChange={(e) => setTxForm({ ...txForm, method: e.target.value })}
+            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+          >
+            <option value="cash">کیش (Cash)</option>
+            <option value="bank">بینک ٹرانسفر (Bank)</option>
+            <option value="easypaisa">ایزی پیسہ (Easypaisa)</option>
+            <option value="jazzcash">جاز کیش (Jazzcash)</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs text-gray-700 font-medium mb-1">تفصیل / نوٹ</label>
+          <input
+            type="text"
+            value={txForm.note}
+            onChange={(e) => setTxForm({ ...txForm, note: e.target.value })}
+            placeholder="عمرہ ایڈوانس قسط نمبر 2"
+            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+      </Modal>
 
       {/* CREATE CUSTOMER MODAL */}
-      {showAddCustModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">+ نیا گاہک کھاتہ بنائیں</h3>
-            <form onSubmit={handleCreateCustomer} className="space-y-3">
-              <div>
-                <label className="block text-xs text-gray-700 font-medium mb-1">گاہک کا نام*</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="محمد شفیق"
-                  value={newCustForm.customer_name}
-                  onChange={(e) => setNewCustForm({ ...newCustForm, customer_name: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-700 font-medium mb-1">فون نمبر (WhatsApp)</label>
-                <input
-                  type="text"
-                  placeholder="03001234567"
-                  value={newCustForm.phone}
-                  onChange={(e) => setNewCustForm({ ...newCustForm, phone: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-700 font-medium mb-1">کل پیکیج رقم (PKR)</label>
-                <input
-                  type="number"
-                  value={newCustForm.total_payable}
-                  onChange={(e) => setNewCustForm({ ...newCustForm, total_payable: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-              <div className="pt-3 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddCustModal(false)}
-                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition"
-                >
-                  منسوخ
-                </button>
-                <button type="submit" className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 transition">
-                  کھاتہ بنائیں
-                </button>
-              </div>
-            </form>
-          </div>
+      <Modal
+        isOpen={showAddCustModal}
+        onClose={() => setShowAddCustModal(false)}
+        title="+ نیا گاہک کھاتہ بنائیں"
+        onSubmit={handleCreateCustomer}
+        maxWidth="480px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setShowAddCustModal(false)}
+              className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition"
+            >
+              منسوخ
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 transition"
+            >
+              کھاتہ بنائیں
+            </button>
+          </>
+        }
+      >
+        <div>
+          <label className="block text-xs text-gray-700 font-medium mb-1">گاہک کا نام*</label>
+          <input
+            type="text"
+            required
+            placeholder="محمد شفیق"
+            value={newCustForm.customer_name}
+            onChange={(e) => setNewCustForm({ ...newCustForm, customer_name: e.target.value })}
+            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+          />
         </div>
-      )}
+        <div>
+          <label className="block text-xs text-gray-700 font-medium mb-1">فون نمبر (WhatsApp)</label>
+          <input
+            type="text"
+            placeholder="03001234567"
+            value={newCustForm.phone}
+            onChange={(e) => setNewCustForm({ ...newCustForm, phone: e.target.value })}
+            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-700 font-medium mb-1">کل پیکیج رقم (PKR)</label>
+          <input
+            type="number"
+            value={newCustForm.total_payable}
+            onChange={(e) => setNewCustForm({ ...newCustForm, total_payable: e.target.value })}
+            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+      </Modal>
 
       {/* CREATE SUPPLIER MODAL */}
-      {showAddSuppModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">+ نیا سپلائر کھاتہ بنائیں</h3>
-            <form onSubmit={handleCreateSupplier} className="space-y-3">
-              <div>
-                <label className="block text-xs text-gray-700 font-medium mb-1">سپلائر کا نام*</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="سعودی ایئرلائنز / دار الایمان ہوٹل"
-                  value={newSuppForm.supplier_name}
-                  onChange={(e) => setNewSuppForm({ ...newSuppForm, supplier_name: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-700 font-medium mb-1">سپلائر کی قسم</label>
-                <select
-                  value={newSuppForm.supplier_type}
-                  onChange={(e) => setNewSuppForm({ ...newSuppForm, supplier_type: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="hotel">ہوٹل (Hotel)</option>
-                  <option value="airline">ایئرلائن (Airline)</option>
-                  <option value="transport">ٹرانسپورٹ (Transport)</option>
-                  <option value="visa_agent">ویزہ ایجنٹ (Visa Agent)</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs text-gray-700 font-medium mb-1">کل واجب الادا رقم (PKR)</label>
-                <input
-                  type="number"
-                  value={newSuppForm.total_payable}
-                  onChange={(e) => setNewSuppForm({ ...newSuppForm, total_payable: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-              <div className="pt-3 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddSuppModal(false)}
-                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition"
-                >
-                  منسوخ
-                </button>
-                <button type="submit" className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-200 transition">
-                  کھاتہ بنائیں
-                </button>
-              </div>
-            </form>
-          </div>
+      <Modal
+        isOpen={showAddSuppModal}
+        onClose={() => setShowAddSuppModal(false)}
+        title="+ نیا سپلائر کھاتہ بنائیں"
+        onSubmit={handleCreateSupplier}
+        maxWidth="480px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setShowAddSuppModal(false)}
+              className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition"
+            >
+              منسوخ
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-200 transition"
+            >
+              کھاتہ بنائیں
+            </button>
+          </>
+        }
+      >
+        <div>
+          <label className="block text-xs text-gray-700 font-medium mb-1">سپلائر کا نام*</label>
+          <input
+            type="text"
+            required
+            placeholder="سعودی ایئرلائنز / دار الایمان ہوٹل"
+            value={newSuppForm.supplier_name}
+            onChange={(e) => setNewSuppForm({ ...newSuppForm, supplier_name: e.target.value })}
+            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+          />
         </div>
-      )}
+        <div>
+          <label className="block text-xs text-gray-700 font-medium mb-1">سپلائر کی قسم</label>
+          <select
+            value={newSuppForm.supplier_type}
+            onChange={(e) => setNewSuppForm({ ...newSuppForm, supplier_type: e.target.value })}
+            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+          >
+            <option value="hotel">ہوٹل (Hotel)</option>
+            <option value="airline">ایئرلائن (Airline)</option>
+            <option value="transport">ٹرانسپورٹ (Transport)</option>
+            <option value="visa_agent">ویزہ ایجنٹ (Visa Agent)</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-gray-700 font-medium mb-1">کل واجب الادا رقم (PKR)</label>
+          <input
+            type="number"
+            value={newSuppForm.total_payable}
+            onChange={(e) => setNewSuppForm({ ...newSuppForm, total_payable: e.target.value })}
+            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

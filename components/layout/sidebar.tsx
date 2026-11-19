@@ -96,7 +96,10 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   };
 
   return (
-    <aside className="w-full md:w-72 lg:w-[240px] xl:w-[260px] max-w-[320px] bg-[#0f172a] bg-gradient-to-b from-slate-900 to-slate-950 text-white shadow-2xl border-r border-slate-800/80 p-4 sm:p-5 lg:p-3 xl:p-4 flex flex-col justify-between h-full select-none overflow-y-auto" style={{ transform: 'none' }}>
+    <aside
+      className="w-[260px] min-w-[260px] max-w-[260px] bg-[#0f172a] bg-gradient-to-b from-slate-900 to-slate-950 text-white shadow-2xl border-r border-slate-800/80 p-3 sm:p-4 flex flex-col justify-between h-full select-none overflow-y-auto flex-shrink-0"
+      style={{ width: '260px', minWidth: '260px', maxWidth: '260px', transform: 'none' }}
+    >
       <div>
         {/* Dynamic Agency Branding Header */}
         <div className="flex items-center justify-between pb-4 sm:pb-5 lg:pb-3 border-b border-white/10 gap-2">
@@ -181,7 +184,7 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
         )}
 
         {/* Navigation Links */}
-        <nav className="mt-3 lg:mt-2.5 space-y-0.5 lg:space-y-0.5 transform-none" style={{ transform: 'none' }}>
+        <nav className="mt-3 lg:mt-2.5 space-y-1 transform-none" style={{ transform: 'none' }}>
           {navItems.map((item) => {
             const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             const Icon = item.icon;
@@ -191,30 +194,49 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                 href={item.href}
                 prefetch={true}
                 onClick={onCloseMobile}
-                className={`flex items-center justify-between w-full px-3.5 py-2.5 lg:py-2 xl:py-2.5 rounded-xl transition-all duration-150 active:scale-[0.98] transform-none ${
+                className={`flex items-center gap-3 w-full px-3 py-2 rounded-xl transition-all duration-150 active:scale-[0.98] transform-none ${
                   active
                     ? 'bg-white/10 backdrop-blur-xl border-l-4 border-emerald-400 text-white shadow-lg'
                     : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
                 style={{ transform: 'none' }}
               >
-                <div className="flex items-center gap-2.5 lg:gap-2 transform-none" style={{ transform: 'none' }}>
-                  <Icon
-                    className={`w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0 ${
-                      active ? 'text-emerald-400' : 'text-slate-400'
-                    }`}
-                  />
-                  <span className="font-english text-[10px] lg:text-[9px] xl:text-[10px] text-gray-400 tracking-wider transform-none uppercase" style={{ transform: 'none' }}>
-                    ({item.eng})
+                <Icon
+                  className={`w-5 h-5 flex-shrink-0 ${
+                    active ? 'text-emerald-400' : 'text-slate-400'
+                  }`}
+                />
+                <div
+                  className="flex flex-col min-w-0 text-left overflow-hidden flex-1"
+                  style={{
+                    lineHeight: '1.2',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <span
+                    className="text-[10px] text-gray-400 font-medium uppercase tracking-wider font-english block"
+                    style={{
+                      lineHeight: '1.2',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {item.eng}
+                  </span>
+                  <span
+                    className="font-urdu text-[13px] text-white block mt-0.5"
+                    dir="rtl"
+                    style={{
+                      lineHeight: '1.2',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {item.urdu}
                   </span>
                 </div>
-                <span
-                  className="font-urdu text-[14px] md:text-[15px] lg:text-[13px] xl:text-[14px] leading-[1.5] text-white transform-none rotate-0 not-italic"
-                  dir="rtl"
-                  style={{ transform: 'none', fontStyle: 'normal' }}
-                >
-                  {item.urdu}
-                </span>
               </Link>
             );
           })}

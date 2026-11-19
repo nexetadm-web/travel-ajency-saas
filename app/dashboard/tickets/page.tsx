@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import Modal from '@/components/ui/modal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -258,172 +259,157 @@ export default function TicketsPage() {
       </div>
 
       {/* CREATE TICKET MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <div className="w-full max-w-lg max-h-[90vh] bg-white border border-gray-100 rounded-[24px] sm:rounded-[28px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Modal Header - Fixed */}
-            <div className="flex items-center justify-between px-6 py-4 sm:px-8 sm:py-5 border-b border-gray-100 shrink-0">
-              <h3 className="text-base sm:text-lg font-bold text-gray-900">+ نئی ٹکٹ بکنگ (New PNR)</h3>
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center text-sm font-bold transition"
-              >
-                ✕
-              </button>
-            </div>
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="+ نئی ٹکٹ بکنگ (New PNR)"
+        onSubmit={handleCreateTicket}
+        maxWidth="540px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setShowModal(false)}
+              className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-white transition"
+            >
+              منسوخ کریں
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50 transition"
+            >
+              {submitting ? 'محفوظ ہو رہا ہے...' : 'ٹکٹ محفوظ کریں'}
+            </button>
+          </>
+        }
+      >
+        {errorMsg && (
+          <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs text-right">
+            {errorMsg}
+          </div>
+        )}
 
-            {/* Modal Body & Form - Scrollable */}
-            <form onSubmit={handleCreateTicket} className="flex flex-col flex-1 min-h-0 overflow-hidden">
-              <div className="p-6 sm:p-8 overflow-y-auto space-y-4 flex-1">
-                {errorMsg && (
-                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs text-right">
-                    {errorMsg}
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">PNR کوڈ *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. ABC123"
-                      value={formData.pnr}
-                      onChange={(e) => setFormData({ ...formData, pnr: e.target.value.toUpperCase() })}
-                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase font-black focus:outline-none focus:border-sky-500 text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">ایئرلائن *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Saudi Airlines"
-                      value={formData.airline}
-                      onChange={(e) => setFormData({ ...formData, airline: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-sky-500 text-right"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">سیکٹر (Sector)*</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="LHE-JED-LHE"
-                    value={formData.sector}
-                    onChange={(e) => setFormData({ ...formData, sector: e.target.value.toUpperCase() })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase focus:outline-none focus:border-sky-500 text-left"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">پاسپورٹ (Select or Type)</label>
-                    <input
-                      type="text"
-                      placeholder="AK1234567"
-                      value={formData.passport_no}
-                      onChange={(e) => handleSelectPilgrim(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase focus:outline-none focus:border-sky-500 text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">مسافر کا نام *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="محمد علی"
-                      value={formData.passenger_name}
-                      onChange={(e) => setFormData({ ...formData, passenger_name: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-sky-500 text-right"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">خرید ریٹ (Purchase Rate)</label>
-                    <input
-                      type="number"
-                      required
-                      value={formData.purchase_rate}
-                      onChange={(e) => setFormData({ ...formData, purchase_rate: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold focus:outline-none focus:border-sky-500 text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">فروخت ریٹ (Sale Rate)</label>
-                    <input
-                      type="number"
-                      required
-                      value={formData.sale_rate}
-                      onChange={(e) => setFormData({ ...formData, sale_rate: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold focus:outline-none focus:border-sky-500 text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                </div>
-
-                {/* Live Profit Preview */}
-                <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
-                  <span className="text-emerald-800 font-bold">خودکار منافع کا حساب (Auto Profit):</span>
-                  <span className="font-black text-sm text-emerald-700" dir="ltr">
-                    {formatCurrency(liveProfit)}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">سفر تاریخ</label>
-                    <input
-                      type="date"
-                      value={formData.travel_date}
-                      onChange={(e) => setFormData({ ...formData, travel_date: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">واپسی تاریخ</label>
-                    <input
-                      type="date"
-                      value={formData.return_date}
-                      onChange={(e) => setFormData({ ...formData, return_date: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer - Sticky / Always Visible */}
-              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-white transition"
-                >
-                  منسوخ کریں
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50 transition"
-                >
-                  {submitting ? 'محفوظ ہو رہا ہے...' : 'ٹکٹ محفوظ کریں'}
-                </button>
-              </div>
-            </form>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">PNR کوڈ *</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. ABC123"
+              value={formData.pnr}
+              onChange={(e) => setFormData({ ...formData, pnr: e.target.value.toUpperCase() })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase font-black focus:outline-none focus:border-sky-500 text-left"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">ایئرلائن *</label>
+            <input
+              type="text"
+              required
+              placeholder="Saudi Airlines"
+              value={formData.airline}
+              onChange={(e) => setFormData({ ...formData, airline: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-sky-500 text-right"
+            />
           </div>
         </div>
-      )}
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1 text-right">سیکٹر (Sector)*</label>
+          <input
+            type="text"
+            required
+            placeholder="LHE-JED-LHE"
+            value={formData.sector}
+            onChange={(e) => setFormData({ ...formData, sector: e.target.value.toUpperCase() })}
+            className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase focus:outline-none focus:border-sky-500 text-left"
+            dir="ltr"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">پاسپورٹ (Select or Type)</label>
+            <input
+              type="text"
+              placeholder="AK1234567"
+              value={formData.passport_no}
+              onChange={(e) => handleSelectPilgrim(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase focus:outline-none focus:border-sky-500 text-left"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">مسافر کا نام *</label>
+            <input
+              type="text"
+              required
+              placeholder="محمد علی"
+              value={formData.passenger_name}
+              onChange={(e) => setFormData({ ...formData, passenger_name: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-sky-500 text-right"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">خرید ریٹ (Purchase Rate)</label>
+            <input
+              type="number"
+              required
+              value={formData.purchase_rate}
+              onChange={(e) => setFormData({ ...formData, purchase_rate: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold focus:outline-none focus:border-sky-500 text-left"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">فروخت ریٹ (Sale Rate)</label>
+            <input
+              type="number"
+              required
+              value={formData.sale_rate}
+              onChange={(e) => setFormData({ ...formData, sale_rate: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold focus:outline-none focus:border-sky-500 text-left"
+              dir="ltr"
+            />
+          </div>
+        </div>
+
+        {/* Live Profit Preview */}
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
+          <span className="text-emerald-800 font-bold">خودکار منافع کا حساب (Auto Profit):</span>
+          <span className="font-black text-sm text-emerald-700" dir="ltr">
+            {formatCurrency(liveProfit)}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">سفر تاریخ</label>
+            <input
+              type="date"
+              value={formData.travel_date}
+              onChange={(e) => setFormData({ ...formData, travel_date: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-left"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">واپسی تاریخ</label>
+            <input
+              type="date"
+              value={formData.return_date}
+              onChange={(e) => setFormData({ ...formData, return_date: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs text-left"
+              dir="ltr"
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

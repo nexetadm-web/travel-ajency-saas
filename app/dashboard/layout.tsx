@@ -18,7 +18,7 @@ export default function DashboardLayout({
   return (
     <div className="dashboard min-h-screen bg-[#F8FAFF] text-slate-800 flex flex-col lg:flex-row antialiased" style={{ transform: 'none' }}>
       {/* DESKTOP SIDEBAR */}
-      <div className="hidden lg:block sticky top-0 h-screen flex-shrink-0 z-30">
+      <div className="hidden lg:block sticky top-0 h-screen flex-shrink-0 z-30 w-[260px]">
         <Sidebar />
       </div>
 

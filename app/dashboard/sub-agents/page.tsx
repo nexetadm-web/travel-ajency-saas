@@ -22,6 +22,7 @@ import {
 import { formatCurrency } from '@/lib/utils';
 import PremiumCard from '@/components/ui/premium-card';
 import ContentCard from '@/components/ui/content-card';
+import Modal from '@/components/ui/modal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -168,41 +169,41 @@ export default function SubAgentsPage() {
       ) : (
         <ContentCard>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-left text-xs text-gray-700">
+            <table className="w-full min-w-[800px] text-xs text-gray-700" dir="rtl">
               <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 uppercase tracking-wider text-[11px]">
                 <tr>
-                  <th className="p-4">سب ایجنٹ نام</th>
-                  <th className="p-4">فون و شہر</th>
-                  <th className="p-4">شناختی کارڈ</th>
-                  <th className="p-4">کمیشن ریٹ</th>
-                  <th className="p-4 text-center">ریفر کردہ حجاج</th>
-                  <th className="p-4">کل کمیشن</th>
-                  <th className="p-4">ادا شدہ</th>
-                  <th className="p-4">باقی رقم</th>
-                  <th className="p-4 text-center">تفصیلات و کھاتہ</th>
+                  <th className="p-4 text-right whitespace-nowrap">سب ایجنٹ نام</th>
+                  <th className="p-4 text-right whitespace-nowrap">فون و شہر</th>
+                  <th className="p-4 text-right whitespace-nowrap">شناختی کارڈ</th>
+                  <th className="p-4 text-right whitespace-nowrap">کمیشن ریٹ</th>
+                  <th className="p-4 text-center whitespace-nowrap">ریفر کردہ حجاج</th>
+                  <th className="p-4 text-left whitespace-nowrap" dir="ltr">کل کمیشن</th>
+                  <th className="p-4 text-left whitespace-nowrap" dir="ltr">ادا شدہ</th>
+                  <th className="p-4 text-left whitespace-nowrap" dir="ltr">باقی رقم</th>
+                  <th className="p-4 text-center whitespace-nowrap">تفصیلات و کھاتہ</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {subAgents.map((agent: any) => (
                   <tr key={agent.id} className="hover:bg-indigo-50/20 transition">
-                    <td className="p-4">
+                    <td className="p-4 text-right align-middle">
                       <div className="font-bold text-gray-900 text-sm">{agent.name}</div>
                     </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-1.5 text-gray-800 font-mono">
-                        <Phone className="w-3.5 h-3.5 text-indigo-500" />
+                    <td className="p-4 text-right align-middle">
+                      <div className="flex items-center justify-end gap-1.5 text-gray-800 font-mono" dir="ltr">
                         <span>{agent.phone}</span>
+                        <Phone className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                       </div>
                       {agent.city && (
-                        <div className="flex items-center gap-1 text-[11px] text-gray-400 mt-0.5">
-                          <MapPin className="w-3 h-3" />
+                        <div className="flex items-center justify-end gap-1 text-[11px] text-gray-400 mt-0.5" dir="rtl">
+                          <MapPin className="w-3 h-3 shrink-0" />
                           <span>{agent.city}</span>
                         </div>
                       )}
                     </td>
-                    <td className="p-4 font-mono text-gray-500">{agent.cnic || '-'}</td>
-                    <td className="p-4">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    <td className="p-4 text-right align-middle font-mono text-gray-500">{agent.cnic || '-'}</td>
+                    <td className="p-4 text-right align-middle">
+                      <span className="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 whitespace-nowrap">
                         {agent.commissionType === 'percent' ||
                         agent.commission_type === 'percent' ||
                         agent.commission_type === 'percentage'
@@ -210,21 +211,21 @@ export default function SubAgentsPage() {
                           : `Rs. ${Number(agent.commissionValue ?? agent.commission_value ?? agent.commission_per_haji ?? 0).toLocaleString()} فی حاجی`}
                       </span>
                     </td>
-                    <td className="p-4 text-center">
+                    <td className="p-4 text-center align-middle">
                       <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
                         {agent.totalPilgrims || 0}
                       </span>
                     </td>
-                    <td className="p-4 font-bold text-gray-900">
+                    <td className="p-4 text-left align-middle font-bold text-gray-900" dir="ltr">
                       {formatCurrency(agent.totalEarned || 0)}
                     </td>
-                    <td className="p-4 font-semibold text-emerald-600">
+                    <td className="p-4 text-left align-middle font-semibold text-emerald-600" dir="ltr">
                       {formatCurrency(agent.totalPaid || 0)}
                     </td>
-                    <td className="p-4 font-black text-rose-600">
+                    <td className="p-4 text-left align-middle font-black text-rose-600" dir="ltr">
                       {formatCurrency(agent.remaining || 0)}
                     </td>
-                    <td className="p-4 text-center">
+                    <td className="p-4 text-center align-middle">
                       <Link
                         href={`/dashboard/sub-agents/${agent.id}`}
                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-[11px] border border-indigo-200 transition"
@@ -242,155 +243,133 @@ export default function SubAgentsPage() {
       )}
 
       {/* ADD SUB AGENT MODAL */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Header - Fixed */}
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 sm:px-8 sm:py-5 shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-                  👥
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-base">نیا سب ایجنٹ رجسٹر کریں</h3>
-                  <p className="text-[11px] text-gray-500">کمیشن کا ریٹ اور رابطہ نمبر درج کریں</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="نیا سب ایجنٹ رجسٹر کریں"
+        subtitle="کمیشن کا ریٹ اور رابطہ نمبر درج کریں"
+        onSubmit={handleSubmit}
+        maxWidth="520px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setModalOpen(false)}
+              className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-white transition"
+            >
+              منسوخ کریں
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-lg shadow-indigo-200 transition flex items-center gap-2"
+            >
+              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              <span>محفوظ کریں</span>
+            </button>
+          </>
+        }
+      >
+        {errorMsg && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 text-right">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
-            {/* Form - Scrollable */}
-            <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
-              <div className="p-6 sm:p-8 overflow-y-auto space-y-4 flex-1">
-                {errorMsg && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 text-right">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    <span>{errorMsg}</span>
-                  </div>
-                )}
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+            ایجنٹ کا مکمل نام *
+          </label>
+          <input
+            type="text"
+            required
+            placeholder="e.g. محمد سلیم (گوجرانوالہ ایجنٹ)"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 text-right"
+          />
+        </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
-                    ایجنٹ کا مکمل نام *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. محمد سلیم (گوجرانوالہ ایجنٹ)"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 text-right"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
-                      موبائل / واٹس ایپ نمبر *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="0300-1234567"
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-mono text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
-                      شہر / علاقہ
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. لاہور / سیالکوٹ"
-                      value={form.city}
-                      onChange={(e) => setForm({ ...form, city: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 text-right"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
-                    شناختی کارڈ (CNIC) اختیاری
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="35201-xxxxxxx-x"
-                    value={form.cnic}
-                    onChange={(e) => setForm({ ...form, cnic: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-mono text-left"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
-                      کمیشن کی قسم
-                    </label>
-                    <select
-                      value={form.commissionType}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          commissionType: e.target.value,
-                          commissionValue: e.target.value === 'percent' ? '5' : '5000',
-                        })
-                      }
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 text-right"
-                    >
-                      <option value="per_person">مقررہ رقم فی حاجی (Per Pilgrim)</option>
-                      <option value="percent">فیصد تناسب (Percentage %)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
-                      {form.commissionType === 'percent' ? 'کمیشن فیصد (%)' : 'کمیشن رقم (روپے)'}
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      required
-                      value={form.commissionValue}
-                      onChange={(e) => setForm({ ...form, commissionValue: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-bold text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer - Fixed */}
-              <div className="flex items-center justify-end gap-3 px-6 py-4 sm:px-8 sm:py-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-white transition"
-                >
-                  منسوخ کریں
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-lg shadow-indigo-200 transition flex items-center gap-2"
-                >
-                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  <span>محفوظ کریں</span>
-                </button>
-              </div>
-            </form>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+              موبائل / واٹس ایپ نمبر *
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="0300-1234567"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-mono text-left"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+              شہر / علاقہ
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. لاہور / سیالکوٹ"
+              value={form.city}
+              onChange={(e) => setForm({ ...form, city: e.target.value })}
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 text-right"
+            />
           </div>
         </div>
-      )}
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+            شناختی کارڈ (CNIC) اختیاری
+          </label>
+          <input
+            type="text"
+            placeholder="35201-xxxxxxx-x"
+            value={form.cnic}
+            onChange={(e) => setForm({ ...form, cnic: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-mono text-left"
+            dir="ltr"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+              کمیشن کی قسم
+            </label>
+            <select
+              value={form.commissionType}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  commissionType: e.target.value,
+                  commissionValue: e.target.value === 'percent' ? '5' : '5000',
+                })
+              }
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 text-right"
+            >
+              <option value="per_person">مقررہ رقم فی حاجی (Per Pilgrim)</option>
+              <option value="percent">فیصد تناسب (Percentage %)</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">
+              {form.commissionType === 'percent' ? 'کمیشن فیصد (%)' : 'کمیشن رقم (روپے)'}
+            </label>
+            <input
+              type="number"
+              min="1"
+              required
+              value={form.commissionValue}
+              onChange={(e) => setForm({ ...form, commissionValue: e.target.value })}
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-indigo-500 font-bold text-left"
+              dir="ltr"
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

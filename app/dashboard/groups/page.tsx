@@ -19,6 +19,7 @@ import {
 import dayjs from 'dayjs';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import PremiumCard from '@/components/ui/premium-card';
+import Modal from '@/components/ui/modal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -286,137 +287,128 @@ export default function GroupsPage() {
       )}
 
       {/* CREATE GROUP MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <div className="w-full max-w-lg bg-white border border-gray-100 rounded-[28px] p-5 sm:p-8 shadow-2xl max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-              <h3 className="text-lg font-bold text-gray-900">+ نیا گروپ بنائیں</h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 flex items-center justify-center text-sm font-bold"
-              >
-                ✕
-              </button>
-            </div>
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="+ نیا گروپ بنائیں"
+        onSubmit={handleCreateGroup}
+        maxWidth="540px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setShowModal(false)}
+              className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50"
+            >
+              منسوخ کریں
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50"
+            >
+              {submitting ? 'محفوظ ہو رہا ہے...' : 'گروپ محفوظ کریں'}
+            </button>
+          </>
+        }
+      >
+        {errorMsg && (
+          <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+            {errorMsg}
+          </div>
+        )}
 
-            {errorMsg && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
-                {errorMsg}
-              </div>
-            )}
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1">
+            گروپ کا نام (Group Name)*
+          </label>
+          <input
+            type="text"
+            required
+            placeholder='e.g. "Umrah Group 15 Dec 2026 - 40 Persons"'
+            value={formData.group_name}
+            onChange={(e) => setFormData({ ...formData, group_name: e.target.value })}
+            className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+          />
+        </div>
 
-            <form onSubmit={handleCreateGroup} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  گروپ کا نام (Group Name)*
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder='e.g. "Umrah Group 15 Dec 2026 - 40 Persons"'
-                  value={formData.group_name}
-                  onChange={(e) => setFormData({ ...formData, group_name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">تاریخ روانگی</label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.departure_date}
-                    onChange={(e) => setFormData({ ...formData, departure_date: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">تاریخ واپسی</label>
-                  <input
-                    type="date"
-                    value={formData.return_date}
-                    onChange={(e) => setFormData({ ...formData, return_date: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">ایئرلائن</label>
-                  <input
-                    type="text"
-                    value={formData.airline}
-                    onChange={(e) => setFormData({ ...formData, airline: e.target.value })}
-                    placeholder="Saudi Airlines / PIA"
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">کل سیٹیں (Total Seats)</label>
-                  <input
-                    type="number"
-                    value={formData.total_seats}
-                    onChange={(e) => setFormData({ ...formData, total_seats: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">مکہ مکرمہ ہوٹل</label>
-                  <input
-                    type="text"
-                    value={formData.makkah_hotel}
-                    onChange={(e) => setFormData({ ...formData, makkah_hotel: e.target.value })}
-                    placeholder="Swissotel Makkah"
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">مدینہ منورہ ہوٹل</label>
-                  <input
-                    type="text"
-                    value={formData.madina_hotel}
-                    onChange={(e) => setFormData({ ...formData, madina_hotel: e.target.value })}
-                    placeholder="Anwar Al Madinah"
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">پیکج قیمت فی کس (PKR)</label>
-                <input
-                  type="number"
-                  value={formData.price_per_person}
-                  onChange={(e) => setFormData({ ...formData, price_per_person: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50"
-                >
-                  منسوخ کریں
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-200 disabled:opacity-50"
-                >
-                  {submitting ? 'محفوظ ہو رہا ہے...' : 'گروپ محفوظ کریں'}
-                </button>
-              </div>
-            </form>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">تاریخ روانگی</label>
+            <input
+              type="date"
+              required
+              value={formData.departure_date}
+              onChange={(e) => setFormData({ ...formData, departure_date: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">تاریخ واپسی</label>
+            <input
+              type="date"
+              value={formData.return_date}
+              onChange={(e) => setFormData({ ...formData, return_date: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+            />
           </div>
         </div>
-      )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">ایئرلائن</label>
+            <input
+              type="text"
+              value={formData.airline}
+              onChange={(e) => setFormData({ ...formData, airline: e.target.value })}
+              placeholder="Saudi Airlines / PIA"
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">کل سیٹیں (Total Seats)</label>
+            <input
+              type="number"
+              value={formData.total_seats}
+              onChange={(e) => setFormData({ ...formData, total_seats: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">مکہ مکرمہ ہوٹل</label>
+            <input
+              type="text"
+              value={formData.makkah_hotel}
+              onChange={(e) => setFormData({ ...formData, makkah_hotel: e.target.value })}
+              placeholder="Swissotel Makkah"
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">مدینہ منورہ ہوٹل</label>
+            <input
+              type="text"
+              value={formData.madina_hotel}
+              onChange={(e) => setFormData({ ...formData, madina_hotel: e.target.value })}
+              placeholder="Anwar Al Madinah"
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1">پیکج قیمت فی کس (PKR)</label>
+          <input
+            type="number"
+            value={formData.price_per_person}
+            onChange={(e) => setFormData({ ...formData, price_per_person: e.target.value })}
+            className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-bold focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -20,6 +20,7 @@ import {
 import { formatCurrency, formatDate } from '@/lib/utils';
 import PremiumCard from '@/components/ui/premium-card';
 import ContentCard from '@/components/ui/content-card';
+import Modal from '@/components/ui/modal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -366,118 +367,102 @@ export default function InventoryPage() {
       )}
 
       {/* CREATE ITEM MODAL */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[24px] shadow-2xl border border-gray-100 max-w-lg w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-                  🧳
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-base">نیا سامان شامل کریں</h3>
-                  <p className="text-[11px] text-gray-500">حج و عمرہ کٹ، احرام، دعائیہ کتب وغیرہ</p>
-                </div>
-              </div>
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="نیا سامان شامل کریں"
+        subtitle="حج و عمرہ کٹ، احرام، دعائیہ کتب وغیرہ"
+        onSubmit={handleCreateItem}
+        maxWidth="500px"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setModalOpen(false)}
+              className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50 transition"
+            >
+              منسوخ کریں
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-lg shadow-emerald-200 transition flex items-center gap-2"
+            >
+              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              <span>سٹاک میں محفوظ کریں</span>
+            </button>
+          </>
+        }
+      >
+        {errorMsg && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        <div>
+          <label className="block text-xs font-bold text-gray-700 mb-1">
+            سامان کا نام *
+          </label>
+          <input
+            type="text"
+            required
+            placeholder="e.g. احرام مردانہ یا عمرہ بیگ"
+            value={form.itemName}
+            onChange={(e) => setForm({ ...form, itemName: e.target.value })}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        {/* QUICK PRESETS */}
+        <div>
+          <span className="text-[11px] text-gray-400 block mb-1.5 font-bold">
+            تجویز کردہ آئٹمز پر کلک کریں:
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            {ITEM_PRESETS.map((preset) => (
               <button
-                onClick={() => setModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"
+                key={preset}
+                type="button"
+                onClick={() => setForm({ ...form, itemName: preset })}
+                className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-emerald-50 hover:text-emerald-700 text-gray-600 text-[11px] font-semibold transition"
               >
-                <X className="w-4 h-4" />
+                {preset}
               </button>
-            </div>
-
-            {errorMsg && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleCreateItem} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  سامان کا نام *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. احرام مردانہ یا عمرہ بیگ"
-                  value={form.itemName}
-                  onChange={(e) => setForm({ ...form, itemName: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              {/* QUICK PRESETS */}
-              <div>
-                <span className="text-[11px] text-gray-400 block mb-1.5 font-bold">
-                  تجویز کردہ آئٹمز پر کلک کریں:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {ITEM_PRESETS.map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      onClick={() => setForm({ ...form, itemName: preset })}
-                      className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-emerald-50 hover:text-emerald-700 text-gray-600 text-[11px] font-semibold transition"
-                    >
-                      {preset}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    خرید قیمت فی پیس (اختیاری)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="e.g. 1200"
-                    value={form.purchasePrice}
-                    onChange={(e) => setForm({ ...form, purchasePrice: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    ابتدائی سٹاک کی تعداد *
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    required
-                    value={form.stockQty}
-                    onChange={(e) => setForm({ ...form, stockQty: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-bold"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50 transition"
-                >
-                  منسوخ کریں
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-lg shadow-emerald-200 transition flex items-center gap-2"
-                >
-                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  <span>سٹاک میں محفوظ کریں</span>
-                </button>
-              </div>
-            </form>
+            ))}
           </div>
         </div>
-      )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">
+              خرید قیمت فی پیس (اختیاری)
+            </label>
+            <input
+              type="number"
+              min="0"
+              placeholder="e.g. 1200"
+              value={form.purchasePrice}
+              onChange={(e) => setForm({ ...form, purchasePrice: e.target.value })}
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-mono"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">
+              ابتدائی سٹاک کی تعداد *
+            </label>
+            <input
+              type="number"
+              min="0"
+              required
+              value={form.stockQty}
+              onChange={(e) => setForm({ ...form, stockQty: e.target.value })}
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-emerald-500 font-bold"
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
