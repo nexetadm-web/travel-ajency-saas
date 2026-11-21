@@ -22,6 +22,7 @@ import { formatDate } from '@/lib/utils';
 import PremiumCard from '@/components/ui/premium-card';
 import ContentCard from '@/components/ui/content-card';
 import Modal from '@/components/ui/modal';
+import PassportScannerModal, { PassportScanButton, PassportScanData } from '@/components/passport/passport-scanner-modal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -138,6 +139,8 @@ export default function VisasPage() {
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showPassportScan, setShowPassportScan] = useState(false);
+  const [passportScanInfo, setPassportScanInfo] = useState<PassportScanData | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -416,8 +419,11 @@ export default function VisasPage() {
           </div>
         )}
 
-        <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1 text-right">پاسپورٹ نمبر *</label>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-bold text-gray-700 text-right">پاسپورٹ نمبر *</label>
+            <PassportScanButton onClick={() => setShowPassportScan(true)} />
+          </div>
           <input
             type="text"
             required
@@ -427,6 +433,15 @@ export default function VisasPage() {
             className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase font-black focus:outline-none focus:border-purple-500 text-left"
             dir="ltr"
           />
+          {passportScanInfo && (
+            <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="font-bold">اسکین شدہ نام: {passportScanInfo.full_name}</span>
+              <span>• تاریخ پیدائش: {passportScanInfo.dob}</span>
+              <span>• میعاد: {passportScanInfo.expiry}</span>
+              <span>• جنس: {passportScanInfo.gender}</span>
+              <span>• قومیت: {passportScanInfo.nationality}</span>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -478,6 +493,19 @@ export default function VisasPage() {
           </div>
         </div>
       </Modal>
+
+      <PassportScannerModal
+        isOpen={showPassportScan}
+        onClose={() => setShowPassportScan(false)}
+        onScanComplete={(data) => {
+          setFormData((prev) => ({
+            ...prev,
+            passport_no: data.passport_no || prev.passport_no,
+            expiry_date: data.expiry_iso || prev.expiry_date,
+          }));
+          setPassportScanInfo(data);
+        }}
+      />
     </div>
   );
 }

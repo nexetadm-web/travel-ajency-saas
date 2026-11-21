@@ -27,6 +27,7 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAgency } from '@/hooks/useAgency';
 import PremiumCard from '@/components/ui/premium-card';
 import Modal from '@/components/ui/modal';
+import PassportScannerModal, { PassportScanButton, PassportScanData } from '@/components/passport/passport-scanner-modal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -45,6 +46,8 @@ export default function VisaConsultancyPage() {
   const [selectedType, setSelectedType] = useState('all');
   const [search, setSearch] = useState('');
   const [showNewModal, setShowNewModal] = useState(false);
+  const [showPassportScan, setShowPassportScan] = useState(false);
+  const [passportScanInfo, setPassportScanInfo] = useState<PassportScanData | null>(null);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
 
   // New Case Form
@@ -433,7 +436,10 @@ export default function VisaConsultancyPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1 text-right">پاسپورٹ نمبر</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-bold text-gray-700 text-right">پاسپورٹ نمبر</label>
+              <PassportScanButton onClick={() => setShowPassportScan(true)} />
+            </div>
             <input
               type="text"
               placeholder="AK1234567"
@@ -442,6 +448,14 @@ export default function VisaConsultancyPage() {
               className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-xs font-mono uppercase focus:outline-none focus:border-indigo-500 text-left"
               dir="ltr"
             />
+            {passportScanInfo && (
+              <div className="mt-1.5 p-2 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] text-emerald-900 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <span className="font-bold">{passportScanInfo.full_name}</span>
+                <span>• DOB: {passportScanInfo.dob}</span>
+                <span>• Exp: {passportScanInfo.expiry}</span>
+                <span>• {passportScanInfo.nationality}</span>
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1 text-right">فون نمبر (WhatsApp)</label>
@@ -503,6 +517,19 @@ export default function VisaConsultancyPage() {
           </div>
         </div>
       </Modal>
+
+      <PassportScannerModal
+        isOpen={showPassportScan}
+        onClose={() => setShowPassportScan(false)}
+        onScanComplete={(data) => {
+          setNewCase((prev) => ({
+            ...prev,
+            passport_no: data.passport_no || prev.passport_no,
+            client_name: data.full_name || prev.client_name,
+          }));
+          setPassportScanInfo(data);
+        }}
+      />
 
       {/* MODAL 2: CASE DETAILS & DOCUMENT CHECKLIST & TIMELINE */}
       <Modal
